@@ -1,0 +1,14 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Godot
+app/.godot/
+app/export/
+
+# Raw downloads (pipeline input, not shipped)
+pipeline/raw/
