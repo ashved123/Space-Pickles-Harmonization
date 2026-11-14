@@ -11,11 +11,11 @@ yet been tested in other regions. See "Known limitations".
 
 ```bash
 pip install pandas numpy matplotlib
-python harmonize.py <input_dir> <output_dir>
-python plots.py <output_dir>          # optional diagnostics figure
+python pipeline/harmonize.py pipeline/raw/firms data/calendar
+python pipeline/plots.py data/calendar     # optional diagnostics figure
 ```
 
-`<input_dir>` must contain these six FIRMS files (default FIRMS names, any request-number suffix):
+The input folder (`pipeline/raw/firms/`, git-ignored) must contain these six FIRMS files directly, not in subfolders (default FIRMS names, any request-number suffix):
 
 | File pattern | Content |
 |---|---|
@@ -39,7 +39,7 @@ Submit one request per sensor, because each satellite has its own valid date ran
 
 Settings used: region = US States -> California, buffer = 0, format = CSV.
 Each request returns an `archive` file and an `nrt` file. Keep the region and buffer identical
-across all requests.
+across all requests. Unzip all six CSVs straight into `pipeline/raw/firms/`.
 
 ## Method
 
@@ -59,6 +59,8 @@ across all requests.
 6. **Uncertainty** (`low_68`, `high_68`) comes from leave-one-year-out cross-validation.
 
 ## Outputs
+
+Written to the output folder (`data/calendar/` in this repo).
 
 | File | Use |
 |---|---|
@@ -111,4 +113,5 @@ Tested on years the model was not fitted on:
 Data: NASA FIRMS (https://earthdata.nasa.gov/firms), part of NASA LANCE. NASA asks that FIRMS
 data be acknowledged and cited, and publishes suggested acknowledgment wording and product DOIs at
 https://www.earthdata.nasa.gov/learn/find-data/near-real-time/citation. Add that wording and the
-DOIs for the MODIS and VIIRS products you use before publishing.
+DOIs for the MODIS and VIIRS products you use before publishing. The full list we use is in
+[`docs/SOURCES.md`](docs/SOURCES.md).

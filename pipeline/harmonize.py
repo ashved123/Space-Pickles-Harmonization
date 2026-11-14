@@ -3,6 +3,7 @@ MODIS / VIIRS active-fire harmonization pipeline (steps 1-6).
 
 Usage:
     python harmonize.py <input_dir> <output_dir>
+    e.g. python pipeline/harmonize.py pipeline/raw/firms data/calendar
 
 Inputs (FIRMS archive + NRT CSVs, one region):
     *fire_archive_M-C61_*.csv   MODIS Terra+Aqua, standard processing

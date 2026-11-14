@@ -23,6 +23,9 @@ app/                Godot 4.5+ project (GDScript only, exported to web)
 pipeline/           Python, runs offline, writes static files
   build_region.py          raw data -> region folder for the sim
   harmonize.py             MODIS/VIIRS -> harmonized calendar series
+  plots.py                 harmonization diagnostics figure
+  check_keys.py            checks the API keys in .env
+  raw/                     downloads, git-ignored (raw/firms/ = the 6 FIRMS CSVs)
 data/               pipeline output, shipped with the web build
   regions/<id>/            sim inputs (see Data contract)
   calendar/                harmonized daily series
@@ -33,7 +36,7 @@ docs/               specs, pitch notes, SOURCES.md
 - **Godot 4.5+, GDScript only.** C# can't export to the web in Godot 4. Don't add C#.
 - **Web export: Compatibility renderer, single-threaded (Threads off).** No compute shaders, no threads, no special server headers, so the build runs on GitHub Pages or itch.io.
 - **No backend.** Everything heavy is precomputed in `pipeline/` and shipped as static files.
-- Python pipeline: `rasterio`, `numpy`, `pyproj`, `geopandas`, `pandas`, `requests`, `pillow`.
+- Python pipeline: `rasterio`, `numpy`, `pyproj`, `geopandas`, `pandas`, `requests`, `pillow`, `matplotlib` (diagnostic plots only).
 
 ## Fire sim model (`app/sim/fire_sim.gd`)
 - A 2D grid, about 200×200 cells at 150 m. The **sim stays 2D**; only the visuals may be 3D (heightmap terrain, voxel-style columns). Don't make the sim voxel-based.

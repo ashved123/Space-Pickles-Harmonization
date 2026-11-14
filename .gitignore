@@ -1,14 +1,25 @@
 # Secrets
 .env
 
+# Raw downloads (pipeline input, not shipped; re-download per README)
+pipeline/raw/
+fire_archive_*.csv
+fire_nrt_*.csv
+DL_FIRE_*/
+*.zip
+
 # Python
 __pycache__/
 *.pyc
 .venv/
+venv/
+.ipynb_checkpoints/
 
 # Godot
 app/.godot/
 app/export/
 
-# Raw downloads (pipeline input, not shipped)
-pipeline/raw/
+# OS / editor
+.DS_Store
+.vscode/
+.idea/

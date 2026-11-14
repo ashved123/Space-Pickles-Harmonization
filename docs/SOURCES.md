@@ -13,15 +13,16 @@ All DOIs below were checked to resolve on 2026-11-14.
 
 ## Active-fire data (hotspots)
 - NASA FIRMS (Fire Information for Resource Management System), LANCE / ESDIS.
-  Area API: https://firms.modaps.eosdis.nasa.gov/api/area/ · yearly country CSVs: https://firms.modaps.eosdis.nasa.gov/country/ (**used**)
+  Archive Download tool: https://firms.modaps.eosdis.nasa.gov/download/ (**used**: California inputs for `pipeline/harmonize.py`)
+  Area API: https://firms.modaps.eosdis.nasa.gov/api/area/ · yearly country CSVs: https://firms.modaps.eosdis.nasa.gov/country/ (**planned**)
   We acknowledge the use of data and imagery from NASA's Fire Information for Resource Management System (FIRMS),
   part of NASA's Earth Science Data and Information System (ESDIS).
-- MODIS Collection 6.1 active fire, standard (MCD14ML): https://doi.org/10.5067/FIRMS/MODIS/MCD14ML (**planned**)
-- MODIS Collection 6.1 active fire, NRT (MCD14DL): https://doi.org/10.5067/FIRMS/MODIS/MCD14DL.NRT.0061 (**planned**)
-- VIIRS 375 m active fire, Suomi NPP (VNP14IMG v2): https://doi.org/10.5067/VIIRS/VNP14IMG.002 (**planned**)
-  NRT: https://doi.org/10.5067/FIRMS/VIIRS/VNP14IMGT_NRT.002
-- VIIRS 375 m active fire, NOAA-20 (VJ114IMG v2): https://doi.org/10.5067/VIIRS/VJ114IMG.002 (**planned**)
-  NRT: https://doi.org/10.5067/FIRMS/VIIRS/VJ114IMGT_NRT.002
+- MODIS Collection 6.1 active fire, standard (MCD14ML): https://doi.org/10.5067/FIRMS/MODIS/MCD14ML (**used**)
+- MODIS Collection 6.1 active fire, NRT (MCD14DL): https://doi.org/10.5067/FIRMS/MODIS/MCD14DL.NRT.0061 (**used**)
+- VIIRS 375 m active fire, Suomi NPP (VNP14IMG v2): https://doi.org/10.5067/VIIRS/VNP14IMG.002 (**used**)
+  NRT: https://doi.org/10.5067/FIRMS/VIIRS/VNP14IMGT_NRT.002 (**used**)
+- VIIRS 375 m active fire, NOAA-20 (VJ114IMG v2): https://doi.org/10.5067/VIIRS/VJ114IMG.002 (**used**)
+  NRT: https://doi.org/10.5067/FIRMS/VIIRS/VJ114IMGT_NRT.002 (**used**)
 - VIIRS 375 m active fire, NOAA-21 (VJ214IMG v2): https://doi.org/10.5067/VIIRS/VJ214IMG.002 (**planned**)
   NRT: https://doi.org/10.5067/VIIRS/VJ214IMG_NRT.002
 
@@ -55,7 +56,8 @@ All DOIs below were checked to resolve on 2026-11-14.
 
 ## Software and libraries
 - Godot Engine 4.5+, MIT License. https://godotengine.org/ (**planned**)
-- Python libraries, pipeline (**planned**):
+- Python libraries, pipeline (**used** by `pipeline/harmonize.py` / `plots.py`: NumPy, pandas, Matplotlib; the rest **planned**):
+  - Matplotlib (PSF-based Matplotlib License): https://matplotlib.org/
   - rasterio (BSD-3): https://rasterio.readthedocs.io/
   - NumPy (BSD-3): https://numpy.org/
   - pyproj (MIT): https://pyproj4.github.io/pyproj/
