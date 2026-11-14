@@ -1,13 +1,13 @@
 ## Prototype top-down view of the fire sim.
 ## Left click: ignite · Shift+left click: retardant · Right drag: firebreak
-## Space: play/pause · N: one step · Left/Right: turn wind · Up/Down: wind speed
+## Space: play/pause · N: one step · [ / ]: slower/faster · Left/Right: turn wind · Up/Down: wind speed
 ## R: reset fire · T: new test terrain
 extends Node2D
 
 const FireSim = preload("res://sim/fire_sim.gd")
 
 const SCALE := 4
-const STEPS_PER_SEC := 12.0
+const SPEEDS: Array[float] = [1.0, 2.0, 4.0, 8.0, 16.0]  # steps per second
 const RETARDANT_RADIUS := 5.0
 const FIREBREAK_WIDTH := 2
 
@@ -31,6 +31,7 @@ var shade := PackedFloat32Array()
 var sprite := Sprite2D.new()
 var hud := Label.new()
 var playing := false
+var speed_index := 3  # 8 steps per second
 var step_timer := 0.0
 var terrain_seed := 1
 var break_start := Vector2i(-1, -1)
@@ -94,8 +95,9 @@ func repaint_changed() -> void:
 func _process(delta: float) -> void:
 	if playing:
 		step_timer += delta
-		while step_timer >= 1.0 / STEPS_PER_SEC:
-			step_timer -= 1.0 / STEPS_PER_SEC
+		var interval := 1.0 / SPEEDS[speed_index]
+		while step_timer >= interval:
+			step_timer -= interval
 			sim.step()
 			repaint_changed()
 			if sim.is_done():
@@ -148,17 +150,26 @@ func _unhandled_input(event: InputEvent) -> void:
 					paint(i)
 				texture.update(image)
 				playing = false
+			KEY_BRACKETLEFT:
+				speed_index = maxi(speed_index - 1, 0)
+			KEY_BRACKETRIGHT:
+				speed_index = mini(speed_index + 1, SPEEDS.size() - 1)
 			KEY_T:
 				terrain_seed += 1
 				new_terrain()
 
 
 func update_hud() -> void:
-	var area_ha: float = sim.burnt_count * sim.cell_size_m * sim.cell_size_m / 10000.0
-	hud.text = "SIMULATED (test terrain)\n\nstep %d  %s\nburning %d\nburnt %d cells (%.0f ha)\nwind toward %.0f° @ %.0f m/s\n\n" % [
-		sim.step_count, "playing" if playing else "paused", sim.burning.size(),
-		sim.burnt_count, area_ha, sim.wind_to_deg, sim.wind_speed]
-	hud.text += "Left click   ignite\nShift+click  retardant\nRight drag   firebreak\nSpace        play/pause\nN            one step\nLeft/Right   turn wind\nUp/Down      wind speed\nR            reset fire\nT            new terrain"
+	var fire_cells: int = sim.burnt_count + sim.burning.size()
+	var area_ha: float = fire_cells * sim.cell_size_m * sim.cell_size_m / 10000.0
+	var mins := int(sim.elapsed_minutes)
+	hud.text = "SIMULATED (test terrain)\n\nsim time %dh %02dm  %s\nstep %d  (%.1f min/step, %.0f steps/s)\nfire area %.0f ha\nburning %d  burnt %d cells\nwind toward %.0f° @ %.0f m/s\nhead spread ~%.1f km/h on flat shrub\n\n" % [
+		mins / 60, mins % 60, "playing" if playing else "paused",
+		sim.step_count, sim.step_minutes, SPEEDS[speed_index],
+		area_ha, sim.burning.size(), sim.burnt_count,
+		sim.wind_to_deg, sim.wind_speed,
+		sim.ROS_FRACTION_OF_WIND * maxf(sim.wind_speed, sim.MIN_WIND_FOR_ROS) * 3.6]
+	hud.text += "Left click   ignite\nShift+click  retardant\nRight drag   firebreak\nSpace        play/pause\nN            one step\n[ / ]        slower / faster\nLeft/Right   turn wind\nUp/Down      wind speed\nR            reset fire\nT            new terrain"
 
 
 func _draw() -> void:

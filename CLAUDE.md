@@ -41,16 +41,19 @@ docs/               specs, pitch notes, SOURCES.md
 ## Fire sim model (`app/sim/fire_sim.gd`)
 - A 2D grid, about 200×200 cells at 150 m. The **sim stays 2D**; only the visuals may be 3D (heightmap terrain, voxel-style columns). Don't make the sim voxel-based.
 - Cell states: `NO_FUEL 0`, `UNBURNT 1`, `BURNING 2`, `BURNT 3`.
-- Spread rule from Alexandridis et al. (2008): `p_burn = p_h * (1 + p_veg) * (1 + p_den) * p_wind * p_slope * retardant`
-  - `p_wind = exp(c1*V) * exp(V*c2*(cos θ - 1))`, θ = angle between the wind's blow-toward direction and the direction of spread
-  - `p_slope = exp(a * slope_deg)`, positive when spreading uphill
-  - Starting constants: `p_h 0.58, c1 0.045, c2 0.131, a 0.078`. These are tuning targets.
+- Spread rule based on Alexandridis et al. (2008): `p_burn = p_h * (1 + p_veg) * (1 + p_den) * p_wind * p_slope * retardant`, applied as a **per-step** chance. Three changes from the paper, all measured in `docs/fire_sim_calibration.md`:
+  - **Multi-step burning:** a cell burns for `burn_steps` (24) steps and tries its neighbours every step; diagonals × `diag_factor` (0.707). The paper's 1-step burning pins the head at 1 cell/step and makes fires square.
+  - **Elliptical wind term** (replaces the paper's `exp(c1*V) * exp(V*c2*(cos θ - 1))`, which starved the flanks): `p_wind = (1 + wind_gain*V) * ((1 - e) / (1 - e*cos θ))^shape_k`, eccentricity e from `L/B = 1 + 0.25*U_mid` (mi/h), `U_mid = 0.4*V/1.15` (Andrews 2018, 2012). θ = angle between the wind's blow-toward direction and the direction of spread.
+  - **Wind-dependent step length:** `step_minutes` is set so the head on flat shrub spreads at 10% of the 10 m wind (Cruz & Alexander 2019; held at 2 m/s below that). Probabilities set the shape; step length sets the speed.
+  - `p_slope = exp(a * slope_deg)`, positive when spreading uphill (unchanged).
+  - Constants: `p_h 0.06, wind_gain 0.3, shape_k 1.0, diag_factor 0.707, burn_steps 24, a 0.078`. Changing any of the first five means re-running `calibrate.gd` and updating `HEAD_CPS_0` / `HEAD_CPS_PER_MS`. The final tuning should come from validation against a real fire (Camp Fire).
 - Each step processes only the burning front (`burning` array). The renderer redraws only `changed` cells.
 - **Interventions edit cell data. Don't add new physics for them:** a firebreak sets cells to `NO_FUEL`; retardant multiplies the burn probability in an area (~0.2).
 - Wind convention: `wind_to_deg` is the compass direction the wind blows **toward** (0 = N, 90 = E). Weather data reports where wind comes *from*, so convert with `(from + 180) % 360`.
 - Performance rules: use typed packed arrays (`PackedByteArray`, `PackedFloat32Array`). Draw the grid as one `Image` → `ImageTexture`. **Never one node per cell.**
-- Benchmark: `godot --headless --path app -s bench.gd`. Desktop baseline (Godot 4.5.2, 200×200 test terrain, wind 45° @ 5 m/s, 2026-11-14): ~1.1 ms worst step, ~29 ms per full fire (~147 steps, ~26.6k cells burnt). Recheck in the web build after big engine changes.
-- Tests: `godot --headless --path app -s test_fire_sim.gd` (no-fuel, firebreak, wind, slope, retardant, wind-from conversion, seeded repeatability).
+- Benchmark: `godot --headless --path app -s bench.gd`. Desktop baseline (Godot 4.5.2, 200×200 test terrain, wind 45° @ 5 m/s, 2026-11-14, calibrated model): ~1.9 ms worst step, ~675 ms per full fire (~1550 steps, ~26.8k cells burnt). Recheck in the web build after big engine changes.
+- Calibration: `godot --headless --path app -s calibrate.gd` measures head speed, length/breadth and no-wind roundness against the targets.
+- Tests: `godot --headless --path app -s test_fire_sim.gd` (no-fuel, firebreak, wind, slope, retardant, wind-from conversion, seeded repeatability, no-wind roundness, wind length/breadth, step time vs 10% rule).
 
 ## Data contract (pipeline → sim)
 Full spec: the "Data → Sim Space Pipeline Spec" doc. Summary:

@@ -14,6 +14,9 @@ func _init() -> void:
 	test_retardant_slows_fire()
 	test_wind_from_conversion()
 	test_same_seed_same_fire()
+	test_no_wind_fire_is_round()
+	test_wind_stretches_fire()
+	test_step_time_follows_wind()
 	print("FAILED: %d" % failures if failures > 0 else "all tests passed")
 	quit(1 if failures > 0 else 0)
 
@@ -38,6 +41,25 @@ func flat_sim(n: int = 60):
 func run(sim) -> void:
 	while not sim.is_done():
 		sim.step()
+
+
+func touched(sim) -> int:
+	var n := 0
+	for s in sim.state:
+		if s == FireSim.BURNING or s == FireSim.BURNT:
+			n += 1
+	return n
+
+
+func reach(sim, r0: int, c0: int, dr: int, dc: int) -> int:
+	var far := 0
+	var k := 1
+	while sim.in_bounds(r0 + dr * k, c0 + dc * k):
+		var s: int = sim.state[sim.index(r0 + dr * k, c0 + dc * k)]
+		if s == FireSim.BURNING or s == FireSim.BURNT:
+			far = k
+		k += 1
+	return far
 
 
 func test_no_fuel_does_not_burn() -> void:
@@ -72,7 +94,7 @@ func test_wind_pushes_fire_downwind() -> void:
 		sim.set_wind(90.0, 8.0)  # blowing toward east
 		sim.rng.seed = s
 		sim.ignite(30, 30)
-		for i in 15:
+		for i in 40:
 			sim.step()
 		for r in 60:
 			for c in 60:
@@ -96,7 +118,7 @@ func test_uphill_spreads_faster() -> void:
 		sim.finish_terrain()
 		sim.rng.seed = s
 		sim.ignite(30, 30)
-		for i in 15:
+		for i in 40:
 			sim.step()
 		for r in 60:
 			for c in 60:
@@ -120,12 +142,12 @@ func test_retardant_slows_fire() -> void:
 				sim.apply_retardant(30, 30, 10.0)
 			sim.rng.seed = s
 			sim.ignite(30, 30)
-			for i in 10:
+			for i in 40:
 				sim.step()
 			if use_ret:
-				with_ret += sim.burnt_count
+				with_ret += touched(sim)
 			else:
-				without += sim.burnt_count
+				without += touched(sim)
 	check(with_ret < without / 2, "retardant slows spread (%d vs %d burnt)" % [with_ret, without])
 
 
@@ -146,3 +168,50 @@ func test_same_seed_same_fire() -> void:
 		sim.ignite(40, 40)
 		run(sim)
 	check(a.state == b.state, "same seed gives the same fire")
+
+
+func test_no_wind_fire_is_round() -> void:
+	var ratio := 0.0
+	for s in 6:
+		var sim = FireSim.new()
+		sim.setup(161, 161, 150.0)
+		sim.fuel.fill(3)
+		sim.finish_terrain()
+		sim.rng.seed = s
+		sim.ignite(80, 80)
+		while reach(sim, 80, 80, 0, 1) < 50 and not sim.is_done():
+			sim.step()
+		var axial := (reach(sim, 80, 80, 0, 1) + reach(sim, 80, 80, 0, -1) + reach(sim, 80, 80, 1, 0) + reach(sim, 80, 80, -1, 0)) / 4.0
+		var diag := (reach(sim, 80, 80, 1, 1) + reach(sim, 80, 80, 1, -1) + reach(sim, 80, 80, -1, 1) + reach(sim, 80, 80, -1, -1)) * 1.41421 / 4.0
+		ratio += diag / axial / 6.0
+	check(absf(ratio - 1.0) < 0.08, "no-wind fire is round (diagonal/axial %.2f, square would be 1.41)" % ratio)
+
+
+func test_wind_stretches_fire() -> void:
+	var lb := 0.0
+	for s in 6:
+		var sim = FireSim.new()
+		sim.setup(201, 201, 150.0)
+		sim.fuel.fill(3)
+		sim.finish_terrain()
+		sim.set_wind(90.0, 5.0)
+		sim.rng.seed = s
+		sim.ignite(100, 100)
+		while reach(sim, 100, 100, 0, 1) < 60 and not sim.is_done():
+			sim.step()
+		var length := reach(sim, 100, 100, 0, 1) + reach(sim, 100, 100, 0, -1)
+		var breadth := reach(sim, 100, 100, 1, 0) + reach(sim, 100, 100, -1, 0)
+		lb += float(length) / breadth / 6.0
+	var target: float = FireSim.length_to_breadth(5.0)
+	check(absf(lb - target) / target < 0.2, "5 m/s fire length/breadth %.2f near target %.2f" % [lb, target])
+
+
+func test_step_time_follows_wind() -> void:
+	var sim = FireSim.new()
+	sim.setup(4, 4, 150.0)
+	var slow: float = sim.minutes_per_step(3.0)
+	var fast: float = sim.minutes_per_step(10.0)
+	# Head ROS = cells/step * cell size / minutes per step, should be ~10% of wind.
+	var ros10: float = (sim.HEAD_CPS_0 + sim.HEAD_CPS_PER_MS * 10.0) * 150.0 / (fast * 60.0)
+	check(fast < slow, "stronger wind means shorter steps (%.2f vs %.2f min)" % [fast, slow])
+	check(is_equal_approx(snappedf(ros10, 0.001), 1.0), "head ROS at 10 m/s is 1.0 m/s (10%% rule): %.3f" % ros10)
