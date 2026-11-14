@@ -49,7 +49,8 @@ docs/               specs, pitch notes, SOURCES.md
 - **Interventions edit cell data. Don't add new physics for them:** a firebreak sets cells to `NO_FUEL`; retardant multiplies the burn probability in an area (~0.2).
 - Wind convention: `wind_to_deg` is the compass direction the wind blows **toward** (0 = N, 90 = E). Weather data reports where wind comes *from*, so convert with `(from + 180) % 360`.
 - Performance rules: use typed packed arrays (`PackedByteArray`, `PackedFloat32Array`). Draw the grid as one `Image` → `ImageTexture`. **Never one node per cell.**
-- Benchmark: `godot --headless -s bench.gd`. Desktop baseline is ~0.6 ms worst step, ~42 ms per full fire. Recheck in the web build after big engine changes.
+- Benchmark: `godot --headless --path app -s bench.gd`. Desktop baseline (Godot 4.5.2, 200×200 test terrain, wind 45° @ 5 m/s, 2026-11-14): ~1.1 ms worst step, ~29 ms per full fire (~147 steps, ~26.6k cells burnt). Recheck in the web build after big engine changes.
+- Tests: `godot --headless --path app -s test_fire_sim.gd` (no-fuel, firebreak, wind, slope, retardant, wind-from conversion, seeded repeatability).
 
 ## Data contract (pipeline → sim)
 Full spec: the "Data → Sim Space Pipeline Spec" doc. Summary:
