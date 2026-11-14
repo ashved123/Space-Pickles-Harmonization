@@ -6,8 +6,12 @@ config_version=5
 [application]
 
 config/name="FireSim"
-run/main_scene="res://main.tscn"
+run/main_scene="res://ui/calendar_view.tscn"
 config/features=PackedStringArray("4.5", "GL Compatibility")
+
+[autoload]
+
+AppState="*res://data/app_state.gd"
 
 [display]
 

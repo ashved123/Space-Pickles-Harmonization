@@ -43,6 +43,11 @@ func _ready() -> void:
 	add_child(sprite)
 	add_child(hud)
 	new_terrain()
+	# Opened from the calendar: start a fire so there is something to look at.
+	if not AppState.sim_event.is_empty():
+		sim.changed = PackedInt32Array()
+		sim.ignite(sim.rows / 2, sim.cols / 2)
+		repaint_changed()
 
 
 func new_terrain() -> void:
@@ -161,13 +166,19 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_T:
 				terrain_seed += 1
 				new_terrain()
+			KEY_ESCAPE, KEY_B:
+				get_tree().change_scene_to_file("res://ui/calendar_view.tscn")
 
 
 func update_hud() -> void:
 	var fire_cells: int = sim.burnt_count + sim.burning.size()
 	var area_ha: float = fire_cells * sim.cell_size_m * sim.cell_size_m / 10000.0
 	var mins := int(sim.elapsed_minutes)
-	hud.text = "SIMULATED (test terrain)\n\nsim time %dh %02dm  %s\nstep %d  (%.1f min/step, %.0f steps/s)\nfire area %.0f ha\nburning %d  burnt %d cells\nwind toward %.0f° @ %.0f m/s\nhumidity %.0f%%  temp %.0f °C\nfuel moisture %.1f%%%s\nhead spread ~%.1f km/h on flat shrub\n\n" % [
+	var header := "SIMULATED (test terrain)"
+	var ev: Dictionary = AppState.sim_event
+	if not ev.is_empty():
+		header = "SIMULATED: %s\nfire dates %s → %s\nTest terrain for now: real fuel,\nterrain and weather not loaded yet.\nEsc / B: back to calendar" % [ev.id, ev.start, ev.end]
+	hud.text = header + "\n\nsim time %dh %02dm  %s\nstep %d  (%.1f min/step, %.0f steps/s)\nfire area %.0f ha\nburning %d  burnt %d cells\nwind toward %.0f° @ %.0f m/s\nhumidity %.0f%%  temp %.0f °C\nfuel moisture %.1f%%%s\nhead spread ~%.1f km/h on flat shrub\n\n" % [
 		mins / 60, mins % 60, "playing" if playing else "paused",
 		sim.step_count, sim.step_minutes, SPEEDS[speed_index],
 		area_ha, sim.burning.size(), sim.burnt_count,
@@ -175,7 +186,7 @@ func update_hud() -> void:
 		sim.humidity_pct, sim.temperature_c, sim.fuel_moisture_pct,
 		"  (too damp to spread)" if sim.moisture_speed <= 0.0 else "",
 		sim.ROS_FRACTION_OF_WIND * maxf(sim.wind_speed, sim.MIN_WIND_FOR_ROS) * 3.6 * sim.moisture_factor(sim.fuel_moisture_pct, sim.MX_BY_CLASS[3])]
-	hud.text += "Left click   ignite\nShift+click  retardant\nRight drag   firebreak\nSpace        play/pause\nN            one step\n[ / ]        slower / faster\nLeft/Right   turn wind\nUp/Down      wind speed\nH / J        humidity - / +\nR            reset fire\nT            new terrain"
+	hud.text += "Left click   ignite\nShift+click  retardant\nRight drag   firebreak\nSpace        play/pause\nN            one step\n[ / ]        slower / faster\nLeft/Right   turn wind\nUp/Down      wind speed\nH / J        humidity - / +\nR            reset fire\nT            new terrain\nEsc / B      back to calendar"
 
 
 func _draw() -> void:
