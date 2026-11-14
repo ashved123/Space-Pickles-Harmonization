@@ -24,12 +24,13 @@ pipeline/           Python, runs offline, writes static files
   build_region.py          raw data -> region folder for the sim
   harmonize.py             MODIS/VIIRS -> harmonized calendar series
   find_fires.py            FIRMS hotspots -> fire events (space-time grouping) for picking sim regions
+  risk_model.py            harmonized grid -> next-year risk outlook per 25 km cell/month (random forest)
   plots.py                 harmonization diagnostics figure
   check_keys.py            checks the API keys in .env
   raw/                     downloads, git-ignored (raw/firms/ = the 6 FIRMS CSVs)
 data/               pipeline output, shipped with the web build
   regions/<id>/            sim inputs (see Data contract)
-  calendar/                harmonized daily series
+  calendar/                harmonized series + risk_outlook_<year>.json, risk_validation.json
   fires/                   fire_events.csv + fire_event_days.csv (observed detections grouped into events)
 docs/               specs, pitch notes, SOURCES.md
 ```
@@ -38,7 +39,7 @@ docs/               specs, pitch notes, SOURCES.md
 - **Godot 4.5+, GDScript only.** C# can't export to the web in Godot 4. Don't add C#.
 - **Web export: Compatibility renderer, single-threaded (Threads off).** No compute shaders, no threads, no special server headers, so the build runs on GitHub Pages or itch.io.
 - **No backend.** Everything heavy is precomputed in `pipeline/` and shipped as static files.
-- Python pipeline: `rasterio`, `numpy`, `pyproj`, `geopandas`, `pandas`, `requests`, `pillow`, `matplotlib` (diagnostic plots only).
+- Python pipeline: `rasterio`, `numpy`, `pyproj`, `geopandas`, `pandas`, `requests`, `pillow`, `matplotlib` (diagnostic plots only), `scikit-learn` (risk outlook only). Setup: `python3 -m venv --system-site-packages .venv && .venv/bin/pip install -r pipeline/requirements.txt`.
 
 ## Fire sim model (`app/sim/fire_sim.gd`)
 - A 2D grid, about 200×200 cells at 150 m. The **sim stays 2D**; only the visuals may be 3D (heightmap terrain, voxel-style columns). Don't make the sim voxel-based.
@@ -100,7 +101,8 @@ data/regions/<id>/
 ## Harmonization (calendar)
 - Calibrate on the 2012–present overlap: bin both sensors to the same cells/days and compute a MODIS↔VIIRS conversion factor per area/month. Start simple (a ratio), get fancier only if time allows.
 - Validate on held-out years. The key chart: raw counts (with the jump at 2012) vs harmonized (smooth).
-- Always label data as **observed**, **harmonized** or **simulated**. Missing data is not zero fire.
+- Always label data as **observed**, **harmonized**, **simulated** or **outlook** (the risk model). Missing data is not zero fire.
+- Risk outlook (`pipeline/risk_model.py`): probability of notable burning (≥10 harmonized fire cell-days) per 25 km cell and month, from the 10 years before. Features use past years only (no `year` feature). Held-out 2019–2025: AUC 0.84 vs 0.73 for past-frequency climatology, Brier skill +0.06. It can't foresee extreme years (2020: 395 notable cell-months vs ~212 expected). Present it as "outlook from historical patterns, not a forecast of actual fires". Notable burning includes agricultural and prescribed burns, not only wildfires.
 
 ## Rules (Space Apps + honesty)
 - **Cite every external resource** (data, libraries, assets, papers) in `docs/SOURCES.md`, even free or open-source ones. Teams that don't cite can lose awards.

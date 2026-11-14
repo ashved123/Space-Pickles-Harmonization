@@ -1,0 +1,8 @@
+# Pipeline dependencies. Setup:
+#   python3 -m venv --system-site-packages .venv
+#   .venv/bin/pip install -r pipeline/requirements.txt
+numpy==1.26.4
+pandas==2.1.4
+scikit-learn==1.9.1
+matplotlib
+requests

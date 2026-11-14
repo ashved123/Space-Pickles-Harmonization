@@ -51,6 +51,7 @@ All DOIs below were checked to resolve on 2026-11-14.
 - Simard, A. J. (1968). *The moisture content of forest fuels – I: A review of the basic concepts*. Inf. Rep. FF-X-14. Forest Fire Research Institute, Ottawa. (**used** via Ottmar & Sandberg 1985; original not consulted)
 - Bradshaw, L. S., Deeming, J. E., Burgan, R. E., & Cohen, J. D. (1984). *The 1978 National Fire-Danger Rating System: technical documentation*. Gen. Tech. Rep. INT-169. USDA Forest Service, Intermountain Forest and Range Experiment Station. https://doi.org/10.2737/INT-GTR-169 (**used**: 1-hour fuel moisture ≈ 1.03 × EMC, eq. 26)
 - Balch, J. K., St. Denis, L. A., Mahood, A. L., et al. (2020). FIRED (Fire Events Delineation): An open, flexible algorithm and database of US fire events derived from the MODIS burned area product (2001–2019). *Remote Sensing*, 12(21), 3498. https://doi.org/10.3390/rs12213498 (**used**: idea of linking detections in space and time into fire events, `pipeline/find_fires.py`; our thresholds differ)
+- Breiman, L. (2001). Random Forests. *Machine Learning*, 45, 5–32. https://doi.org/10.1023/A:1010933404324 (**used**: risk outlook model)
 - Giglio, L., Schroeder, W., & Justice, C. O. (2016). The collection 6 MODIS active fire detection algorithm and fire products. *Remote Sensing of Environment*, 178, 31–41. https://doi.org/10.1016/j.rse.2016.02.054 (**planned**: MODIS product background)
 - Schroeder, W., Oliva, P., Giglio, L., & Csiszar, I. A. (2014). The New VIIRS 375 m active fire detection data product: Algorithm description and initial assessment. *Remote Sensing of Environment*, 143, 85–96. https://doi.org/10.1016/j.rse.2013.12.008 (**planned**: VIIRS product background)
 - Vadrevu, K., & Lasko, K. (2018). Intercomparison of MODIS AQUA and VIIRS I-Band Fires and Emissions in an Agricultural Landscape—Implications for Air Pollution Research. *Remote Sensing*, 10(7), 978. https://doi.org/10.3390/rs10070978 (**used**: MODIS/VIIRS count ratio, harmonization background)
@@ -73,6 +74,7 @@ All DOIs below were checked to resolve on 2026-11-14.
   - pandas (BSD-3): https://pandas.pydata.org/
   - Requests (Apache-2.0): https://requests.readthedocs.io/
   - Pillow (MIT-CMU / HPND): https://python-pillow.org/
+  - scikit-learn (BSD-3), **used** by `pipeline/risk_model.py`: https://scikit-learn.org/ · Pedregosa, F., et al. (2011). Scikit-learn: Machine Learning in Python. *Journal of Machine Learning Research*, 12, 2825–2830.
 
 ## Assets
 - None yet. Only free/CC0 packs (e.g. Kenney, Quaternius), listed here with pack name, URL and license.
