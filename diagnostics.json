@@ -1,0 +1,877 @@
+{
+  "cleaning": {
+    "MODIS_archive": {
+      "rows_in": 322882,
+      "rows_kept": 295966,
+      "first": "2000-11-01",
+      "last": "2026-08-31"
+    },
+    "MODIS_nrt": {
+      "rows_in": 1189,
+      "rows_kept": 1105,
+      "first": "2026-09-01",
+      "last": "2026-11-13"
+    },
+    "SNPP_archive": {
+      "rows_in": 1005803,
+      "rows_kept": 877748,
+      "first": "2012-01-20",
+      "last": "2026-07-31"
+    },
+    "SNPP_nrt": {
+      "rows_in": 9078,
+      "rows_kept": 6879,
+      "first": "2026-08-01",
+      "last": "2026-11-02"
+    },
+    "N20_archive": {
+      "rows_in": 715433,
+      "rows_kept": 629458,
+      "first": "2018-04-01",
+      "last": "2026-07-31"
+    },
+    "N20_nrt": {
+      "rows_in": 10833,
+      "rows_kept": 8122,
+      "first": "2026-08-01",
+      "last": "2026-11-14"
+    }
+  },
+  "static_cells_masked": 4785,
+  "fire_season_months": [
+    6,
+    7,
+    8,
+    9,
+    10,
+    11
+  ],
+  "latitude_bands": {
+    "32-34N": [
+      32.0,
+      34.0
+    ],
+    "34-36N": [
+      34.0,
+      36.0
+    ],
+    "36-38N": [
+      36.0,
+      38.0
+    ],
+    "38-40N": [
+      38.0,
+      40.0
+    ],
+    "40-44N": [
+      40.0,
+      44.0
+    ]
+  },
+  "models": {
+    "modis_celldays": {
+      "bands": {
+        "32-34N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 2.722105870952588,
+          "b1": 0.4393079078172299,
+          "b2": -0.4595899339195244,
+          "b3": 0.15890553852597522,
+          "r2_log_scale": 0.538,
+          "n_months": 173
+        },
+        "34-36N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 1.3914833684085386,
+          "b1": 0.864124741387733,
+          "b2": 0.34531511144965643,
+          "b3": -0.07736811696741676,
+          "r2_log_scale": 0.848,
+          "n_months": 174
+        },
+        "36-38N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 2.431836296348403,
+          "b1": 0.6356151948170529,
+          "b2": -1.4972262616245096,
+          "b3": 0.32447544041086246,
+          "r2_log_scale": 0.919,
+          "n_months": 174
+        },
+        "38-40N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 2.1253546318303425,
+          "b1": 0.740750427526616,
+          "b2": -1.1636104384195272,
+          "b3": 0.20385375309882717,
+          "r2_log_scale": 0.93,
+          "n_months": 174
+        },
+        "40-44N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 2.0592182424947776,
+          "b1": 0.6777065366709517,
+          "b2": -1.3433423316389905,
+          "b3": 0.3089568153082328,
+          "r2_log_scale": 0.903,
+          "n_months": 172
+        }
+      },
+      "band_68_log_ratio_regional_total": {
+        "season": [
+          -0.159,
+          0.165
+        ],
+        "off_season": [
+          -0.223,
+          0.153
+        ]
+      }
+    },
+    "modis_frp": {
+      "bands": {
+        "32-34N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 1.7985174504637844,
+          "b1": 0.7595492864609882,
+          "b2": 0.15448267032564164,
+          "b3": -0.04256474544112521,
+          "r2_log_scale": 0.669,
+          "n_months": 173
+        },
+        "34-36N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 0.45964071874241674,
+          "b1": 0.8999704263808014,
+          "b2": -0.03580119665547944,
+          "b3": -0.006251623008727769,
+          "r2_log_scale": 0.86,
+          "n_months": 174
+        },
+        "36-38N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 2.260037785764261,
+          "b1": 0.6889912313782401,
+          "b2": -2.1965424554934665,
+          "b3": 0.2592135297997351,
+          "r2_log_scale": 0.95,
+          "n_months": 174
+        },
+        "38-40N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 1.8374367934417077,
+          "b1": 0.7678747416718762,
+          "b2": -1.267302944278825,
+          "b3": 0.12687677857538168,
+          "r2_log_scale": 0.934,
+          "n_months": 174
+        },
+        "40-44N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 2.257636679145358,
+          "b1": 0.6825707035637022,
+          "b2": -2.280484757378811,
+          "b3": 0.25839420177976774,
+          "r2_log_scale": 0.908,
+          "n_months": 172
+        }
+      },
+      "band_68_log_ratio_regional_total": {
+        "season": [
+          -0.193,
+          0.253
+        ],
+        "off_season": [
+          -0.256,
+          0.203
+        ]
+      }
+    },
+    "terra_celldays": {
+      "bands": {
+        "32-34N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 3.274585320016873,
+          "b1": 0.33829423927817803,
+          "b2": -0.35017137866380543,
+          "b3": 0.1709847465367905,
+          "r2_log_scale": 0.477,
+          "n_months": 169
+        },
+        "34-36N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 2.0014584681699845,
+          "b1": 0.836992289774003,
+          "b2": 0.34402431243434145,
+          "b3": -0.08962326874849645,
+          "r2_log_scale": 0.752,
+          "n_months": 174
+        },
+        "36-38N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 3.3782858351912184,
+          "b1": 0.48871489011173747,
+          "b2": -1.795250019472881,
+          "b3": 0.43821605456141827,
+          "r2_log_scale": 0.857,
+          "n_months": 174
+        },
+        "38-40N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 3.2198810818958,
+          "b1": 0.6104075929555545,
+          "b2": -1.269932500562142,
+          "b3": 0.2562227119649158,
+          "r2_log_scale": 0.846,
+          "n_months": 173
+        },
+        "40-44N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 3.1791382198293348,
+          "b1": 0.46398878013948996,
+          "b2": -1.7006141903913004,
+          "b3": 0.48037772233168463,
+          "r2_log_scale": 0.862,
+          "n_months": 165
+        }
+      },
+      "band_68_log_ratio_regional_total": {
+        "season": [
+          -0.188,
+          0.238
+        ],
+        "off_season": [
+          -0.276,
+          0.267
+        ]
+      }
+    },
+    "terra_frp": {
+      "bands": {
+        "32-34N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 3.8774041586676433,
+          "b1": 0.5651674889486286,
+          "b2": -0.038640477035700574,
+          "b3": 0.011510462860220264,
+          "r2_log_scale": 0.49,
+          "n_months": 169
+        },
+        "34-36N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 1.253799773664693,
+          "b1": 0.8939930717128789,
+          "b2": 0.4079623946322275,
+          "b3": -0.04727760909847455,
+          "r2_log_scale": 0.751,
+          "n_months": 174
+        },
+        "36-38N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 3.2266420737654564,
+          "b1": 0.6301881273531249,
+          "b2": -1.8063506224503207,
+          "b3": 0.26736464758556805,
+          "r2_log_scale": 0.88,
+          "n_months": 174
+        },
+        "38-40N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 3.4072599009346387,
+          "b1": 0.6472915263350864,
+          "b2": -1.6160268989832232,
+          "b3": 0.20437946904415932,
+          "r2_log_scale": 0.87,
+          "n_months": 173
+        },
+        "40-44N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 4.138235502890921,
+          "b1": 0.48825034136878,
+          "b2": -2.6995921350410588,
+          "b3": 0.3934288269899607,
+          "r2_log_scale": 0.876,
+          "n_months": 165
+        }
+      },
+      "band_68_log_ratio_regional_total": {
+        "season": [
+          -0.328,
+          0.362
+        ],
+        "off_season": [
+          -0.43,
+          0.422
+        ]
+      }
+    },
+    "aqua_celldays": {
+      "bands": {
+        "32-34N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 3.2436698809016007,
+          "b1": 0.32454133824259707,
+          "b2": -0.6319940597195522,
+          "b3": 0.2676202576418278,
+          "r2_log_scale": 0.533,
+          "n_months": 169
+        },
+        "34-36N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 2.307501023799557,
+          "b1": 0.7799870764927914,
+          "b2": 0.1274447050729029,
+          "b3": -0.04801949922165802,
+          "r2_log_scale": 0.751,
+          "n_months": 174
+        },
+        "36-38N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 3.213102207103681,
+          "b1": 0.5482283509959964,
+          "b2": -1.528830946375764,
+          "b3": 0.37921259913474,
+          "r2_log_scale": 0.879,
+          "n_months": 174
+        },
+        "38-40N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 2.9032353218673195,
+          "b1": 0.6507619757846101,
+          "b2": -1.285958521597186,
+          "b3": 0.26956628510318903,
+          "r2_log_scale": 0.872,
+          "n_months": 173
+        },
+        "40-44N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 2.3381679991240136,
+          "b1": 0.7068294813260376,
+          "b2": -1.0297908826558697,
+          "b3": 0.2685166019402609,
+          "r2_log_scale": 0.905,
+          "n_months": 171
+        }
+      },
+      "band_68_log_ratio_regional_total": {
+        "season": [
+          -0.2,
+          0.176
+        ],
+        "off_season": [
+          -0.248,
+          0.177
+        ]
+      }
+    },
+    "aqua_frp": {
+      "bands": {
+        "32-34N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 2.1561052107054763,
+          "b1": 0.7600187739675723,
+          "b2": -0.3177646348667118,
+          "b3": 0.014461148304847833,
+          "r2_log_scale": 0.588,
+          "n_months": 169
+        },
+        "34-36N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 1.156555754556037,
+          "b1": 0.8854159713053805,
+          "b2": 0.05071727736905324,
+          "b3": -0.014926701814982716,
+          "r2_log_scale": 0.809,
+          "n_months": 174
+        },
+        "36-38N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 3.292945143428557,
+          "b1": 0.606637845196288,
+          "b2": -2.8008680343311925,
+          "b3": 0.35260870604289235,
+          "r2_log_scale": 0.931,
+          "n_months": 174
+        },
+        "38-40N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 3.0459397935659536,
+          "b1": 0.6583758972218947,
+          "b2": -1.9546728408838943,
+          "b3": 0.23836863615668208,
+          "r2_log_scale": 0.918,
+          "n_months": 173
+        },
+        "40-44N": {
+          "formula": "VIIRS = exp(b0 + b1*ln(MODIS) + b2*S + b3*S*ln(MODIS)), S=1 in fire season",
+          "b0": 2.9585471332840507,
+          "b1": 0.6341260782243002,
+          "b2": -2.801665872612816,
+          "b3": 0.3395116809643724,
+          "r2_log_scale": 0.9,
+          "n_months": 171
+        }
+      },
+      "band_68_log_ratio_regional_total": {
+        "season": [
+          -0.237,
+          0.256
+        ],
+        "off_season": [
+          -0.299,
+          0.171
+        ]
+      }
+    }
+  },
+  "validation": {
+    "modis_celldays": {
+      "forward_train2012_2019_test2020_2026": {
+        "median_abs_pct_error": 14.5,
+        "log_rmse": 0.227,
+        "corr_log": 0.975,
+        "total_bias_pct": -4.0,
+        "largest_10pct_months_bias_pct": -2.3
+      },
+      "forward_train2012_2019_test2020_2026_statewide_single_model": {
+        "median_abs_pct_error": 12.8,
+        "log_rmse": 0.239,
+        "corr_log": 0.973,
+        "total_bias_pct": -2.9,
+        "largest_10pct_months_bias_pct": -1.8
+      },
+      "forward_train2012_2019_test2020_2026_OLD_loglog": {
+        "median_abs_pct_error": 13.0,
+        "log_rmse": 0.245,
+        "corr_log": 0.968,
+        "total_bias_pct": -12.7,
+        "largest_10pct_months_bias_pct": -19.8
+      },
+      "backcast_train2019_2026_test2012_2018": {
+        "median_abs_pct_error": 13.4,
+        "log_rmse": 0.185,
+        "corr_log": 0.985,
+        "total_bias_pct": 1.6,
+        "largest_10pct_months_bias_pct": -1.9
+      },
+      "backcast_train2019_2026_test2012_2018_statewide_single_model": {
+        "median_abs_pct_error": 14.7,
+        "log_rmse": 0.202,
+        "corr_log": 0.983,
+        "total_bias_pct": 2.3,
+        "largest_10pct_months_bias_pct": -0.5
+      },
+      "backcast_train2019_2026_test2012_2018_OLD_loglog": {
+        "median_abs_pct_error": 16.0,
+        "log_rmse": 0.201,
+        "corr_log": 0.984,
+        "total_bias_pct": -0.6,
+        "largest_10pct_months_bias_pct": -10.9
+      },
+      "leave_one_year_out": {
+        "median_abs_pct_error": 12.2,
+        "log_rmse": 0.19,
+        "corr_log": 0.979,
+        "total_bias_pct": -2.0
+      }
+    },
+    "modis_frp": {
+      "forward_train2012_2019_test2020_2026": {
+        "median_abs_pct_error": 21.6,
+        "log_rmse": 0.342,
+        "corr_log": 0.98,
+        "total_bias_pct": -0.5,
+        "largest_10pct_months_bias_pct": -1.1
+      },
+      "forward_train2012_2019_test2020_2026_statewide_single_model": {
+        "median_abs_pct_error": 26.1,
+        "log_rmse": 0.383,
+        "corr_log": 0.978,
+        "total_bias_pct": -2.8,
+        "largest_10pct_months_bias_pct": -4.1
+      },
+      "forward_train2012_2019_test2020_2026_OLD_loglog": {
+        "median_abs_pct_error": 24.1,
+        "log_rmse": 0.348,
+        "corr_log": 0.978,
+        "total_bias_pct": -18.1,
+        "largest_10pct_months_bias_pct": -23.7
+      },
+      "backcast_train2019_2026_test2012_2018": {
+        "median_abs_pct_error": 17.1,
+        "log_rmse": 0.239,
+        "corr_log": 0.992,
+        "total_bias_pct": 1.0,
+        "largest_10pct_months_bias_pct": -1.9
+      },
+      "backcast_train2019_2026_test2012_2018_statewide_single_model": {
+        "median_abs_pct_error": 17.3,
+        "log_rmse": 0.264,
+        "corr_log": 0.988,
+        "total_bias_pct": 0.9,
+        "largest_10pct_months_bias_pct": -1.7
+      },
+      "backcast_train2019_2026_test2012_2018_OLD_loglog": {
+        "median_abs_pct_error": 20.0,
+        "log_rmse": 0.263,
+        "corr_log": 0.992,
+        "total_bias_pct": -3.6,
+        "largest_10pct_months_bias_pct": -12.6
+      },
+      "leave_one_year_out": {
+        "median_abs_pct_error": 16.0,
+        "log_rmse": 0.271,
+        "corr_log": 0.984,
+        "total_bias_pct": -3.2
+      }
+    },
+    "terra_celldays": {
+      "forward_train2012_2019_test2020_2026": {
+        "median_abs_pct_error": 18.0,
+        "log_rmse": 0.31,
+        "corr_log": 0.953,
+        "total_bias_pct": -5.2,
+        "largest_10pct_months_bias_pct": -3.5
+      },
+      "forward_train2012_2019_test2020_2026_statewide_single_model": {
+        "median_abs_pct_error": 19.3,
+        "log_rmse": 0.339,
+        "corr_log": 0.948,
+        "total_bias_pct": -5.4,
+        "largest_10pct_months_bias_pct": -4.8
+      },
+      "forward_train2012_2019_test2020_2026_OLD_loglog": {
+        "median_abs_pct_error": 19.8,
+        "log_rmse": 0.338,
+        "corr_log": 0.938,
+        "total_bias_pct": -18.8,
+        "largest_10pct_months_bias_pct": -29.7
+      },
+      "backcast_train2019_2026_test2012_2018": {
+        "median_abs_pct_error": 18.6,
+        "log_rmse": 0.249,
+        "corr_log": 0.97,
+        "total_bias_pct": 1.8,
+        "largest_10pct_months_bias_pct": -2.0
+      },
+      "backcast_train2019_2026_test2012_2018_statewide_single_model": {
+        "median_abs_pct_error": 18.8,
+        "log_rmse": 0.277,
+        "corr_log": 0.964,
+        "total_bias_pct": 3.7,
+        "largest_10pct_months_bias_pct": 0.2
+      },
+      "backcast_train2019_2026_test2012_2018_OLD_loglog": {
+        "median_abs_pct_error": 22.3,
+        "log_rmse": 0.289,
+        "corr_log": 0.964,
+        "total_bias_pct": -0.8,
+        "largest_10pct_months_bias_pct": -15.8
+      },
+      "leave_one_year_out": {
+        "median_abs_pct_error": 17.2,
+        "log_rmse": 0.265,
+        "corr_log": 0.958,
+        "total_bias_pct": -2.7
+      }
+    },
+    "terra_frp": {
+      "forward_train2012_2019_test2020_2026": {
+        "median_abs_pct_error": 31.3,
+        "log_rmse": 0.434,
+        "corr_log": 0.965,
+        "total_bias_pct": -2.6,
+        "largest_10pct_months_bias_pct": -3.5
+      },
+      "forward_train2012_2019_test2020_2026_statewide_single_model": {
+        "median_abs_pct_error": 26.7,
+        "log_rmse": 0.5,
+        "corr_log": 0.961,
+        "total_bias_pct": -6.1,
+        "largest_10pct_months_bias_pct": -8.1
+      },
+      "forward_train2012_2019_test2020_2026_OLD_loglog": {
+        "median_abs_pct_error": 30.1,
+        "log_rmse": 0.433,
+        "corr_log": 0.961,
+        "total_bias_pct": -23.9,
+        "largest_10pct_months_bias_pct": -31.2
+      },
+      "backcast_train2019_2026_test2012_2018": {
+        "median_abs_pct_error": 24.6,
+        "log_rmse": 0.373,
+        "corr_log": 0.976,
+        "total_bias_pct": 3.0,
+        "largest_10pct_months_bias_pct": -1.4
+      },
+      "backcast_train2019_2026_test2012_2018_statewide_single_model": {
+        "median_abs_pct_error": 24.4,
+        "log_rmse": 0.372,
+        "corr_log": 0.974,
+        "total_bias_pct": 4.9,
+        "largest_10pct_months_bias_pct": 0.6
+      },
+      "backcast_train2019_2026_test2012_2018_OLD_loglog": {
+        "median_abs_pct_error": 30.2,
+        "log_rmse": 0.406,
+        "corr_log": 0.975,
+        "total_bias_pct": -0.7,
+        "largest_10pct_months_bias_pct": -11.4
+      },
+      "leave_one_year_out": {
+        "median_abs_pct_error": 24.9,
+        "log_rmse": 0.39,
+        "corr_log": 0.966,
+        "total_bias_pct": -3.5
+      }
+    },
+    "aqua_celldays": {
+      "forward_train2012_2019_test2020_2026": {
+        "median_abs_pct_error": 17.1,
+        "log_rmse": 0.267,
+        "corr_log": 0.966,
+        "total_bias_pct": -7.7,
+        "largest_10pct_months_bias_pct": -7.6
+      },
+      "forward_train2012_2019_test2020_2026_statewide_single_model": {
+        "median_abs_pct_error": 17.1,
+        "log_rmse": 0.286,
+        "corr_log": 0.962,
+        "total_bias_pct": -6.9,
+        "largest_10pct_months_bias_pct": -8.2
+      },
+      "forward_train2012_2019_test2020_2026_OLD_loglog": {
+        "median_abs_pct_error": 18.1,
+        "log_rmse": 0.296,
+        "corr_log": 0.954,
+        "total_bias_pct": -16.5,
+        "largest_10pct_months_bias_pct": -26.1
+      },
+      "backcast_train2019_2026_test2012_2018": {
+        "median_abs_pct_error": 12.0,
+        "log_rmse": 0.235,
+        "corr_log": 0.979,
+        "total_bias_pct": 5.5,
+        "largest_10pct_months_bias_pct": 1.1
+      },
+      "backcast_train2019_2026_test2012_2018_statewide_single_model": {
+        "median_abs_pct_error": 15.6,
+        "log_rmse": 0.258,
+        "corr_log": 0.974,
+        "total_bias_pct": 6.6,
+        "largest_10pct_months_bias_pct": 2.9
+      },
+      "backcast_train2019_2026_test2012_2018_OLD_loglog": {
+        "median_abs_pct_error": 16.7,
+        "log_rmse": 0.256,
+        "corr_log": 0.978,
+        "total_bias_pct": 1.7,
+        "largest_10pct_months_bias_pct": -11.8
+      },
+      "leave_one_year_out": {
+        "median_abs_pct_error": 12.5,
+        "log_rmse": 0.23,
+        "corr_log": 0.969,
+        "total_bias_pct": -2.6
+      }
+    },
+    "aqua_frp": {
+      "forward_train2012_2019_test2020_2026": {
+        "median_abs_pct_error": 21.4,
+        "log_rmse": 0.351,
+        "corr_log": 0.977,
+        "total_bias_pct": -3.3,
+        "largest_10pct_months_bias_pct": -5.2
+      },
+      "forward_train2012_2019_test2020_2026_statewide_single_model": {
+        "median_abs_pct_error": 25.5,
+        "log_rmse": 0.391,
+        "corr_log": 0.976,
+        "total_bias_pct": -5.6,
+        "largest_10pct_months_bias_pct": -8.2
+      },
+      "forward_train2012_2019_test2020_2026_OLD_loglog": {
+        "median_abs_pct_error": 22.9,
+        "log_rmse": 0.359,
+        "corr_log": 0.975,
+        "total_bias_pct": -20.3,
+        "largest_10pct_months_bias_pct": -27.2
+      },
+      "backcast_train2019_2026_test2012_2018": {
+        "median_abs_pct_error": 18.4,
+        "log_rmse": 0.268,
+        "corr_log": 0.99,
+        "total_bias_pct": 2.8,
+        "largest_10pct_months_bias_pct": 0.8
+      },
+      "backcast_train2019_2026_test2012_2018_statewide_single_model": {
+        "median_abs_pct_error": 18.4,
+        "log_rmse": 0.297,
+        "corr_log": 0.984,
+        "total_bias_pct": -0.8,
+        "largest_10pct_months_bias_pct": -1.7
+      },
+      "backcast_train2019_2026_test2012_2018_OLD_loglog": {
+        "median_abs_pct_error": 20.2,
+        "log_rmse": 0.294,
+        "corr_log": 0.99,
+        "total_bias_pct": -6.8,
+        "largest_10pct_months_bias_pct": -15.7
+      },
+      "leave_one_year_out": {
+        "median_abs_pct_error": 17.7,
+        "log_rmse": 0.289,
+        "corr_log": 0.982,
+        "total_bias_pct": -2.8
+      }
+    }
+  },
+  "overlap_stability": {
+    "terra": {
+      "ratio_snpp_per_modis_2012_2018": 3.303,
+      "ratio_snpp_per_modis_2019_2026": 3.133
+    },
+    "aqua": {
+      "ratio_snpp_per_modis_2012_2018": 3.299,
+      "ratio_snpp_per_modis_2019_2026": 3.324
+    },
+    "modis": {
+      "ratio_snpp_per_modis_2012_2018": 1.939,
+      "ratio_snpp_per_modis_2019_2026": 1.912
+    }
+  },
+  "noaa20_vs_snpp": {
+    "snpp_per_n20_celldays": 0.962,
+    "snpp_per_n20_frp": 0.989,
+    "median_abs_pct_error": 3.8,
+    "log_rmse": 0.122,
+    "corr_log": 0.991,
+    "total_bias_pct": 0.0
+  },
+  "spatial_checks": {
+    "band 32-34N": {
+      "band_model_LOYO": {
+        "median_abs_pct_error": 22.5,
+        "log_rmse": 0.373,
+        "corr_log": 0.734,
+        "total_bias_pct": -0.3
+      },
+      "statewide_model_applied": {
+        "median_abs_pct_error": 37.9,
+        "log_rmse": 0.626,
+        "corr_log": 0.653,
+        "total_bias_pct": 25.0
+      },
+      "months": 173
+    },
+    "band 34-36N": {
+      "band_model_LOYO": {
+        "median_abs_pct_error": 22.3,
+        "log_rmse": 0.341,
+        "corr_log": 0.922,
+        "total_bias_pct": -3.8
+      },
+      "statewide_model_applied": {
+        "median_abs_pct_error": 36.2,
+        "log_rmse": 0.53,
+        "corr_log": 0.851,
+        "total_bias_pct": 27.6
+      },
+      "months": 174
+    },
+    "band 36-38N": {
+      "band_model_LOYO": {
+        "median_abs_pct_error": 14.2,
+        "log_rmse": 0.271,
+        "corr_log": 0.958,
+        "total_bias_pct": -5.0
+      },
+      "statewide_model_applied": {
+        "median_abs_pct_error": 26.4,
+        "log_rmse": 0.359,
+        "corr_log": 0.934,
+        "total_bias_pct": 7.9
+      },
+      "months": 174
+    },
+    "band 38-40N": {
+      "band_model_LOYO": {
+        "median_abs_pct_error": 15.0,
+        "log_rmse": 0.258,
+        "corr_log": 0.964,
+        "total_bias_pct": -2.0
+      },
+      "statewide_model_applied": {
+        "median_abs_pct_error": 18.9,
+        "log_rmse": 0.297,
+        "corr_log": 0.96,
+        "total_bias_pct": 11.4
+      },
+      "months": 174
+    },
+    "band 40-44N": {
+      "band_model_LOYO": {
+        "median_abs_pct_error": 27.6,
+        "log_rmse": 0.507,
+        "corr_log": 0.949,
+        "total_bias_pct": 0.7
+      },
+      "statewide_model_applied": {
+        "median_abs_pct_error": 36.7,
+        "log_rmse": 0.628,
+        "corr_log": 0.942,
+        "total_bias_pct": 5.4
+      },
+      "months": 172
+    },
+    "one_degree_boxes": {
+      "yearly_totals": {
+        "median_abs_pct_error": 21.1,
+        "log_rmse": 0.46,
+        "corr_log": 0.943,
+        "total_bias_pct": 0.5,
+        "box_years": 604
+      },
+      "monthly": {
+        "median_abs_pct_error": 29.0,
+        "log_rmse": 0.576,
+        "corr_log": 0.89,
+        "total_bias_pct": 0.5,
+        "box_months": 1901
+      }
+    }
+  },
+  "seam_check_yearly": {
+    "2009": {
+      "raw_modis_celldays": 6066,
+      "harmonized_celldays": 11778.0,
+      "modis_converted_all_year": 11778.0
+    },
+    "2010": {
+      "raw_modis_celldays": 2340,
+      "harmonized_celldays": 5550.0,
+      "modis_converted_all_year": 5550.0
+    },
+    "2011": {
+      "raw_modis_celldays": 2966,
+      "harmonized_celldays": 6788.0,
+      "modis_converted_all_year": 6788.0
+    },
+    "2012": {
+      "raw_modis_celldays": 6498,
+      "harmonized_celldays": 12453.0,
+      "modis_converted_all_year": 13276.0
+    },
+    "2013": {
+      "raw_modis_celldays": 7178,
+      "harmonized_celldays": 13555.0,
+      "modis_converted_all_year": 14529.0
+    },
+    "2014": {
+      "raw_modis_celldays": 5887,
+      "harmonized_celldays": 12546.0,
+      "modis_converted_all_year": 12171.0
+    }
+  },
+  "grid_vs_region_max_abs_difference": 0.0166
+}
