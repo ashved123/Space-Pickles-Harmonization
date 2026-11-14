@@ -17,6 +17,9 @@ func _init() -> void:
 	test_no_wind_fire_is_round()
 	test_wind_stretches_fire()
 	test_step_time_follows_wind()
+	test_moisture_values()
+	test_damp_air_slows_fire()
+	test_too_damp_no_spread()
 	print("FAILED: %d" % failures if failures > 0 else "all tests passed")
 	quit(1 if failures > 0 else 0)
 
@@ -215,3 +218,51 @@ func test_step_time_follows_wind() -> void:
 	var ros10: float = (sim.HEAD_CPS_0 + sim.HEAD_CPS_PER_MS * 10.0) * 150.0 / (fast * 60.0)
 	check(fast < slow, "stronger wind means shorter steps (%.2f vs %.2f min)" % [fast, slow])
 	check(is_equal_approx(snappedf(ros10, 0.001), 1.0), "head ROS at 10 m/s is 1.0 m/s (10%% rule): %.3f" % ros10)
+
+
+func test_moisture_values() -> void:
+	# Simard (1968) EMC, 10-50% branch: 2.22749 + 0.160107*30 - 0.014784*77 = 5.89
+	var emc: float = FireSim.emc_pct(30.0, 25.0)
+	check(absf(emc - 5.890) < 0.01, "EMC at 30%% RH, 25 C is 5.89%% (%.3f)" % emc)
+	check(is_equal_approx(FireSim.moisture_factor(FireSim.M_REF, 15.0), 1.0), "moisture factor is 1 at the reference moisture")
+	check(FireSim.moisture_factor(15.0, 15.0) == 0.0, "moisture factor is 0 at moisture of extinction")
+	check(FireSim.moisture_factor(10.0, 15.0) < FireSim.moisture_factor(4.0, 15.0), "wetter fuel spreads slower")
+
+
+func test_damp_air_slows_fire() -> void:
+	var dry := 0
+	var damp := 0
+	var dry_minutes := 0.0
+	var damp_minutes := 0.0
+	for s in 10:
+		for wet in [false, true]:
+			var sim = FireSim.new()
+			sim.setup(60, 60, 150.0)
+			sim.fuel.fill(3)
+			sim.finish_terrain()
+			sim.set_wind(90.0, 5.0)
+			sim.set_moisture(60.0 if wet else 20.0, 25.0)
+			sim.rng.seed = s
+			sim.ignite(30, 30)
+			# Same real time for both: 3 hours.
+			while sim.elapsed_minutes < 180.0 and not sim.is_done():
+				sim.step()
+			if wet:
+				damp += touched(sim)
+				damp_minutes = sim.step_minutes
+			else:
+				dry += touched(sim)
+				dry_minutes = sim.step_minutes
+	check(damp < dry / 2, "damp air (60%% RH) burns much less than dry (20%% RH) in 3 h: %d vs %d cells" % [damp, dry])
+	check(damp_minutes > dry_minutes, "damp air stretches the step time (%.1f vs %.1f min)" % [damp_minutes, dry_minutes])
+
+
+func test_too_damp_no_spread() -> void:
+	var sim = FireSim.new()
+	sim.setup(40, 40, 150.0)
+	sim.fuel.fill(3)  # shrub, Mx 15%
+	sim.finish_terrain()
+	sim.set_moisture(95.0, 10.0)
+	sim.ignite(20, 20)
+	run(sim)
+	check(touched(sim) == 1, "shrub doesn't spread at 95%% RH (fuel moisture %.0f%%)" % sim.fuel_moisture_pct)

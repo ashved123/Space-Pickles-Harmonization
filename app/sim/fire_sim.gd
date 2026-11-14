@@ -17,6 +17,13 @@
 ##    so the head spreads at ~10% of the 10 m wind (Cruz & Alexander 2019) on the
 ##    reference fuel (shrub, flat). The probabilities set the shape; the step
 ##    length sets the speed.
+## 4. Fuel moisture from humidity and temperature (one value for the whole region):
+##    fine dead fuel moisture M = 1.03 * EMC(RH, T) (Simard 1968 via Ottmar &
+##    Sandberg 1985; Bradshaw et al. 1984). Spread scales with Rothermel's
+##    eta_M(M/Mx) / (250 + 1116*M) (Andrews 2018), relative to M_REF. Mx per fuel
+##    class from Scott & Burgan 2005 (arid-climate models). The fastest fuel's
+##    factor scales the step time; the others scale p_burn relative to it, and a
+##    fuel at or above its Mx can't carry fire.
 ## Grid: row 0 = north edge, col 0 = west edge. Index = row * cols + col.
 extends RefCounted
 
@@ -52,8 +59,19 @@ const HEAD_CPS_PER_MS := 0.01798
 const ROS_FRACTION_OF_WIND := 0.1  # 10% rule (Cruz & Alexander 2019)
 const MIN_WIND_FOR_ROS := 2.0      # m/s; below this the 10% rule is held at 2 m/s (assumption)
 
-var step_minutes := 1.0    # real time per step at the current wind
+var step_minutes := 1.0    # real time per step at the current wind and moisture
 var elapsed_minutes := 0.0
+
+# Moisture. Defaults (RH 30%, 25 °C) give M ≈ 6%, the calibration reference.
+# Dead fuel moisture of extinction (%) per fuel class, Scott & Burgan 2005
+# arid/semiarid models (California): GR/GS/SH 15, TU 20, TL/SB 25.
+const MX_BY_CLASS: Array[float] = [0.0, 15.0, 15.0, 15.0, 20.0, 25.0, 25.0]
+const M_REF := 6.0  # % fine dead fuel moisture behind the 10% rule calibration (assumption)
+var humidity_pct := 30.0
+var temperature_c := 25.0
+var fuel_moisture_pct := 6.0
+var moisture_speed := 1.0  # fastest fuel's spread factor vs M_REF; 0 = too damp to spread
+var _moist_mult := PackedFloat32Array([0, 1, 1, 1, 1, 1, 1])  # p_burn multiplier per fuel class
 
 var rows := 0
 var cols := 0
@@ -99,6 +117,7 @@ func setup(p_rows: int, p_cols: int, p_cell_size_m: float) -> void:
 	state.resize(n)
 	burn_left.resize(n)
 	set_wind(0.0, 0.0)
+	set_moisture(humidity_pct, temperature_c)
 
 
 ## Call after filling fuel/elevation/density. Precomputes slope factors and resets the fire.
@@ -124,12 +143,62 @@ func set_wind(to_deg: float, speed_ms: float) -> void:
 	wind_speed = maxf(speed_ms, 0.0)
 	_p_wind.resize(DIRS.size())
 	var e := ellipse_eccentricity(wind_speed)
-	step_minutes = minutes_per_step(wind_speed)
+	_update_step_minutes()
 	for k in DIRS.size():
 		var theta := deg_to_rad(wind_to_deg - _bearing_deg(DIRS[k]))
 		_p_wind[k] = (1.0 + wind_gain * wind_speed) * pow((1.0 - e) / (1.0 - e * cos(theta)), shape_k)
 		if DIRS[k].x != 0 and DIRS[k].y != 0:
 			_p_wind[k] *= diag_factor
+
+
+## Humidity (%) and air temperature (°C) for the whole region.
+func set_moisture(rh_pct: float, temp_c: float) -> void:
+	humidity_pct = clampf(rh_pct, 0.0, 100.0)
+	temperature_c = temp_c
+	fuel_moisture_pct = fine_fuel_moisture_pct(humidity_pct, temperature_c)
+	var factors := PackedFloat32Array()
+	moisture_speed = 0.0
+	for c in MX_BY_CLASS.size():
+		var f := 0.0 if c == 0 else moisture_factor(fuel_moisture_pct, MX_BY_CLASS[c])
+		factors.append(f)
+		moisture_speed = maxf(moisture_speed, f)
+	for c in factors.size():
+		_moist_mult[c] = factors[c] / moisture_speed if moisture_speed > 0.0 else 0.0
+	_update_step_minutes()
+
+
+## Equilibrium moisture content (%) of fine fuels, Simard (1968), T in °F.
+static func emc_pct(rh_pct: float, temp_c: float) -> float:
+	var t := temp_c * 9.0 / 5.0 + 32.0
+	var h := rh_pct
+	if h < 10.0:
+		return 0.03229 + 0.281073 * h - 0.000578 * h * t
+	if h <= 50.0:
+		return 2.22749 + 0.160107 * h - 0.014784 * t
+	return 21.0606 + 0.005565 * h * h - 0.00035 * h * t - 0.483199 * h
+
+
+## 1-hour dead fuel moisture (%) = 1.03 * EMC (Bradshaw et al. 1984, eq. 26).
+static func fine_fuel_moisture_pct(rh_pct: float, temp_c: float) -> float:
+	return maxf(1.03 * emc_pct(rh_pct, temp_c), 1.0)
+
+
+## Rothermel moisture effect on spread rate, relative to M_REF. 0 at or above Mx.
+static func moisture_factor(m_pct: float, mx_pct: float) -> float:
+	return _rothermel_moisture(m_pct, mx_pct) / _rothermel_moisture(M_REF, mx_pct)
+
+
+static func _rothermel_moisture(m_pct: float, mx_pct: float) -> float:
+	if m_pct >= mx_pct:
+		return 0.0
+	var r := m_pct / mx_pct
+	var eta := 1.0 - 2.59 * r + 5.11 * r * r - 3.52 * r * r * r
+	return maxf(eta, 0.0) / (250.0 + 1116.0 * m_pct / 100.0)
+
+
+func _update_step_minutes() -> void:
+	# Damp fuel spreads slower: stretch the time a step stands for.
+	step_minutes = minutes_per_step(wind_speed) / maxf(moisture_speed, 0.05)
 
 
 ## Real minutes per step so the head on flat shrub spreads at ~10% of the wind speed.
@@ -153,6 +222,12 @@ static func ellipse_eccentricity(wind_10m_ms: float) -> float:
 ## Weather data reports where wind comes FROM; this converts it.
 func set_wind_from(from_deg: float, speed_ms: float) -> void:
 	set_wind(from_deg + 180.0, speed_ms)
+
+
+## One hour of weather as reported (wind FROM direction, 10 m speed m/s, RH %, °C).
+func set_weather(wind_from_deg: float, wind_ms: float, rh_pct: float, temp_c: float) -> void:
+	set_wind_from(wind_from_deg, wind_ms)
+	set_moisture(rh_pct, temp_c)
 
 
 func index(row: int, col: int) -> int:
@@ -194,7 +269,7 @@ func step() -> PackedInt32Array:
 			if state[j] != UNBURNT:
 				continue
 			var p: float = p_h * (1.0 + P_VEG[fuel[j]]) * (1.0 + density[j]) \
-				* _p_wind[k] * _p_slope[i * 8 + k] * retardant[j]
+				* _p_wind[k] * _p_slope[i * 8 + k] * retardant[j] * _moist_mult[fuel[j]]
 			if rng.randf() < p:
 				state[j] = BURNING
 				burn_left[j] = burn_steps

@@ -79,6 +79,38 @@ Fires never died out in any setting (10/10 seeds).
 - **Cost:** about 10× more steps per fire (bench: ~1550 steps, ~675 ms per full fire vs ~29 ms before;
   worst step 1.9 ms). Fine for interactive play; the Monte Carlo risk map may need to be precomputed offline.
 
+## Fuel moisture (humidity and temperature)
+
+Added after the wind calibration. Weather is one value for the whole region per hour, like wind.
+
+1. Equilibrium moisture content from relative humidity h (%) and temperature T (°F), Simard (1968) as
+   printed in Ottmar & Sandberg (1985), eqs. 4a–4c:
+   - h < 10%: `EMC = 0.03229 + 0.281073·h − 0.000578·h·T`
+   - 10% ≤ h ≤ 50%: `EMC = 2.22749 + 0.160107·h − 0.014784·T`
+   - h > 50%: `EMC = 21.0606 + 0.005565·h² − 0.00035·h·T − 0.483199·h`
+2. Fine (1-hour) dead fuel moisture `M = 1.03·EMC` (Bradshaw et al. 1984, eq. 26, the midafternoon
+   simplification; we use it every hour).
+3. Rothermel's moisture effect on spread (Andrews 2018): reaction intensity ∝ `ηM = 1 − 2.59r + 5.11r² − 3.52r³`,
+   `r = M/Mx`, and spread ∝ 1 / heat of preignition `Qig = 250 + 1116·M`. So the factor is
+   `f(M) = [ηM/Qig](M) / [ηM/Qig](M_REF)`, 0 at or above Mx.
+4. Mx per fuel class: Scott & Burgan (2005) arid/semiarid models (California): grass, grass-shrub, shrub 15%;
+   timber-understory 20%; timber litter, slash 25%.
+5. The fastest fuel's factor stretches the step time (like the wind); every other fuel's `p_burn` is scaled by
+   its factor relative to the fastest.
+
+At 25 °C, 5 m/s wind, flat shrub:
+
+| RH | fuel moisture | head spread | min/step |
+|---|---|---|---|
+| 30% | 6.1% | 1.8 km/h | 2.1 |
+| 65% | 11.8% | 1.1 km/h | 2.9 |
+| 95% | 23.5% | 0 (shrub extinct; only TL/SB creep) | 13.7 |
+
+Test: 3 h of sim time at 60% vs 20% RH burns 4,638 vs 10,611 cells (10 seeds).
+
+Limits: `M_REF = 6%` (the moisture behind the 10% rule calibration) is our assumption. Live fuel moisture
+(important in chaparral) isn't modelled. Moisture lag is ignored (fine fuels respond within about an hour).
+
 ## Re-running
 
 ```

@@ -1,6 +1,6 @@
 ## Prototype top-down view of the fire sim.
 ## Left click: ignite · Shift+left click: retardant · Right drag: firebreak
-## Space: play/pause · N: one step · [ / ]: slower/faster · Left/Right: turn wind · Up/Down: wind speed
+## Space: play/pause · N: one step · [ / ]: slower/faster · Left/Right: turn wind · Up/Down: wind speed · H/J: humidity -/+
 ## R: reset fire · T: new test terrain
 extends Node2D
 
@@ -144,6 +144,10 @@ func _unhandled_input(event: InputEvent) -> void:
 				sim.set_wind(sim.wind_to_deg, sim.wind_speed + 1.0)
 			KEY_DOWN:
 				sim.set_wind(sim.wind_to_deg, sim.wind_speed - 1.0)
+			KEY_H:
+				sim.set_moisture(sim.humidity_pct - 5.0, sim.temperature_c)
+			KEY_J:
+				sim.set_moisture(sim.humidity_pct + 5.0, sim.temperature_c)
 			KEY_R:
 				sim.reset_fire()
 				for i in sim.rows * sim.cols:
@@ -163,13 +167,15 @@ func update_hud() -> void:
 	var fire_cells: int = sim.burnt_count + sim.burning.size()
 	var area_ha: float = fire_cells * sim.cell_size_m * sim.cell_size_m / 10000.0
 	var mins := int(sim.elapsed_minutes)
-	hud.text = "SIMULATED (test terrain)\n\nsim time %dh %02dm  %s\nstep %d  (%.1f min/step, %.0f steps/s)\nfire area %.0f ha\nburning %d  burnt %d cells\nwind toward %.0f° @ %.0f m/s\nhead spread ~%.1f km/h on flat shrub\n\n" % [
+	hud.text = "SIMULATED (test terrain)\n\nsim time %dh %02dm  %s\nstep %d  (%.1f min/step, %.0f steps/s)\nfire area %.0f ha\nburning %d  burnt %d cells\nwind toward %.0f° @ %.0f m/s\nhumidity %.0f%%  temp %.0f °C\nfuel moisture %.1f%%%s\nhead spread ~%.1f km/h on flat shrub\n\n" % [
 		mins / 60, mins % 60, "playing" if playing else "paused",
 		sim.step_count, sim.step_minutes, SPEEDS[speed_index],
 		area_ha, sim.burning.size(), sim.burnt_count,
 		sim.wind_to_deg, sim.wind_speed,
-		sim.ROS_FRACTION_OF_WIND * maxf(sim.wind_speed, sim.MIN_WIND_FOR_ROS) * 3.6]
-	hud.text += "Left click   ignite\nShift+click  retardant\nRight drag   firebreak\nSpace        play/pause\nN            one step\n[ / ]        slower / faster\nLeft/Right   turn wind\nUp/Down      wind speed\nR            reset fire\nT            new terrain"
+		sim.humidity_pct, sim.temperature_c, sim.fuel_moisture_pct,
+		"  (too damp to spread)" if sim.moisture_speed <= 0.0 else "",
+		sim.ROS_FRACTION_OF_WIND * maxf(sim.wind_speed, sim.MIN_WIND_FOR_ROS) * 3.6 * sim.moisture_factor(sim.fuel_moisture_pct, sim.MX_BY_CLASS[3])]
+	hud.text += "Left click   ignite\nShift+click  retardant\nRight drag   firebreak\nSpace        play/pause\nN            one step\n[ / ]        slower / faster\nLeft/Right   turn wind\nUp/Down      wind speed\nH / J        humidity - / +\nR            reset fire\nT            new terrain"
 
 
 func _draw() -> void:

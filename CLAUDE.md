@@ -23,12 +23,14 @@ app/                Godot 4.5+ project (GDScript only, exported to web)
 pipeline/           Python, runs offline, writes static files
   build_region.py          raw data -> region folder for the sim
   harmonize.py             MODIS/VIIRS -> harmonized calendar series
+  find_fires.py            FIRMS hotspots -> fire events (space-time grouping) for picking sim regions
   plots.py                 harmonization diagnostics figure
   check_keys.py            checks the API keys in .env
   raw/                     downloads, git-ignored (raw/firms/ = the 6 FIRMS CSVs)
 data/               pipeline output, shipped with the web build
   regions/<id>/            sim inputs (see Data contract)
   calendar/                harmonized daily series
+  fires/                   fire_events.csv + fire_event_days.csv (observed detections grouped into events)
 docs/               specs, pitch notes, SOURCES.md
 ```
 
@@ -45,6 +47,7 @@ docs/               specs, pitch notes, SOURCES.md
   - **Multi-step burning:** a cell burns for `burn_steps` (24) steps and tries its neighbours every step; diagonals × `diag_factor` (0.707). The paper's 1-step burning pins the head at 1 cell/step and makes fires square.
   - **Elliptical wind term** (replaces the paper's `exp(c1*V) * exp(V*c2*(cos θ - 1))`, which starved the flanks): `p_wind = (1 + wind_gain*V) * ((1 - e) / (1 - e*cos θ))^shape_k`, eccentricity e from `L/B = 1 + 0.25*U_mid` (mi/h), `U_mid = 0.4*V/1.15` (Andrews 2018, 2012). θ = angle between the wind's blow-toward direction and the direction of spread.
   - **Wind-dependent step length:** `step_minutes` is set so the head on flat shrub spreads at 10% of the 10 m wind (Cruz & Alexander 2019; held at 2 m/s below that). Probabilities set the shape; step length sets the speed.
+  - **Fuel moisture** from humidity + temperature (region-wide, hourly): `M = 1.03·EMC(RH, T)` (Simard 1968; Bradshaw et al. 1984). Spread ∝ `ηM(M/Mx) / (250 + 1116·M)` (Rothermel via Andrews 2018) relative to `M_REF` 6%. `Mx` per fuel class from Scott & Burgan 2005 (arid models: GR/GS/SH 15%, TU 20%, TL/SB 25%). The fastest fuel's factor stretches the step time; other fuels scale `p_burn` relative to it; fuel at/above Mx can't burn. Live fuel moisture is not modelled.
   - `p_slope = exp(a * slope_deg)`, positive when spreading uphill (unchanged).
   - Constants: `p_h 0.06, wind_gain 0.3, shape_k 1.0, diag_factor 0.707, burn_steps 24, a 0.078`. Changing any of the first five means re-running `calibrate.gd` and updating `HEAD_CPS_0` / `HEAD_CPS_PER_MS`. The final tuning should come from validation against a real fire (Camp Fire).
 - Each step processes only the burning front (`burning` array). The renderer redraws only `changed` cells.
@@ -67,6 +70,8 @@ data/regions/<id>/
   ndvi.png          8-bit scaled
   background.jpg    NASA Worldview snapshot, reprojected onto the grid
   days/<YYYY-MM-DD>.json   hotspots {row, col, sensor, time_utc, frp, conf} + hourly weather
+                           (PROPOSED, not yet agreed with pipeline owner: each hour needs
+                           wind_from_deg, wind_ms, rh_pct, temp_c for the sim's moisture term)
   validation/<fire>.png    perimeter mask
 ```
 - Grid: row 0 = north edge, col 0 = west edge.
