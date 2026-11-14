@@ -1,0 +1,1566 @@
+month,calibration_band,raw_celldays_of_source,harmonized_fire_celldays,source
+2000-11,32-34N,9.0,57.02,MODIS Terra (converted)
+2000-11,34-36N,37.0,155.12,MODIS Terra (converted)
+2000-11,36-38N,65.0,233.32,MODIS Terra (converted)
+2000-11,38-40N,145.0,524.76,MODIS Terra (converted)
+2000-11,40-44N,63.0,219.46,MODIS Terra (converted)
+2000-12,32-34N,10.0,57.6,MODIS Terra (converted)
+2000-12,34-36N,21.0,94.6,MODIS Terra (converted)
+2000-12,36-38N,22.0,132.81,MODIS Terra (converted)
+2000-12,38-40N,17.0,141.08,MODIS Terra (converted)
+2000-12,40-44N,6.0,55.17,MODIS Terra (converted)
+2001-01,32-34N,53.0,101.26,MODIS Terra (converted)
+2001-01,34-36N,19.0,87.0,MODIS Terra (converted)
+2001-01,36-38N,13.0,102.7,MODIS Terra (converted)
+2001-01,38-40N,26.0,182.85,MODIS Terra (converted)
+2001-01,40-44N,8.0,63.05,MODIS Terra (converted)
+2001-02,32-34N,11.0,59.49,MODIS Terra (converted)
+2001-02,34-36N,25.0,109.47,MODIS Terra (converted)
+2001-02,36-38N,13.0,102.7,MODIS Terra (converted)
+2001-02,38-40N,13.0,119.77,MODIS Terra (converted)
+2001-02,40-44N,1.0,24.03,MODIS Terra (converted)
+2001-03,32-34N,10.0,57.6,MODIS Terra (converted)
+2001-03,34-36N,23.0,102.09,MODIS Terra (converted)
+2001-03,36-38N,53.0,204.1,MODIS Terra (converted)
+2001-03,38-40N,79.0,360.33,MODIS Terra (converted)
+2001-03,40-44N,11.0,73.09,MODIS Terra (converted)
+2001-04,32-34N,2.0,33.42,MODIS Terra (converted)
+2001-04,34-36N,24.0,105.79,MODIS Terra (converted)
+2001-04,36-38N,27.0,146.79,MODIS Terra (converted)
+2001-04,38-40N,83.0,371.36,MODIS Terra (converted)
+2001-04,40-44N,11.0,73.09,MODIS Terra (converted)
+2001-05,32-34N,2.0,33.42,MODIS Terra (converted)
+2001-05,34-36N,7.0,37.72,MODIS Terra (converted)
+2001-05,36-38N,38.0,173.47,MODIS Terra (converted)
+2001-05,38-40N,36.0,223.03,MODIS Terra (converted)
+2001-05,40-44N,36.0,126.7,MODIS Terra (converted)
+2001-06,32-34N,15.0,73.96,MODIS Terra (converted)
+2001-06,34-36N,12.0,66.86,MODIS Terra (converted)
+2001-06,36-38N,19.0,74.61,MODIS Terra (converted)
+2001-06,38-40N,18.0,86.04,MODIS Terra (converted)
+2001-06,40-44N,0.0,0.0,MODIS Terra (converted)
+2001-07,32-34N,5.0,42.27,MODIS Terra (converted)
+2001-07,34-36N,23.0,108.73,MODIS Terra (converted)
+2001-07,36-38N,19.0,74.61,MODIS Terra (converted)
+2001-07,38-40N,33.0,145.49,MODIS Terra (converted)
+2001-07,40-44N,38.0,136.15,MODIS Terra (converted)
+2001-08,32-34N,12.0,66.02,MODIS Terra (converted)
+2001-08,34-36N,11.0,62.65,MODIS Terra (converted)
+2001-08,36-38N,209.0,688.84,MODIS Terra (converted)
+2001-08,38-40N,328.0,1064.6,MODIS Terra (converted)
+2001-08,40-44N,410.0,1286.89,MODIS Terra (converted)
+2001-09,32-34N,8.0,53.7,MODIS Terra (converted)
+2001-09,34-36N,15.0,79.0,MODIS Terra (converted)
+2001-09,36-38N,69.0,246.6,MODIS Terra (converted)
+2001-09,38-40N,244.0,823.83,MODIS Terra (converted)
+2001-09,40-44N,50.0,176.43,MODIS Terra (converted)
+2001-10,32-34N,7.0,50.17,MODIS Terra (converted)
+2001-10,34-36N,35.0,148.81,MODIS Terra (converted)
+2001-10,36-38N,90.0,315.47,MODIS Terra (converted)
+2001-10,38-40N,100.0,380.29,MODIS Terra (converted)
+2001-10,40-44N,31.0,112.33,MODIS Terra (converted)
+2001-11,32-34N,4.0,37.73,MODIS Terra (converted)
+2001-11,34-36N,36.0,151.97,MODIS Terra (converted)
+2001-11,36-38N,76.0,269.7,MODIS Terra (converted)
+2001-11,38-40N,55.0,226.52,MODIS Terra (converted)
+2001-11,40-44N,76.0,261.99,MODIS Terra (converted)
+2001-12,32-34N,9.0,55.58,MODIS Terra (converted)
+2001-12,34-36N,17.0,79.27,MODIS Terra (converted)
+2001-12,36-38N,14.0,106.49,MODIS Terra (converted)
+2001-12,38-40N,5.0,66.84,MODIS Terra (converted)
+2001-12,40-44N,0.0,0.0,MODIS Terra (converted)
+2002-01,32-34N,23.0,76.35,MODIS Terra (converted)
+2002-01,34-36N,29.0,123.95,MODIS Terra (converted)
+2002-01,36-38N,9.0,85.81,MODIS Terra (converted)
+2002-01,38-40N,9.0,95.69,MODIS Terra (converted)
+2002-01,40-44N,2.0,33.14,MODIS Terra (converted)
+2002-02,32-34N,23.0,76.35,MODIS Terra (converted)
+2002-02,34-36N,32.0,134.59,MODIS Terra (converted)
+2002-02,36-38N,24.0,138.58,MODIS Terra (converted)
+2002-02,38-40N,39.0,234.19,MODIS Terra (converted)
+2002-02,40-44N,5.0,50.7,MODIS Terra (converted)
+2002-03,32-34N,5.0,45.56,MODIS Terra (converted)
+2002-03,34-36N,31.0,131.06,MODIS Terra (converted)
+2002-03,36-38N,75.0,241.85,MODIS Terra (converted)
+2002-03,38-40N,54.0,285.66,MODIS Terra (converted)
+2002-03,40-44N,16.0,86.97,MODIS Terra (converted)
+2002-04,32-34N,8.0,53.41,MODIS Terra (converted)
+2002-04,34-36N,17.0,79.27,MODIS Terra (converted)
+2002-04,36-38N,49.0,196.42,MODIS Terra (converted)
+2002-04,38-40N,66.0,322.88,MODIS Terra (converted)
+2002-04,40-44N,28.0,112.76,MODIS Terra (converted)
+2002-05,32-34N,9.0,55.58,MODIS Terra (converted)
+2002-05,34-36N,20.0,90.82,MODIS Terra (converted)
+2002-05,36-38N,26.0,144.11,MODIS Terra (converted)
+2002-05,38-40N,28.0,191.31,MODIS Terra (converted)
+2002-05,40-44N,16.0,86.97,MODIS Terra (converted)
+2002-06,32-34N,21.0,87.79,MODIS Terra (converted)
+2002-06,34-36N,196.0,539.25,MODIS Terra (converted)
+2002-06,36-38N,23.0,89.07,MODIS Terra (converted)
+2002-06,38-40N,151.0,543.52,MODIS Terra (converted)
+2002-06,40-44N,8.0,31.26,MODIS Terra (converted)
+2002-07,32-34N,61.0,112.36,MODIS Terra+Aqua (converted)
+2002-07,34-36N,294.0,496.9,MODIS Terra+Aqua (converted)
+2002-07,36-38N,369.0,742.12,MODIS Terra+Aqua (converted)
+2002-07,38-40N,108.0,218.0,MODIS Terra+Aqua (converted)
+2002-07,40-44N,197.0,375.64,MODIS Terra+Aqua (converted)
+2002-08,32-34N,172.0,208.89,MODIS Terra+Aqua (converted)
+2002-08,34-36N,71.0,162.47,MODIS Terra+Aqua (converted)
+2002-08,36-38N,716.0,1402.4,MODIS Terra+Aqua (converted)
+2002-08,38-40N,63.0,131.02,MODIS Terra+Aqua (converted)
+2002-08,40-44N,81.0,156.29,MODIS Terra+Aqua (converted)
+2002-09,32-34N,8.0,33.33,MODIS Terra+Aqua (converted)
+2002-09,34-36N,396.0,628.11,MODIS Terra+Aqua (converted)
+2002-09,36-38N,163.0,338.69,MODIS Terra+Aqua (converted)
+2002-09,38-40N,174.0,342.07,MODIS Terra+Aqua (converted)
+2002-09,40-44N,44.0,85.59,MODIS Terra+Aqua (converted)
+2002-10,32-34N,3.0,18.54,MODIS Terra+Aqua (converted)
+2002-10,34-36N,47.0,117.44,MODIS Terra+Aqua (converted)
+2002-10,36-38N,325.0,656.95,MODIS Terra+Aqua (converted)
+2002-10,38-40N,355.0,670.87,MODIS Terra+Aqua (converted)
+2002-10,40-44N,18.0,35.43,MODIS Terra+Aqua (converted)
+2002-11,32-34N,19.0,55.92,MODIS Terra+Aqua (converted)
+2002-11,34-36N,22.0,64.63,MODIS Terra+Aqua (converted)
+2002-11,36-38N,127.0,266.53,MODIS Terra+Aqua (converted)
+2002-11,38-40N,406.0,761.56,MODIS Terra+Aqua (converted)
+2002-11,40-44N,105.0,201.9,MODIS Terra+Aqua (converted)
+2002-12,32-34N,23.0,60.31,MODIS Terra+Aqua (converted)
+2002-12,34-36N,91.0,198.23,MODIS Terra+Aqua (converted)
+2002-12,36-38N,99.0,211.15,MODIS Terra+Aqua (converted)
+2002-12,38-40N,97.0,248.16,MODIS Terra+Aqua (converted)
+2002-12,40-44N,35.0,87.24,MODIS Terra+Aqua (converted)
+2003-01,32-34N,31.0,68.76,MODIS Terra+Aqua (converted)
+2003-01,34-36N,25.0,64.91,MODIS Terra+Aqua (converted)
+2003-01,36-38N,5.0,31.65,MODIS Terra+Aqua (converted)
+2003-01,38-40N,11.0,49.48,MODIS Terra+Aqua (converted)
+2003-01,40-44N,8.0,32.09,MODIS Terra+Aqua (converted)
+2003-02,32-34N,45.0,81.0,MODIS Terra+Aqua (converted)
+2003-02,34-36N,46.0,109.94,MODIS Terra+Aqua (converted)
+2003-02,36-38N,67.0,164.75,MODIS Terra+Aqua (converted)
+2003-02,38-40N,45.0,140.49,MODIS Terra+Aqua (converted)
+2003-02,40-44N,35.0,87.24,MODIS Terra+Aqua (converted)
+2003-03,32-34N,25.0,62.56,MODIS Terra+Aqua (converted)
+2003-03,34-36N,69.0,156.07,MODIS Terra+Aqua (converted)
+2003-03,36-38N,120.0,238.61,MODIS Terra+Aqua (converted)
+2003-03,38-40N,128.0,304.75,MODIS Terra+Aqua (converted)
+2003-03,40-44N,32.0,82.1,MODIS Terra+Aqua (converted)
+2003-04,32-34N,14.0,48.5,MODIS Terra+Aqua (converted)
+2003-04,34-36N,34.0,84.66,MODIS Terra+Aqua (converted)
+2003-04,36-38N,54.0,143.64,MODIS Terra+Aqua (converted)
+2003-04,38-40N,65.0,184.48,MODIS Terra+Aqua (converted)
+2003-04,40-44N,4.0,20.06,MODIS Terra+Aqua (converted)
+2003-05,32-34N,30.0,67.78,MODIS Terra+Aqua (converted)
+2003-05,34-36N,20.0,53.53,MODIS Terra+Aqua (converted)
+2003-05,36-38N,28.0,94.62,MODIS Terra+Aqua (converted)
+2003-05,38-40N,27.0,96.23,MODIS Terra+Aqua (converted)
+2003-05,40-44N,51.0,112.6,MODIS Terra+Aqua (converted)
+2003-06,32-34N,65.0,116.71,MODIS Terra+Aqua (converted)
+2003-06,34-36N,42.0,107.49,MODIS Terra+Aqua (converted)
+2003-06,36-38N,110.0,232.18,MODIS Terra+Aqua (converted)
+2003-06,38-40N,125.0,250.28,MODIS Terra+Aqua (converted)
+2003-06,40-44N,20.0,39.32,MODIS Terra+Aqua (converted)
+2003-07,32-34N,81.0,133.13,MODIS Terra+Aqua (converted)
+2003-07,34-36N,58.0,138.57,MODIS Terra+Aqua (converted)
+2003-07,36-38N,91.0,193.53,MODIS Terra+Aqua (converted)
+2003-07,38-40N,88.0,179.66,MODIS Terra+Aqua (converted)
+2003-07,40-44N,51.0,99.01,MODIS Terra+Aqua (converted)
+2003-08,32-34N,29.0,72.02,MODIS Terra+Aqua (converted)
+2003-08,34-36N,47.0,117.44,MODIS Terra+Aqua (converted)
+2003-08,36-38N,313.0,633.64,MODIS Terra+Aqua (converted)
+2003-08,38-40N,141.0,280.44,MODIS Terra+Aqua (converted)
+2003-08,40-44N,2.0,4.05,MODIS Terra+Aqua (converted)
+2003-09,32-34N,20.0,57.66,MODIS Terra+Aqua (converted)
+2003-09,34-36N,42.0,107.49,MODIS Terra+Aqua (converted)
+2003-09,36-38N,516.0,1023.97,MODIS Terra+Aqua (converted)
+2003-09,38-40N,718.0,1304.93,MODIS Terra+Aqua (converted)
+2003-09,40-44N,145.0,277.62,MODIS Terra+Aqua (converted)
+2003-10,32-34N,1327.0,709.16,MODIS Terra+Aqua (converted)
+2003-10,34-36N,1380.0,1677.27,MODIS Terra+Aqua (converted)
+2003-10,36-38N,467.0,930.43,MODIS Terra+Aqua (converted)
+2003-10,38-40N,281.0,537.95,MODIS Terra+Aqua (converted)
+2003-10,40-44N,34.0,66.37,MODIS Terra+Aqua (converted)
+2003-11,32-34N,9.0,35.76,MODIS Terra+Aqua (converted)
+2003-11,34-36N,70.0,160.67,MODIS Terra+Aqua (converted)
+2003-11,36-38N,348.0,701.52,MODIS Terra+Aqua (converted)
+2003-11,38-40N,221.0,428.75,MODIS Terra+Aqua (converted)
+2003-11,40-44N,115.0,220.86,MODIS Terra+Aqua (converted)
+2003-12,32-34N,25.0,62.56,MODIS Terra+Aqua (converted)
+2003-12,34-36N,51.0,120.19,MODIS Terra+Aqua (converted)
+2003-12,36-38N,114.0,230.96,MODIS Terra+Aqua (converted)
+2003-12,38-40N,48.0,147.37,MODIS Terra+Aqua (converted)
+2003-12,40-44N,4.0,20.06,MODIS Terra+Aqua (converted)
+2004-01,32-34N,49.0,84.08,MODIS Terra+Aqua (converted)
+2004-01,34-36N,67.0,152.15,MODIS Terra+Aqua (converted)
+2004-01,36-38N,41.0,120.57,MODIS Terra+Aqua (converted)
+2004-01,38-40N,4.0,23.39,MODIS Terra+Aqua (converted)
+2004-01,40-44N,1.0,7.84,MODIS Terra+Aqua (converted)
+2004-02,32-34N,38.0,75.2,MODIS Terra+Aqua (converted)
+2004-02,34-36N,21.0,55.83,MODIS Terra+Aqua (converted)
+2004-02,36-38N,66.0,163.18,MODIS Terra+Aqua (converted)
+2004-02,38-40N,18.0,71.26,MODIS Terra+Aqua (converted)
+2004-02,40-44N,10.0,37.33,MODIS Terra+Aqua (converted)
+2004-03,32-34N,20.0,56.72,MODIS Terra+Aqua (converted)
+2004-03,34-36N,65.0,148.22,MODIS Terra+Aqua (converted)
+2004-03,36-38N,158.0,284.21,MODIS Terra+Aqua (converted)
+2004-03,38-40N,211.0,441.31,MODIS Terra+Aqua (converted)
+2004-03,40-44N,122.0,203.35,MODIS Terra+Aqua (converted)
+2004-04,32-34N,17.0,52.81,MODIS Terra+Aqua (converted)
+2004-04,34-36N,73.0,163.85,MODIS Terra+Aqua (converted)
+2004-04,36-38N,128.0,248.6,MODIS Terra+Aqua (converted)
+2004-04,38-40N,97.0,248.16,MODIS Terra+Aqua (converted)
+2004-04,40-44N,95.0,171.64,MODIS Terra+Aqua (converted)
+2004-05,32-34N,97.0,113.5,MODIS Terra+Aqua (converted)
+2004-05,34-36N,69.0,156.07,MODIS Terra+Aqua (converted)
+2004-05,36-38N,86.0,193.08,MODIS Terra+Aqua (converted)
+2004-05,38-40N,26.0,93.58,MODIS Terra+Aqua (converted)
+2004-05,40-44N,28.0,75.0,MODIS Terra+Aqua (converted)
+2004-06,32-34N,14.0,46.58,MODIS Terra+Aqua (converted)
+2004-06,34-36N,56.0,134.8,MODIS Terra+Aqua (converted)
+2004-06,36-38N,66.0,142.17,MODIS Terra+Aqua (converted)
+2004-06,38-40N,97.0,196.97,MODIS Terra+Aqua (converted)
+2004-06,40-44N,23.0,45.13,MODIS Terra+Aqua (converted)
+2004-07,32-34N,81.0,133.13,MODIS Terra+Aqua (converted)
+2004-07,34-36N,165.0,315.43,MODIS Terra+Aqua (converted)
+2004-07,36-38N,155.0,322.71,MODIS Terra+Aqua (converted)
+2004-07,38-40N,35.0,75.2,MODIS Terra+Aqua (converted)
+2004-07,40-44N,70.0,135.33,MODIS Terra+Aqua (converted)
+2004-08,32-34N,28.0,70.52,MODIS Terra+Aqua (converted)
+2004-08,34-36N,34.0,91.03,MODIS Terra+Aqua (converted)
+2004-08,36-38N,172.0,356.62,MODIS Terra+Aqua (converted)
+2004-08,38-40N,87.0,177.73,MODIS Terra+Aqua (converted)
+2004-08,40-44N,158.0,302.16,MODIS Terra+Aqua (converted)
+2004-09,32-34N,20.0,57.66,MODIS Terra+Aqua (converted)
+2004-09,34-36N,38.0,99.35,MODIS Terra+Aqua (converted)
+2004-09,36-38N,161.0,334.69,MODIS Terra+Aqua (converted)
+2004-09,38-40N,242.0,467.13,MODIS Terra+Aqua (converted)
+2004-09,40-44N,105.0,201.9,MODIS Terra+Aqua (converted)
+2004-10,32-34N,5.0,25.16,MODIS Terra+Aqua (converted)
+2004-10,34-36N,9.0,31.99,MODIS Terra+Aqua (converted)
+2004-10,36-38N,223.0,457.6,MODIS Terra+Aqua (converted)
+2004-10,38-40N,628.0,1149.86,MODIS Terra+Aqua (converted)
+2004-10,40-44N,62.0,120.06,MODIS Terra+Aqua (converted)
+2004-11,32-34N,13.0,44.56,MODIS Terra+Aqua (converted)
+2004-11,34-36N,47.0,117.44,MODIS Terra+Aqua (converted)
+2004-11,36-38N,173.0,358.61,MODIS Terra+Aqua (converted)
+2004-11,38-40N,104.0,210.37,MODIS Terra+Aqua (converted)
+2004-11,40-44N,110.0,211.38,MODIS Terra+Aqua (converted)
+2004-12,32-34N,29.0,66.78,MODIS Terra+Aqua (converted)
+2004-12,34-36N,29.0,73.79,MODIS Terra+Aqua (converted)
+2004-12,36-38N,32.0,103.0,MODIS Terra+Aqua (converted)
+2004-12,38-40N,57.0,167.38,MODIS Terra+Aqua (converted)
+2004-12,40-44N,23.0,65.64,MODIS Terra+Aqua (converted)
+2005-01,32-34N,12.0,45.32,MODIS Terra+Aqua (converted)
+2005-01,34-36N,1.0,4.02,MODIS Terra+Aqua (converted)
+2005-01,36-38N,5.0,31.65,MODIS Terra+Aqua (converted)
+2005-01,38-40N,6.0,31.58,MODIS Terra+Aqua (converted)
+2005-01,40-44N,9.0,34.75,MODIS Terra+Aqua (converted)
+2005-02,32-34N,8.0,37.93,MODIS Terra+Aqua (converted)
+2005-02,34-36N,15.0,41.74,MODIS Terra+Aqua (converted)
+2005-02,36-38N,22.0,81.17,MODIS Terra+Aqua (converted)
+2005-02,38-40N,14.0,59.16,MODIS Terra+Aqua (converted)
+2005-02,40-44N,21.0,61.71,MODIS Terra+Aqua (converted)
+2005-03,32-34N,8.0,37.93,MODIS Terra+Aqua (converted)
+2005-03,34-36N,24.0,62.66,MODIS Terra+Aqua (converted)
+2005-03,36-38N,41.0,120.57,MODIS Terra+Aqua (converted)
+2005-03,38-40N,53.0,158.59,MODIS Terra+Aqua (converted)
+2005-03,40-44N,51.0,112.6,MODIS Terra+Aqua (converted)
+2005-04,32-34N,7.0,35.76,MODIS Terra+Aqua (converted)
+2005-04,34-36N,35.0,86.81,MODIS Terra+Aqua (converted)
+2005-04,36-38N,76.0,178.49,MODIS Terra+Aqua (converted)
+2005-04,38-40N,187.0,403.55,MODIS Terra+Aqua (converted)
+2005-04,40-44N,15.0,49.13,MODIS Terra+Aqua (converted)
+2005-05,32-34N,14.0,48.5,MODIS Terra+Aqua (converted)
+2005-05,34-36N,24.0,62.66,MODIS Terra+Aqua (converted)
+2005-05,36-38N,59.0,151.95,MODIS Terra+Aqua (converted)
+2005-05,38-40N,34.0,114.15,MODIS Terra+Aqua (converted)
+2005-05,40-44N,33.0,83.83,MODIS Terra+Aqua (converted)
+2005-06,32-34N,32.0,76.38,MODIS Terra+Aqua (converted)
+2005-06,34-36N,309.0,516.74,MODIS Terra+Aqua (converted)
+2005-06,36-38N,44.0,96.33,MODIS Terra+Aqua (converted)
+2005-06,38-40N,80.0,164.19,MODIS Terra+Aqua (converted)
+2005-06,40-44N,43.0,83.67,MODIS Terra+Aqua (converted)
+2005-07,32-34N,32.0,76.38,MODIS Terra+Aqua (converted)
+2005-07,34-36N,75.0,169.63,MODIS Terra+Aqua (converted)
+2005-07,36-38N,71.0,152.5,MODIS Terra+Aqua (converted)
+2005-07,38-40N,43.0,91.34,MODIS Terra+Aqua (converted)
+2005-07,40-44N,8.0,15.92,MODIS Terra+Aqua (converted)
+2005-08,32-34N,42.0,89.88,MODIS Terra+Aqua (converted)
+2005-08,34-36N,35.0,93.13,MODIS Terra+Aqua (converted)
+2005-08,36-38N,191.0,394.36,MODIS Terra+Aqua (converted)
+2005-08,38-40N,112.0,225.62,MODIS Terra+Aqua (converted)
+2005-08,40-44N,24.0,47.07,MODIS Terra+Aqua (converted)
+2005-09,32-34N,51.0,100.95,MODIS Terra+Aqua (converted)
+2005-09,34-36N,145.0,284.94,MODIS Terra+Aqua (converted)
+2005-09,36-38N,236.0,483.18,MODIS Terra+Aqua (converted)
+2005-09,38-40N,105.0,212.28,MODIS Terra+Aqua (converted)
+2005-09,40-44N,57.0,110.5,MODIS Terra+Aqua (converted)
+2005-10,32-34N,47.0,96.13,MODIS Terra+Aqua (converted)
+2005-10,34-36N,54.0,130.99,MODIS Terra+Aqua (converted)
+2005-10,36-38N,287.0,583.02,MODIS Terra+Aqua (converted)
+2005-10,38-40N,371.0,699.39,MODIS Terra+Aqua (converted)
+2005-10,40-44N,191.0,364.35,MODIS Terra+Aqua (converted)
+2005-11,32-34N,13.0,44.56,MODIS Terra+Aqua (converted)
+2005-11,34-36N,41.0,105.48,MODIS Terra+Aqua (converted)
+2005-11,36-38N,134.0,280.61,MODIS Terra+Aqua (converted)
+2005-11,38-40N,139.0,276.68,MODIS Terra+Aqua (converted)
+2005-11,40-44N,103.0,198.1,MODIS Terra+Aqua (converted)
+2005-12,32-34N,11.0,43.62,MODIS Terra+Aqua (converted)
+2005-12,34-36N,36.0,88.95,MODIS Terra+Aqua (converted)
+2005-12,36-38N,19.0,73.95,MODIS Terra+Aqua (converted)
+2005-12,38-40N,37.0,121.53,MODIS Terra+Aqua (converted)
+2005-12,40-44N,28.0,75.0,MODIS Terra+Aqua (converted)
+2006-01,32-34N,49.0,84.08,MODIS Terra+Aqua (converted)
+2006-01,34-36N,45.0,107.87,MODIS Terra+Aqua (converted)
+2006-01,36-38N,15.0,63.63,MODIS Terra+Aqua (converted)
+2006-01,38-40N,3.0,18.9,MODIS Terra+Aqua (converted)
+2006-01,40-44N,0.0,0.0,MODIS Terra+Aqua (converted)
+2006-02,32-34N,76.0,101.97,MODIS Terra+Aqua (converted)
+2006-02,34-36N,36.0,88.95,MODIS Terra+Aqua (converted)
+2006-02,36-38N,101.0,213.85,MODIS Terra+Aqua (converted)
+2006-02,38-40N,98.0,250.05,MODIS Terra+Aqua (converted)
+2006-02,40-44N,44.0,101.88,MODIS Terra+Aqua (converted)
+2006-03,32-34N,19.0,55.46,MODIS Terra+Aqua (converted)
+2006-03,34-36N,22.0,58.12,MODIS Terra+Aqua (converted)
+2006-03,36-38N,23.0,83.5,MODIS Terra+Aqua (converted)
+2006-03,38-40N,2.0,14.0,MODIS Terra+Aqua (converted)
+2006-03,40-44N,3.0,16.51,MODIS Terra+Aqua (converted)
+2006-04,32-34N,3.0,24.65,MODIS Terra+Aqua (converted)
+2006-04,34-36N,10.0,29.41,MODIS Terra+Aqua (converted)
+2006-04,36-38N,36.0,111.01,MODIS Terra+Aqua (converted)
+2006-04,38-40N,28.0,98.86,MODIS Terra+Aqua (converted)
+2006-04,40-44N,13.0,44.59,MODIS Terra+Aqua (converted)
+2006-05,32-34N,7.0,35.76,MODIS Terra+Aqua (converted)
+2006-05,34-36N,49.0,116.11,MODIS Terra+Aqua (converted)
+2006-05,36-38N,56.0,147.0,MODIS Terra+Aqua (converted)
+2006-05,38-40N,69.0,192.82,MODIS Terra+Aqua (converted)
+2006-05,40-44N,44.0,101.88,MODIS Terra+Aqua (converted)
+2006-06,32-34N,27.0,69.0,MODIS Terra+Aqua (converted)
+2006-06,34-36N,97.0,207.68,MODIS Terra+Aqua (converted)
+2006-06,36-38N,86.0,183.31,MODIS Terra+Aqua (converted)
+2006-06,38-40N,32.0,69.1,MODIS Terra+Aqua (converted)
+2006-06,40-44N,53.0,102.84,MODIS Terra+Aqua (converted)
+2006-07,32-34N,122.0,170.09,MODIS Terra+Aqua (converted)
+2006-07,34-36N,510.0,766.44,MODIS Terra+Aqua (converted)
+2006-07,36-38N,368.0,740.19,MODIS Terra+Aqua (converted)
+2006-07,38-40N,101.0,204.63,MODIS Terra+Aqua (converted)
+2006-07,40-44N,375.0,708.93,MODIS Terra+Aqua (converted)
+2006-08,32-34N,24.0,64.31,MODIS Terra+Aqua (converted)
+2006-08,34-36N,76.0,171.41,MODIS Terra+Aqua (converted)
+2006-08,36-38N,319.0,645.3,MODIS Terra+Aqua (converted)
+2006-08,38-40N,212.0,412.24,MODIS Terra+Aqua (converted)
+2006-08,40-44N,509.0,958.34,MODIS Terra+Aqua (converted)
+2006-09,32-34N,20.0,57.66,MODIS Terra+Aqua (converted)
+2006-09,34-36N,1309.0,1609.0,MODIS Terra+Aqua (converted)
+2006-09,36-38N,172.0,356.62,MODIS Terra+Aqua (converted)
+2006-09,38-40N,231.0,447.05,MODIS Terra+Aqua (converted)
+2006-09,40-44N,1204.0,2241.0,MODIS Terra+Aqua (converted)
+2006-10,32-34N,152.0,194.0,MODIS Terra+Aqua (converted)
+2006-10,34-36N,31.0,84.65,MODIS Terra+Aqua (converted)
+2006-10,36-38N,228.0,467.44,MODIS Terra+Aqua (converted)
+2006-10,38-40N,251.0,483.53,MODIS Terra+Aqua (converted)
+2006-10,40-44N,188.0,358.7,MODIS Terra+Aqua (converted)
+2006-11,32-34N,4.0,22.02,MODIS Terra+Aqua (converted)
+2006-11,34-36N,44.0,111.5,MODIS Terra+Aqua (converted)
+2006-11,36-38N,258.0,526.34,MODIS Terra+Aqua (converted)
+2006-11,38-40N,158.0,312.28,MODIS Terra+Aqua (converted)
+2006-11,40-44N,91.0,175.31,MODIS Terra+Aqua (converted)
+2006-12,32-34N,16.0,51.43,MODIS Terra+Aqua (converted)
+2006-12,34-36N,103.0,220.63,MODIS Terra+Aqua (converted)
+2006-12,36-38N,79.0,182.93,MODIS Terra+Aqua (converted)
+2006-12,38-40N,58.0,169.55,MODIS Terra+Aqua (converted)
+2006-12,40-44N,10.0,37.33,MODIS Terra+Aqua (converted)
+2007-01,32-34N,22.0,59.15,MODIS Terra+Aqua (converted)
+2007-01,34-36N,54.0,126.28,MODIS Terra+Aqua (converted)
+2007-01,36-38N,142.0,265.56,MODIS Terra+Aqua (converted)
+2007-01,38-40N,118.0,286.93,MODIS Terra+Aqua (converted)
+2007-01,40-44N,10.0,37.33,MODIS Terra+Aqua (converted)
+2007-02,32-34N,17.0,52.81,MODIS Terra+Aqua (converted)
+2007-02,34-36N,34.0,84.66,MODIS Terra+Aqua (converted)
+2007-02,36-38N,89.0,197.33,MODIS Terra+Aqua (converted)
+2007-02,38-40N,77.0,209.15,MODIS Terra+Aqua (converted)
+2007-02,40-44N,25.0,69.45,MODIS Terra+Aqua (converted)
+2007-03,32-34N,8.0,37.93,MODIS Terra+Aqua (converted)
+2007-03,34-36N,46.0,109.94,MODIS Terra+Aqua (converted)
+2007-03,36-38N,116.0,233.53,MODIS Terra+Aqua (converted)
+2007-03,38-40N,192.0,411.52,MODIS Terra+Aqua (converted)
+2007-03,40-44N,26.0,71.33,MODIS Terra+Aqua (converted)
+2007-04,32-34N,7.0,35.76,MODIS Terra+Aqua (converted)
+2007-04,34-36N,40.0,97.43,MODIS Terra+Aqua (converted)
+2007-04,36-38N,60.0,153.59,MODIS Terra+Aqua (converted)
+2007-04,38-40N,78.0,211.15,MODIS Terra+Aqua (converted)
+2007-04,40-44N,51.0,112.6,MODIS Terra+Aqua (converted)
+2007-05,32-34N,39.0,76.06,MODIS Terra+Aqua (converted)
+2007-05,34-36N,40.0,97.43,MODIS Terra+Aqua (converted)
+2007-05,36-38N,56.0,147.0,MODIS Terra+Aqua (converted)
+2007-05,38-40N,47.0,145.09,MODIS Terra+Aqua (converted)
+2007-05,40-44N,35.0,87.24,MODIS Terra+Aqua (converted)
+2007-06,32-34N,17.0,52.32,MODIS Terra+Aqua (converted)
+2007-06,34-36N,106.0,222.69,MODIS Terra+Aqua (converted)
+2007-06,36-38N,42.0,92.12,MODIS Terra+Aqua (converted)
+2007-06,38-40N,70.0,144.73,MODIS Terra+Aqua (converted)
+2007-06,40-44N,11.0,21.8,MODIS Terra+Aqua (converted)
+2007-07,32-34N,8.0,33.33,MODIS Terra+Aqua (converted)
+2007-07,34-36N,415.0,651.7,MODIS Terra+Aqua (converted)
+2007-07,36-38N,144.0,300.69,MODIS Terra+Aqua (converted)
+2007-07,38-40N,8.0,18.65,MODIS Terra+Aqua (converted)
+2007-07,40-44N,439.0,828.18,MODIS Terra+Aqua (converted)
+2007-08,32-34N,37.0,83.31,MODIS Terra+Aqua (converted)
+2007-08,34-36N,1982.0,2229.98,MODIS Terra+Aqua (converted)
+2007-08,36-38N,75.0,160.74,MODIS Terra+Aqua (converted)
+2007-08,38-40N,61.0,127.09,MODIS Terra+Aqua (converted)
+2007-08,40-44N,61.0,118.15,MODIS Terra+Aqua (converted)
+2007-09,32-34N,48.0,97.35,MODIS Terra+Aqua (converted)
+2007-09,34-36N,140.0,277.18,MODIS Terra+Aqua (converted)
+2007-09,36-38N,335.0,676.34,MODIS Terra+Aqua (converted)
+2007-09,38-40N,88.0,179.66,MODIS Terra+Aqua (converted)
+2007-09,40-44N,545.0,1025.19,MODIS Terra+Aqua (converted)
+2007-10,32-34N,1381.0,726.28,MODIS Terra+Aqua (converted)
+2007-10,34-36N,556.0,820.33,MODIS Terra+Aqua (converted)
+2007-10,36-38N,104.0,220.0,MODIS Terra+Aqua (converted)
+2007-10,38-40N,193.0,377.25,MODIS Terra+Aqua (converted)
+2007-10,40-44N,46.0,89.43,MODIS Terra+Aqua (converted)
+2007-11,32-34N,13.0,44.56,MODIS Terra+Aqua (converted)
+2007-11,34-36N,25.0,71.47,MODIS Terra+Aqua (converted)
+2007-11,36-38N,169.0,350.65,MODIS Terra+Aqua (converted)
+2007-11,38-40N,194.0,379.09,MODIS Terra+Aqua (converted)
+2007-11,40-44N,92.0,177.21,MODIS Terra+Aqua (converted)
+2007-12,32-34N,12.0,45.32,MODIS Terra+Aqua (converted)
+2007-12,34-36N,19.0,51.21,MODIS Terra+Aqua (converted)
+2007-12,36-38N,103.0,216.53,MODIS Terra+Aqua (converted)
+2007-12,38-40N,129.0,306.51,MODIS Terra+Aqua (converted)
+2007-12,40-44N,37.0,90.59,MODIS Terra+Aqua (converted)
+2008-01,32-34N,42.0,78.58,MODIS Terra+Aqua (converted)
+2008-01,34-36N,25.0,64.91,MODIS Terra+Aqua (converted)
+2008-01,36-38N,32.0,103.0,MODIS Terra+Aqua (converted)
+2008-01,38-40N,7.0,35.4,MODIS Terra+Aqua (converted)
+2008-01,40-44N,4.0,20.06,MODIS Terra+Aqua (converted)
+2008-02,32-34N,14.0,48.5,MODIS Terra+Aqua (converted)
+2008-02,34-36N,22.0,58.12,MODIS Terra+Aqua (converted)
+2008-02,36-38N,79.0,182.93,MODIS Terra+Aqua (converted)
+2008-02,38-40N,36.0,119.09,MODIS Terra+Aqua (converted)
+2008-02,40-44N,8.0,32.09,MODIS Terra+Aqua (converted)
+2008-03,32-34N,18.0,54.16,MODIS Terra+Aqua (converted)
+2008-03,34-36N,67.0,152.15,MODIS Terra+Aqua (converted)
+2008-03,36-38N,181.0,309.85,MODIS Terra+Aqua (converted)
+2008-03,38-40N,155.0,351.17,MODIS Terra+Aqua (converted)
+2008-03,40-44N,13.0,44.59,MODIS Terra+Aqua (converted)
+2008-04,32-34N,22.0,59.15,MODIS Terra+Aqua (converted)
+2008-04,34-36N,36.0,88.95,MODIS Terra+Aqua (converted)
+2008-04,36-38N,124.0,243.64,MODIS Terra+Aqua (converted)
+2008-04,38-40N,129.0,306.51,MODIS Terra+Aqua (converted)
+2008-04,40-44N,60.0,125.71,MODIS Terra+Aqua (converted)
+2008-05,32-34N,22.0,59.15,MODIS Terra+Aqua (converted)
+2008-05,34-36N,35.0,86.81,MODIS Terra+Aqua (converted)
+2008-05,36-38N,113.0,229.67,MODIS Terra+Aqua (converted)
+2008-05,38-40N,55.0,163.01,MODIS Terra+Aqua (converted)
+2008-05,40-44N,29.0,76.8,MODIS Terra+Aqua (converted)
+2008-06,32-34N,60.0,111.25,MODIS Terra+Aqua (converted)
+2008-06,34-36N,87.0,190.64,MODIS Terra+Aqua (converted)
+2008-06,36-38N,1166.0,2239.78,MODIS Terra+Aqua (converted)
+2008-06,38-40N,1013.0,1806.31,MODIS Terra+Aqua (converted)
+2008-06,40-44N,1600.0,2966.8,MODIS Terra+Aqua (converted)
+2008-07,32-34N,26.0,67.46,MODIS Terra+Aqua (converted)
+2008-07,34-36N,410.0,645.52,MODIS Terra+Aqua (converted)
+2008-07,36-38N,1283.0,2455.13,MODIS Terra+Aqua (converted)
+2008-07,38-40N,1014.0,1807.99,MODIS Terra+Aqua (converted)
+2008-07,40-44N,3861.0,7075.65,MODIS Terra+Aqua (converted)
+2008-08,32-34N,6.0,28.06,MODIS Terra+Aqua (converted)
+2008-08,34-36N,22.0,64.63,MODIS Terra+Aqua (converted)
+2008-08,36-38N,104.0,220.0,MODIS Terra+Aqua (converted)
+2008-08,38-40N,71.0,146.69,MODIS Terra+Aqua (converted)
+2008-08,40-44N,1275.0,2371.34,MODIS Terra+Aqua (converted)
+2008-09,32-34N,12.0,42.48,MODIS Terra+Aqua (converted)
+2008-09,34-36N,25.0,71.47,MODIS Terra+Aqua (converted)
+2008-09,36-38N,387.0,776.84,MODIS Terra+Aqua (converted)
+2008-09,38-40N,102.0,206.54,MODIS Terra+Aqua (converted)
+2008-09,40-44N,534.0,1004.77,MODIS Terra+Aqua (converted)
+2008-10,32-34N,16.0,50.46,MODIS Terra+Aqua (converted)
+2008-10,34-36N,88.0,192.36,MODIS Terra+Aqua (converted)
+2008-10,36-38N,178.0,368.56,MODIS Terra+Aqua (converted)
+2008-10,38-40N,218.0,423.25,MODIS Terra+Aqua (converted)
+2008-10,40-44N,180.0,343.63,MODIS Terra+Aqua (converted)
+2008-11,32-34N,90.0,141.79,MODIS Terra+Aqua (converted)
+2008-11,34-36N,85.0,187.18,MODIS Terra+Aqua (converted)
+2008-11,36-38N,149.0,310.71,MODIS Terra+Aqua (converted)
+2008-11,38-40N,136.0,271.04,MODIS Terra+Aqua (converted)
+2008-11,40-44N,80.0,154.39,MODIS Terra+Aqua (converted)
+2008-12,32-34N,2.0,20.63,MODIS Terra+Aqua (converted)
+2008-12,34-36N,34.0,84.66,MODIS Terra+Aqua (converted)
+2008-12,36-38N,66.0,163.18,MODIS Terra+Aqua (converted)
+2008-12,38-40N,86.0,226.99,MODIS Terra+Aqua (converted)
+2008-12,40-44N,48.0,108.07,MODIS Terra+Aqua (converted)
+2009-01,32-34N,33.0,70.68,MODIS Terra+Aqua (converted)
+2009-01,34-36N,46.0,109.94,MODIS Terra+Aqua (converted)
+2009-01,36-38N,27.0,92.45,MODIS Terra+Aqua (converted)
+2009-01,38-40N,35.0,116.63,MODIS Terra+Aqua (converted)
+2009-01,40-44N,40.0,95.51,MODIS Terra+Aqua (converted)
+2009-02,32-34N,35.0,72.53,MODIS Terra+Aqua (converted)
+2009-02,34-36N,44.0,105.79,MODIS Terra+Aqua (converted)
+2009-02,36-38N,40.0,118.69,MODIS Terra+Aqua (converted)
+2009-02,38-40N,24.0,88.19,MODIS Terra+Aqua (converted)
+2009-02,40-44N,8.0,32.09,MODIS Terra+Aqua (converted)
+2009-03,32-34N,25.0,62.56,MODIS Terra+Aqua (converted)
+2009-03,34-36N,62.0,142.29,MODIS Terra+Aqua (converted)
+2009-03,36-38N,107.0,221.84,MODIS Terra+Aqua (converted)
+2009-03,38-40N,110.0,272.39,MODIS Terra+Aqua (converted)
+2009-03,40-44N,22.0,63.69,MODIS Terra+Aqua (converted)
+2009-04,32-34N,12.0,45.32,MODIS Terra+Aqua (converted)
+2009-04,34-36N,26.0,67.15,MODIS Terra+Aqua (converted)
+2009-04,36-38N,76.0,178.49,MODIS Terra+Aqua (converted)
+2009-04,38-40N,156.0,352.85,MODIS Terra+Aqua (converted)
+2009-04,40-44N,31.0,80.35,MODIS Terra+Aqua (converted)
+2009-05,32-34N,15.0,49.99,MODIS Terra+Aqua (converted)
+2009-05,34-36N,89.0,194.46,MODIS Terra+Aqua (converted)
+2009-05,36-38N,54.0,143.64,MODIS Terra+Aqua (converted)
+2009-05,38-40N,45.0,140.49,MODIS Terra+Aqua (converted)
+2009-05,40-44N,18.0,55.59,MODIS Terra+Aqua (converted)
+2009-06,32-34N,56.0,106.75,MODIS Terra+Aqua (converted)
+2009-06,34-36N,14.0,45.29,MODIS Terra+Aqua (converted)
+2009-06,36-38N,76.0,162.8,MODIS Terra+Aqua (converted)
+2009-06,38-40N,35.0,75.2,MODIS Terra+Aqua (converted)
+2009-06,40-44N,5.0,10.01,MODIS Terra+Aqua (converted)
+2009-07,32-34N,45.0,93.66,MODIS Terra+Aqua (converted)
+2009-07,34-36N,31.0,84.65,MODIS Terra+Aqua (converted)
+2009-07,36-38N,204.0,420.1,MODIS Terra+Aqua (converted)
+2009-07,38-40N,102.0,206.54,MODIS Terra+Aqua (converted)
+2009-07,40-44N,193.0,368.11,MODIS Terra+Aqua (converted)
+2009-08,32-34N,33.0,77.8,MODIS Terra+Aqua (converted)
+2009-08,34-36N,1323.0,1622.52,MODIS Terra+Aqua (converted)
+2009-08,36-38N,263.0,536.13,MODIS Terra+Aqua (converted)
+2009-08,38-40N,135.0,269.15,MODIS Terra+Aqua (converted)
+2009-08,40-44N,409.0,772.31,MODIS Terra+Aqua (converted)
+2009-09,32-34N,8.0,33.33,MODIS Terra+Aqua (converted)
+2009-09,34-36N,419.0,656.64,MODIS Terra+Aqua (converted)
+2009-09,36-38N,96.0,203.73,MODIS Terra+Aqua (converted)
+2009-09,38-40N,69.0,142.78,MODIS Terra+Aqua (converted)
+2009-09,40-44N,9.0,17.88,MODIS Terra+Aqua (converted)
+2009-10,32-34N,6.0,28.06,MODIS Terra+Aqua (converted)
+2009-10,34-36N,58.0,138.57,MODIS Terra+Aqua (converted)
+2009-10,36-38N,162.0,336.69,MODIS Terra+Aqua (converted)
+2009-10,38-40N,207.0,403.05,MODIS Terra+Aqua (converted)
+2009-10,40-44N,91.0,175.31,MODIS Terra+Aqua (converted)
+2009-11,32-34N,20.0,57.66,MODIS Terra+Aqua (converted)
+2009-11,34-36N,46.0,115.47,MODIS Terra+Aqua (converted)
+2009-11,36-38N,171.0,354.63,MODIS Terra+Aqua (converted)
+2009-11,38-40N,315.0,599.23,MODIS Terra+Aqua (converted)
+2009-11,40-44N,122.0,234.12,MODIS Terra+Aqua (converted)
+2009-12,32-34N,1.0,15.21,MODIS Terra+Aqua (converted)
+2009-12,34-36N,13.0,36.89,MODIS Terra+Aqua (converted)
+2009-12,36-38N,32.0,103.0,MODIS Terra+Aqua (converted)
+2009-12,38-40N,69.0,192.82,MODIS Terra+Aqua (converted)
+2009-12,40-44N,48.0,108.07,MODIS Terra+Aqua (converted)
+2010-01,32-34N,22.0,59.15,MODIS Terra+Aqua (converted)
+2010-01,34-36N,14.0,39.33,MODIS Terra+Aqua (converted)
+2010-01,36-38N,20.0,76.4,MODIS Terra+Aqua (converted)
+2010-01,38-40N,9.0,42.65,MODIS Terra+Aqua (converted)
+2010-01,40-44N,0.0,0.0,MODIS Terra+Aqua (converted)
+2010-02,32-34N,25.0,62.56,MODIS Terra+Aqua (converted)
+2010-02,34-36N,11.0,31.93,MODIS Terra+Aqua (converted)
+2010-02,36-38N,10.0,49.18,MODIS Terra+Aqua (converted)
+2010-02,38-40N,7.0,35.4,MODIS Terra+Aqua (converted)
+2010-02,40-44N,8.0,32.09,MODIS Terra+Aqua (converted)
+2010-03,32-34N,8.0,37.93,MODIS Terra+Aqua (converted)
+2010-03,34-36N,21.0,55.83,MODIS Terra+Aqua (converted)
+2010-03,36-38N,50.0,136.78,MODIS Terra+Aqua (converted)
+2010-03,38-40N,75.0,205.11,MODIS Terra+Aqua (converted)
+2010-03,40-44N,28.0,75.0,MODIS Terra+Aqua (converted)
+2010-04,32-34N,1.0,15.21,MODIS Terra+Aqua (converted)
+2010-04,34-36N,24.0,62.66,MODIS Terra+Aqua (converted)
+2010-04,36-38N,33.0,105.03,MODIS Terra+Aqua (converted)
+2010-04,38-40N,37.0,121.53,MODIS Terra+Aqua (converted)
+2010-04,40-44N,6.0,26.4,MODIS Terra+Aqua (converted)
+2010-05,32-34N,23.0,60.31,MODIS Terra+Aqua (converted)
+2010-05,34-36N,28.0,71.59,MODIS Terra+Aqua (converted)
+2010-05,36-38N,45.0,127.92,MODIS Terra+Aqua (converted)
+2010-05,38-40N,36.0,119.09,MODIS Terra+Aqua (converted)
+2010-05,40-44N,11.0,39.82,MODIS Terra+Aqua (converted)
+2010-06,32-34N,61.0,112.36,MODIS Terra+Aqua (converted)
+2010-06,34-36N,47.0,117.44,MODIS Terra+Aqua (converted)
+2010-06,36-38N,31.0,68.82,MODIS Terra+Aqua (converted)
+2010-06,38-40N,40.0,85.31,MODIS Terra+Aqua (converted)
+2010-06,40-44N,17.0,33.49,MODIS Terra+Aqua (converted)
+2010-07,32-34N,30.0,73.49,MODIS Terra+Aqua (converted)
+2010-07,34-36N,161.0,309.4,MODIS Terra+Aqua (converted)
+2010-07,36-38N,35.0,77.33,MODIS Terra+Aqua (converted)
+2010-07,38-40N,67.0,138.87,MODIS Terra+Aqua (converted)
+2010-07,40-44N,50.0,97.1,MODIS Terra+Aqua (converted)
+2010-08,32-34N,22.0,61.05,MODIS Terra+Aqua (converted)
+2010-08,34-36N,20.0,59.96,MODIS Terra+Aqua (converted)
+2010-08,36-38N,111.0,234.2,MODIS Terra+Aqua (converted)
+2010-08,38-40N,80.0,164.19,MODIS Terra+Aqua (converted)
+2010-08,40-44N,33.0,64.44,MODIS Terra+Aqua (converted)
+2010-09,32-34N,31.0,74.95,MODIS Terra+Aqua (converted)
+2010-09,34-36N,52.0,127.16,MODIS Terra+Aqua (converted)
+2010-09,36-38N,190.0,392.38,MODIS Terra+Aqua (converted)
+2010-09,38-40N,46.0,97.35,MODIS Terra+Aqua (converted)
+2010-09,40-44N,24.0,47.07,MODIS Terra+Aqua (converted)
+2010-10,32-34N,1.0,9.61,MODIS Terra+Aqua (converted)
+2010-10,34-36N,18.0,55.19,MODIS Terra+Aqua (converted)
+2010-10,36-38N,59.0,127.67,MODIS Terra+Aqua (converted)
+2010-10,38-40N,161.0,317.88,MODIS Terra+Aqua (converted)
+2010-10,40-44N,78.0,150.58,MODIS Terra+Aqua (converted)
+2010-11,32-34N,4.0,22.02,MODIS Terra+Aqua (converted)
+2010-11,34-36N,9.0,31.99,MODIS Terra+Aqua (converted)
+2010-11,36-38N,43.0,94.23,MODIS Terra+Aqua (converted)
+2010-11,38-40N,141.0,280.44,MODIS Terra+Aqua (converted)
+2010-11,40-44N,77.0,148.67,MODIS Terra+Aqua (converted)
+2010-12,32-34N,12.0,45.32,MODIS Terra+Aqua (converted)
+2010-12,34-36N,17.0,46.51,MODIS Terra+Aqua (converted)
+2010-12,36-38N,11.0,52.25,MODIS Terra+Aqua (converted)
+2010-12,38-40N,9.0,42.65,MODIS Terra+Aqua (converted)
+2010-12,40-44N,0.0,0.0,MODIS Terra+Aqua (converted)
+2011-01,32-34N,47.0,82.56,MODIS Terra+Aqua (converted)
+2011-01,34-36N,5.0,16.16,MODIS Terra+Aqua (converted)
+2011-01,36-38N,6.0,35.54,MODIS Terra+Aqua (converted)
+2011-01,38-40N,21.0,79.88,MODIS Terra+Aqua (converted)
+2011-01,40-44N,13.0,44.59,MODIS Terra+Aqua (converted)
+2011-02,32-34N,61.0,92.58,MODIS Terra+Aqua (converted)
+2011-02,34-36N,27.0,69.37,MODIS Terra+Aqua (converted)
+2011-02,36-38N,43.0,124.28,MODIS Terra+Aqua (converted)
+2011-02,38-40N,69.0,192.82,MODIS Terra+Aqua (converted)
+2011-02,40-44N,17.0,53.48,MODIS Terra+Aqua (converted)
+2011-03,32-34N,26.0,63.65,MODIS Terra+Aqua (converted)
+2011-03,34-36N,21.0,55.83,MODIS Terra+Aqua (converted)
+2011-03,36-38N,36.0,111.01,MODIS Terra+Aqua (converted)
+2011-03,38-40N,12.0,52.78,MODIS Terra+Aqua (converted)
+2011-03,40-44N,5.0,23.33,MODIS Terra+Aqua (converted)
+2011-04,32-34N,1.0,15.21,MODIS Terra+Aqua (converted)
+2011-04,34-36N,17.0,46.51,MODIS Terra+Aqua (converted)
+2011-04,36-38N,70.0,169.4,MODIS Terra+Aqua (converted)
+2011-04,38-40N,142.0,329.11,MODIS Terra+Aqua (converted)
+2011-04,40-44N,23.0,65.64,MODIS Terra+Aqua (converted)
+2011-05,32-34N,14.0,48.5,MODIS Terra+Aqua (converted)
+2011-05,34-36N,14.0,39.33,MODIS Terra+Aqua (converted)
+2011-05,36-38N,26.0,90.26,MODIS Terra+Aqua (converted)
+2011-05,38-40N,43.0,135.84,MODIS Terra+Aqua (converted)
+2011-05,40-44N,21.0,61.71,MODIS Terra+Aqua (converted)
+2011-06,32-34N,35.0,80.59,MODIS Terra+Aqua (converted)
+2011-06,34-36N,48.0,119.4,MODIS Terra+Aqua (converted)
+2011-06,36-38N,31.0,68.82,MODIS Terra+Aqua (converted)
+2011-06,38-40N,22.0,48.5,MODIS Terra+Aqua (converted)
+2011-06,40-44N,21.0,41.26,MODIS Terra+Aqua (converted)
+2011-07,32-34N,82.0,134.11,MODIS Terra+Aqua (converted)
+2011-07,34-36N,31.0,84.65,MODIS Terra+Aqua (converted)
+2011-07,36-38N,270.0,549.83,MODIS Terra+Aqua (converted)
+2011-07,38-40N,38.0,81.27,MODIS Terra+Aqua (converted)
+2011-07,40-44N,7.0,13.95,MODIS Terra+Aqua (converted)
+2011-08,32-34N,37.0,83.31,MODIS Terra+Aqua (converted)
+2011-08,34-36N,26.0,73.71,MODIS Terra+Aqua (converted)
+2011-08,36-38N,107.0,226.09,MODIS Terra+Aqua (converted)
+2011-08,38-40N,49.0,103.33,MODIS Terra+Aqua (converted)
+2011-08,40-44N,14.0,27.65,MODIS Terra+Aqua (converted)
+2011-09,32-34N,14.0,46.58,MODIS Terra+Aqua (converted)
+2011-09,34-36N,138.0,274.06,MODIS Terra+Aqua (converted)
+2011-09,36-38N,64.0,138.04,MODIS Terra+Aqua (converted)
+2011-09,38-40N,49.0,103.33,MODIS Terra+Aqua (converted)
+2011-09,40-44N,32.0,62.51,MODIS Terra+Aqua (converted)
+2011-10,32-34N,17.0,52.32,MODIS Terra+Aqua (converted)
+2011-10,34-36N,7.0,26.25,MODIS Terra+Aqua (converted)
+2011-10,36-38N,114.0,240.28,MODIS Terra+Aqua (converted)
+2011-10,38-40N,212.0,412.24,MODIS Terra+Aqua (converted)
+2011-10,40-44N,123.0,236.01,MODIS Terra+Aqua (converted)
+2011-11,32-34N,8.0,33.33,MODIS Terra+Aqua (converted)
+2011-11,34-36N,32.0,86.79,MODIS Terra+Aqua (converted)
+2011-11,36-38N,65.0,140.11,MODIS Terra+Aqua (converted)
+2011-11,38-40N,253.0,487.17,MODIS Terra+Aqua (converted)
+2011-11,40-44N,97.0,186.71,MODIS Terra+Aqua (converted)
+2011-12,32-34N,2.0,20.63,MODIS Terra+Aqua (converted)
+2011-12,34-36N,12.0,34.42,MODIS Terra+Aqua (converted)
+2011-12,36-38N,34.0,107.04,MODIS Terra+Aqua (converted)
+2011-12,38-40N,80.0,215.15,MODIS Terra+Aqua (converted)
+2011-12,40-44N,15.0,49.13,MODIS Terra+Aqua (converted)
+2012-01,32-34N,48.0,83.33,MODIS Terra+Aqua (converted)
+2012-01,34-36N,20.0,53.53,MODIS Terra+Aqua (converted)
+2012-01,36-38N,82.0,187.32,MODIS Terra+Aqua (converted)
+2012-01,38-40N,95.0,244.36,MODIS Terra+Aqua (converted)
+2012-01,40-44N,21.0,61.71,MODIS Terra+Aqua (converted)
+2012-02,32-34N,65.0,65.0,VIIRS S-NPP
+2012-02,34-36N,63.0,63.0,VIIRS S-NPP
+2012-02,36-38N,110.0,110.0,VIIRS S-NPP
+2012-02,38-40N,153.0,153.0,VIIRS S-NPP
+2012-02,40-44N,32.0,32.0,VIIRS S-NPP
+2012-03,32-34N,32.0,32.0,VIIRS S-NPP
+2012-03,34-36N,62.0,62.0,VIIRS S-NPP
+2012-03,36-38N,84.0,84.0,VIIRS S-NPP
+2012-03,38-40N,140.0,140.0,VIIRS S-NPP
+2012-03,40-44N,34.0,34.0,VIIRS S-NPP
+2012-04,32-34N,26.0,26.0,VIIRS S-NPP
+2012-04,34-36N,51.0,51.0,VIIRS S-NPP
+2012-04,36-38N,49.0,49.0,VIIRS S-NPP
+2012-04,38-40N,105.0,105.0,VIIRS S-NPP
+2012-04,40-44N,49.0,49.0,VIIRS S-NPP
+2012-05,32-34N,65.0,65.0,VIIRS S-NPP
+2012-05,34-36N,53.0,53.0,VIIRS S-NPP
+2012-05,36-38N,76.0,76.0,VIIRS S-NPP
+2012-05,38-40N,67.0,67.0,VIIRS S-NPP
+2012-05,40-44N,34.0,34.0,VIIRS S-NPP
+2012-06,32-34N,109.0,109.0,VIIRS S-NPP
+2012-06,34-36N,100.0,100.0,VIIRS S-NPP
+2012-06,36-38N,149.0,149.0,VIIRS S-NPP
+2012-06,38-40N,64.0,64.0,VIIRS S-NPP
+2012-06,40-44N,22.0,22.0,VIIRS S-NPP
+2012-07,32-34N,51.0,51.0,VIIRS S-NPP
+2012-07,34-36N,73.0,73.0,VIIRS S-NPP
+2012-07,36-38N,117.0,117.0,VIIRS S-NPP
+2012-07,38-40N,414.0,414.0,VIIRS S-NPP
+2012-07,40-44N,65.0,65.0,VIIRS S-NPP
+2012-08,32-34N,161.0,161.0,VIIRS S-NPP
+2012-08,34-36N,133.0,133.0,VIIRS S-NPP
+2012-08,36-38N,219.0,219.0,VIIRS S-NPP
+2012-08,38-40N,749.0,749.0,VIIRS S-NPP
+2012-08,40-44N,5296.0,5296.0,VIIRS S-NPP
+2012-09,32-34N,78.0,78.0,VIIRS S-NPP
+2012-09,34-36N,106.0,106.0,VIIRS S-NPP
+2012-09,36-38N,175.0,175.0,VIIRS S-NPP
+2012-09,38-40N,371.0,371.0,VIIRS S-NPP
+2012-09,40-44N,476.0,476.0,VIIRS S-NPP
+2012-10,32-34N,31.0,31.0,VIIRS S-NPP
+2012-10,34-36N,75.0,75.0,VIIRS S-NPP
+2012-10,36-38N,98.0,98.0,VIIRS S-NPP
+2012-10,38-40N,318.0,318.0,VIIRS S-NPP
+2012-10,40-44N,38.0,38.0,VIIRS S-NPP
+2012-11,32-34N,37.0,37.0,VIIRS S-NPP
+2012-11,34-36N,106.0,106.0,VIIRS S-NPP
+2012-11,36-38N,124.0,124.0,VIIRS S-NPP
+2012-11,38-40N,315.0,315.0,VIIRS S-NPP
+2012-11,40-44N,182.0,182.0,VIIRS S-NPP
+2012-12,32-34N,22.0,22.0,VIIRS S-NPP
+2012-12,34-36N,31.0,31.0,VIIRS S-NPP
+2012-12,36-38N,54.0,54.0,VIIRS S-NPP
+2012-12,38-40N,58.0,58.0,VIIRS S-NPP
+2012-12,40-44N,56.0,56.0,VIIRS S-NPP
+2013-01,32-34N,57.0,57.0,VIIRS S-NPP
+2013-01,34-36N,22.0,22.0,VIIRS S-NPP
+2013-01,36-38N,85.0,85.0,VIIRS S-NPP
+2013-01,38-40N,44.0,44.0,VIIRS S-NPP
+2013-01,40-44N,18.0,18.0,VIIRS S-NPP
+2013-02,32-34N,56.0,56.0,VIIRS S-NPP
+2013-02,34-36N,66.0,66.0,VIIRS S-NPP
+2013-02,36-38N,143.0,143.0,VIIRS S-NPP
+2013-02,38-40N,284.0,284.0,VIIRS S-NPP
+2013-02,40-44N,58.0,58.0,VIIRS S-NPP
+2013-03,32-34N,37.0,37.0,VIIRS S-NPP
+2013-03,34-36N,35.0,35.0,VIIRS S-NPP
+2013-03,36-38N,108.0,108.0,VIIRS S-NPP
+2013-03,38-40N,269.0,269.0,VIIRS S-NPP
+2013-03,40-44N,69.0,69.0,VIIRS S-NPP
+2013-04,32-34N,22.0,22.0,VIIRS S-NPP
+2013-04,34-36N,62.0,62.0,VIIRS S-NPP
+2013-04,36-38N,104.0,104.0,VIIRS S-NPP
+2013-04,38-40N,141.0,141.0,VIIRS S-NPP
+2013-04,40-44N,86.0,86.0,VIIRS S-NPP
+2013-05,32-34N,86.0,86.0,VIIRS S-NPP
+2013-05,34-36N,239.0,239.0,VIIRS S-NPP
+2013-05,36-38N,77.0,77.0,VIIRS S-NPP
+2013-05,38-40N,56.0,56.0,VIIRS S-NPP
+2013-05,40-44N,128.0,128.0,VIIRS S-NPP
+2013-06,32-34N,23.0,23.0,VIIRS S-NPP
+2013-06,34-36N,233.0,233.0,VIIRS S-NPP
+2013-06,36-38N,131.0,131.0,VIIRS S-NPP
+2013-06,38-40N,94.0,94.0,VIIRS S-NPP
+2013-06,40-44N,9.0,9.0,VIIRS S-NPP
+2013-07,32-34N,268.0,268.0,VIIRS S-NPP
+2013-07,34-36N,44.0,44.0,VIIRS S-NPP
+2013-07,36-38N,357.0,357.0,VIIRS S-NPP
+2013-07,38-40N,80.0,80.0,VIIRS S-NPP
+2013-07,40-44N,15.0,15.0,VIIRS S-NPP
+2013-08,32-34N,109.0,109.0,VIIRS S-NPP
+2013-08,34-36N,50.0,50.0,VIIRS S-NPP
+2013-08,36-38N,2825.0,2825.0,VIIRS S-NPP
+2013-08,38-40N,1199.0,1199.0,VIIRS S-NPP
+2013-08,40-44N,1332.0,1332.0,VIIRS S-NPP
+2013-09,32-34N,28.0,28.0,VIIRS S-NPP
+2013-09,34-36N,34.0,34.0,VIIRS S-NPP
+2013-09,36-38N,956.0,956.0,VIIRS S-NPP
+2013-09,38-40N,895.0,895.0,VIIRS S-NPP
+2013-09,40-44N,181.0,181.0,VIIRS S-NPP
+2013-10,32-34N,49.0,49.0,VIIRS S-NPP
+2013-10,34-36N,37.0,37.0,VIIRS S-NPP
+2013-10,36-38N,142.0,142.0,VIIRS S-NPP
+2013-10,38-40N,464.0,464.0,VIIRS S-NPP
+2013-10,40-44N,157.0,157.0,VIIRS S-NPP
+2013-11,32-34N,47.0,47.0,VIIRS S-NPP
+2013-11,34-36N,34.0,34.0,VIIRS S-NPP
+2013-11,36-38N,181.0,181.0,VIIRS S-NPP
+2013-11,38-40N,353.0,353.0,VIIRS S-NPP
+2013-11,40-44N,162.0,162.0,VIIRS S-NPP
+2013-12,32-34N,28.0,28.0,VIIRS S-NPP
+2013-12,34-36N,56.0,56.0,VIIRS S-NPP
+2013-12,36-38N,186.0,186.0,VIIRS S-NPP
+2013-12,38-40N,258.0,258.0,VIIRS S-NPP
+2013-12,40-44N,186.0,186.0,VIIRS S-NPP
+2014-01,32-34N,62.0,62.0,VIIRS S-NPP
+2014-01,34-36N,64.0,64.0,VIIRS S-NPP
+2014-01,36-38N,192.0,192.0,VIIRS S-NPP
+2014-01,38-40N,176.0,176.0,VIIRS S-NPP
+2014-01,40-44N,52.0,52.0,VIIRS S-NPP
+2014-02,32-34N,67.0,67.0,VIIRS S-NPP
+2014-02,34-36N,74.0,74.0,VIIRS S-NPP
+2014-02,36-38N,204.0,204.0,VIIRS S-NPP
+2014-02,38-40N,234.0,234.0,VIIRS S-NPP
+2014-02,40-44N,121.0,121.0,VIIRS S-NPP
+2014-03,32-34N,52.0,52.0,VIIRS S-NPP
+2014-03,34-36N,45.0,45.0,VIIRS S-NPP
+2014-03,36-38N,126.0,126.0,VIIRS S-NPP
+2014-03,38-40N,214.0,214.0,VIIRS S-NPP
+2014-03,40-44N,88.0,88.0,VIIRS S-NPP
+2014-04,32-34N,28.0,28.0,VIIRS S-NPP
+2014-04,34-36N,63.0,63.0,VIIRS S-NPP
+2014-04,36-38N,96.0,96.0,VIIRS S-NPP
+2014-04,38-40N,154.0,154.0,VIIRS S-NPP
+2014-04,40-44N,50.0,50.0,VIIRS S-NPP
+2014-05,32-34N,149.0,149.0,VIIRS S-NPP
+2014-05,34-36N,55.0,55.0,VIIRS S-NPP
+2014-05,36-38N,98.0,98.0,VIIRS S-NPP
+2014-05,38-40N,62.0,62.0,VIIRS S-NPP
+2014-05,40-44N,24.0,24.0,VIIRS S-NPP
+2014-06,32-34N,22.0,22.0,VIIRS S-NPP
+2014-06,34-36N,130.0,130.0,VIIRS S-NPP
+2014-06,36-38N,82.0,82.0,VIIRS S-NPP
+2014-06,38-40N,45.0,45.0,VIIRS S-NPP
+2014-06,40-44N,9.0,9.0,VIIRS S-NPP
+2014-07,32-34N,30.0,30.0,VIIRS S-NPP
+2014-07,34-36N,49.0,49.0,VIIRS S-NPP
+2014-07,36-38N,204.0,204.0,VIIRS S-NPP
+2014-07,38-40N,152.0,152.0,VIIRS S-NPP
+2014-07,40-44N,214.0,214.0,VIIRS S-NPP
+2014-08,32-34N,18.0,18.0,VIIRS S-NPP
+2014-08,34-36N,62.0,62.0,VIIRS S-NPP
+2014-08,36-38N,207.0,207.0,VIIRS S-NPP
+2014-08,38-40N,203.0,203.0,VIIRS S-NPP
+2014-08,40-44N,3614.0,3614.0,VIIRS S-NPP
+2014-09,32-34N,35.0,35.0,VIIRS S-NPP
+2014-09,34-36N,58.0,58.0,VIIRS S-NPP
+2014-09,36-38N,210.0,210.0,VIIRS S-NPP
+2014-09,38-40N,1324.0,1324.0,VIIRS S-NPP
+2014-09,40-44N,1739.0,1739.0,VIIRS S-NPP
+2014-10,32-34N,27.0,27.0,VIIRS S-NPP
+2014-10,34-36N,61.0,61.0,VIIRS S-NPP
+2014-10,36-38N,227.0,227.0,VIIRS S-NPP
+2014-10,38-40N,286.0,286.0,VIIRS S-NPP
+2014-10,40-44N,140.0,140.0,VIIRS S-NPP
+2014-11,32-34N,27.0,27.0,VIIRS S-NPP
+2014-11,34-36N,82.0,82.0,VIIRS S-NPP
+2014-11,36-38N,139.0,139.0,VIIRS S-NPP
+2014-11,38-40N,149.0,149.0,VIIRS S-NPP
+2014-11,40-44N,129.0,129.0,VIIRS S-NPP
+2014-12,32-34N,40.0,40.0,VIIRS S-NPP
+2014-12,34-36N,54.0,54.0,VIIRS S-NPP
+2014-12,36-38N,115.0,115.0,VIIRS S-NPP
+2014-12,38-40N,71.0,71.0,VIIRS S-NPP
+2014-12,40-44N,42.0,42.0,VIIRS S-NPP
+2015-01,32-34N,53.0,53.0,VIIRS S-NPP
+2015-01,34-36N,38.0,38.0,VIIRS S-NPP
+2015-01,36-38N,78.0,78.0,VIIRS S-NPP
+2015-01,38-40N,196.0,196.0,VIIRS S-NPP
+2015-01,40-44N,74.0,74.0,VIIRS S-NPP
+2015-02,32-34N,76.0,76.0,VIIRS S-NPP
+2015-02,34-36N,147.0,147.0,VIIRS S-NPP
+2015-02,36-38N,212.0,212.0,VIIRS S-NPP
+2015-02,38-40N,156.0,156.0,VIIRS S-NPP
+2015-02,40-44N,71.0,71.0,VIIRS S-NPP
+2015-03,32-34N,34.0,34.0,VIIRS S-NPP
+2015-03,34-36N,99.0,99.0,VIIRS S-NPP
+2015-03,36-38N,153.0,153.0,VIIRS S-NPP
+2015-03,38-40N,328.0,328.0,VIIRS S-NPP
+2015-03,40-44N,39.0,39.0,VIIRS S-NPP
+2015-04,32-34N,45.0,45.0,VIIRS S-NPP
+2015-04,34-36N,67.0,67.0,VIIRS S-NPP
+2015-04,36-38N,154.0,154.0,VIIRS S-NPP
+2015-04,38-40N,160.0,160.0,VIIRS S-NPP
+2015-04,40-44N,72.0,72.0,VIIRS S-NPP
+2015-05,32-34N,20.0,20.0,VIIRS S-NPP
+2015-05,34-36N,70.0,70.0,VIIRS S-NPP
+2015-05,36-38N,97.0,97.0,VIIRS S-NPP
+2015-05,38-40N,58.0,58.0,VIIRS S-NPP
+2015-05,40-44N,13.0,13.0,VIIRS S-NPP
+2015-06,32-34N,33.0,33.0,VIIRS S-NPP
+2015-06,34-36N,708.0,708.0,VIIRS S-NPP
+2015-06,36-38N,103.0,103.0,VIIRS S-NPP
+2015-06,38-40N,251.0,251.0,VIIRS S-NPP
+2015-06,40-44N,48.0,48.0,VIIRS S-NPP
+2015-07,32-34N,42.0,42.0,VIIRS S-NPP
+2015-07,34-36N,100.0,100.0,VIIRS S-NPP
+2015-07,36-38N,202.0,202.0,VIIRS S-NPP
+2015-07,38-40N,301.0,301.0,VIIRS S-NPP
+2015-07,40-44N,131.0,131.0,VIIRS S-NPP
+2015-08,32-34N,45.0,45.0,VIIRS S-NPP
+2015-08,34-36N,106.0,106.0,VIIRS S-NPP
+2015-08,36-38N,1911.0,1911.0,VIIRS S-NPP
+2015-08,38-40N,384.0,384.0,VIIRS S-NPP
+2015-08,40-44N,6265.0,6265.0,VIIRS S-NPP
+2015-09,32-34N,24.0,24.0,VIIRS S-NPP
+2015-09,34-36N,56.0,56.0,VIIRS S-NPP
+2015-09,36-38N,1740.0,1740.0,VIIRS S-NPP
+2015-09,38-40N,727.0,727.0,VIIRS S-NPP
+2015-09,40-44N,312.0,312.0,VIIRS S-NPP
+2015-10,32-34N,34.0,34.0,VIIRS S-NPP
+2015-10,34-36N,109.0,109.0,VIIRS S-NPP
+2015-10,36-38N,268.0,268.0,VIIRS S-NPP
+2015-10,38-40N,410.0,410.0,VIIRS S-NPP
+2015-10,40-44N,132.0,132.0,VIIRS S-NPP
+2015-11,32-34N,42.0,42.0,VIIRS S-NPP
+2015-11,34-36N,111.0,111.0,VIIRS S-NPP
+2015-11,36-38N,343.0,343.0,VIIRS S-NPP
+2015-11,38-40N,433.0,433.0,VIIRS S-NPP
+2015-11,40-44N,394.0,394.0,VIIRS S-NPP
+2015-12,32-34N,33.0,33.0,VIIRS S-NPP
+2015-12,34-36N,67.0,67.0,VIIRS S-NPP
+2015-12,36-38N,185.0,185.0,VIIRS S-NPP
+2015-12,38-40N,115.0,115.0,VIIRS S-NPP
+2015-12,40-44N,109.0,109.0,VIIRS S-NPP
+2016-01,32-34N,43.0,43.0,VIIRS S-NPP
+2016-01,34-36N,36.0,36.0,VIIRS S-NPP
+2016-01,36-38N,59.0,59.0,VIIRS S-NPP
+2016-01,38-40N,19.0,19.0,VIIRS S-NPP
+2016-01,40-44N,3.0,3.0,VIIRS S-NPP
+2016-02,32-34N,81.0,81.0,VIIRS S-NPP
+2016-02,34-36N,90.0,90.0,VIIRS S-NPP
+2016-02,36-38N,175.0,175.0,VIIRS S-NPP
+2016-02,38-40N,124.0,124.0,VIIRS S-NPP
+2016-02,40-44N,39.0,39.0,VIIRS S-NPP
+2016-03,32-34N,69.0,69.0,VIIRS S-NPP
+2016-03,34-36N,61.0,61.0,VIIRS S-NPP
+2016-03,36-38N,202.0,202.0,VIIRS S-NPP
+2016-03,38-40N,107.0,107.0,VIIRS S-NPP
+2016-03,40-44N,31.0,31.0,VIIRS S-NPP
+2016-04,32-34N,28.0,28.0,VIIRS S-NPP
+2016-04,34-36N,104.0,104.0,VIIRS S-NPP
+2016-04,36-38N,118.0,118.0,VIIRS S-NPP
+2016-04,38-40N,201.0,201.0,VIIRS S-NPP
+2016-04,40-44N,77.0,77.0,VIIRS S-NPP
+2016-05,32-34N,28.0,28.0,VIIRS S-NPP
+2016-05,34-36N,102.0,102.0,VIIRS S-NPP
+2016-05,36-38N,123.0,123.0,VIIRS S-NPP
+2016-05,38-40N,79.0,79.0,VIIRS S-NPP
+2016-05,40-44N,43.0,43.0,VIIRS S-NPP
+2016-06,32-34N,97.0,97.0,VIIRS S-NPP
+2016-06,34-36N,473.0,473.0,VIIRS S-NPP
+2016-06,36-38N,219.0,219.0,VIIRS S-NPP
+2016-06,38-40N,91.0,91.0,VIIRS S-NPP
+2016-06,40-44N,96.0,96.0,VIIRS S-NPP
+2016-07,32-34N,41.0,41.0,VIIRS S-NPP
+2016-07,34-36N,448.0,448.0,VIIRS S-NPP
+2016-07,36-38N,683.0,683.0,VIIRS S-NPP
+2016-07,38-40N,187.0,187.0,VIIRS S-NPP
+2016-07,40-44N,20.0,20.0,VIIRS S-NPP
+2016-08,32-34N,38.0,38.0,VIIRS S-NPP
+2016-08,34-36N,1466.0,1466.0,VIIRS S-NPP
+2016-08,36-38N,1301.0,1301.0,VIIRS S-NPP
+2016-08,38-40N,183.0,183.0,VIIRS S-NPP
+2016-08,40-44N,173.0,173.0,VIIRS S-NPP
+2016-09,32-34N,35.0,35.0,VIIRS S-NPP
+2016-09,34-36N,147.0,147.0,VIIRS S-NPP
+2016-09,36-38N,1009.0,1009.0,VIIRS S-NPP
+2016-09,38-40N,227.0,227.0,VIIRS S-NPP
+2016-09,40-44N,532.0,532.0,VIIRS S-NPP
+2016-10,32-34N,35.0,35.0,VIIRS S-NPP
+2016-10,34-36N,82.0,82.0,VIIRS S-NPP
+2016-10,36-38N,418.0,418.0,VIIRS S-NPP
+2016-10,38-40N,368.0,368.0,VIIRS S-NPP
+2016-10,40-44N,157.0,157.0,VIIRS S-NPP
+2016-11,32-34N,36.0,36.0,VIIRS S-NPP
+2016-11,34-36N,265.0,265.0,VIIRS S-NPP
+2016-11,36-38N,445.0,445.0,VIIRS S-NPP
+2016-11,38-40N,385.0,385.0,VIIRS S-NPP
+2016-11,40-44N,287.0,287.0,VIIRS S-NPP
+2016-12,32-34N,26.0,26.0,VIIRS S-NPP
+2016-12,34-36N,31.0,31.0,VIIRS S-NPP
+2016-12,36-38N,126.0,126.0,VIIRS S-NPP
+2016-12,38-40N,102.0,102.0,VIIRS S-NPP
+2016-12,40-44N,91.0,91.0,VIIRS S-NPP
+2017-01,32-34N,38.0,38.0,VIIRS S-NPP
+2017-01,34-36N,34.0,34.0,VIIRS S-NPP
+2017-01,36-38N,56.0,56.0,VIIRS S-NPP
+2017-01,38-40N,15.0,15.0,VIIRS S-NPP
+2017-01,40-44N,1.0,1.0,VIIRS S-NPP
+2017-02,32-34N,53.0,53.0,VIIRS S-NPP
+2017-02,34-36N,80.0,80.0,VIIRS S-NPP
+2017-02,36-38N,87.0,87.0,VIIRS S-NPP
+2017-02,38-40N,23.0,23.0,VIIRS S-NPP
+2017-02,40-44N,2.0,2.0,VIIRS S-NPP
+2017-03,32-34N,56.0,56.0,VIIRS S-NPP
+2017-03,34-36N,134.0,134.0,VIIRS S-NPP
+2017-03,36-38N,274.0,274.0,VIIRS S-NPP
+2017-03,38-40N,128.0,128.0,VIIRS S-NPP
+2017-03,40-44N,21.0,21.0,VIIRS S-NPP
+2017-04,32-34N,47.0,47.0,VIIRS S-NPP
+2017-04,34-36N,123.0,123.0,VIIRS S-NPP
+2017-04,36-38N,217.0,217.0,VIIRS S-NPP
+2017-04,38-40N,190.0,190.0,VIIRS S-NPP
+2017-04,40-44N,23.0,23.0,VIIRS S-NPP
+2017-05,32-34N,57.0,57.0,VIIRS S-NPP
+2017-05,34-36N,103.0,103.0,VIIRS S-NPP
+2017-05,36-38N,175.0,175.0,VIIRS S-NPP
+2017-05,38-40N,181.0,181.0,VIIRS S-NPP
+2017-05,40-44N,56.0,56.0,VIIRS S-NPP
+2017-06,32-34N,100.0,100.0,VIIRS S-NPP
+2017-06,34-36N,173.0,173.0,VIIRS S-NPP
+2017-06,36-38N,248.0,248.0,VIIRS S-NPP
+2017-06,38-40N,109.0,109.0,VIIRS S-NPP
+2017-06,40-44N,28.0,28.0,VIIRS S-NPP
+2017-07,32-34N,43.0,43.0,VIIRS S-NPP
+2017-07,34-36N,724.0,724.0,VIIRS S-NPP
+2017-07,36-38N,940.0,940.0,VIIRS S-NPP
+2017-07,38-40N,200.0,200.0,VIIRS S-NPP
+2017-07,40-44N,651.0,651.0,VIIRS S-NPP
+2017-08,32-34N,44.0,44.0,VIIRS S-NPP
+2017-08,34-36N,55.0,55.0,VIIRS S-NPP
+2017-08,36-38N,937.0,937.0,VIIRS S-NPP
+2017-08,38-40N,415.0,415.0,VIIRS S-NPP
+2017-08,40-44N,3928.0,3928.0,VIIRS S-NPP
+2017-09,32-34N,65.0,65.0,VIIRS S-NPP
+2017-09,34-36N,186.0,186.0,VIIRS S-NPP
+2017-09,36-38N,1365.0,1365.0,VIIRS S-NPP
+2017-09,38-40N,426.0,426.0,VIIRS S-NPP
+2017-09,40-44N,3301.0,3301.0,VIIRS S-NPP
+2017-10,32-34N,137.0,137.0,VIIRS S-NPP
+2017-10,34-36N,127.0,127.0,VIIRS S-NPP
+2017-10,36-38N,1026.0,1026.0,VIIRS S-NPP
+2017-10,38-40N,2395.0,2395.0,VIIRS S-NPP
+2017-10,40-44N,481.0,481.0,VIIRS S-NPP
+2017-11,32-34N,17.0,17.0,VIIRS S-NPP
+2017-11,34-36N,161.0,161.0,VIIRS S-NPP
+2017-11,36-38N,455.0,455.0,VIIRS S-NPP
+2017-11,38-40N,350.0,350.0,VIIRS S-NPP
+2017-11,40-44N,164.0,164.0,VIIRS S-NPP
+2017-12,32-34N,55.0,55.0,VIIRS S-NPP
+2017-12,34-36N,2426.0,2426.0,VIIRS S-NPP
+2017-12,36-38N,358.0,358.0,VIIRS S-NPP
+2017-12,38-40N,231.0,231.0,VIIRS S-NPP
+2017-12,40-44N,82.0,82.0,VIIRS S-NPP
+2018-01,32-34N,57.0,57.0,VIIRS S-NPP
+2018-01,34-36N,126.0,126.0,VIIRS S-NPP
+2018-01,36-38N,303.0,303.0,VIIRS S-NPP
+2018-01,38-40N,156.0,156.0,VIIRS S-NPP
+2018-01,40-44N,22.0,22.0,VIIRS S-NPP
+2018-02,32-34N,39.0,39.0,VIIRS S-NPP
+2018-02,34-36N,137.0,137.0,VIIRS S-NPP
+2018-02,36-38N,404.0,404.0,VIIRS S-NPP
+2018-02,38-40N,464.0,464.0,VIIRS S-NPP
+2018-02,40-44N,104.0,104.0,VIIRS S-NPP
+2018-03,32-34N,28.0,28.0,VIIRS S-NPP
+2018-03,34-36N,61.0,61.0,VIIRS S-NPP
+2018-03,36-38N,168.0,168.0,VIIRS S-NPP
+2018-03,38-40N,156.0,156.0,VIIRS S-NPP
+2018-03,40-44N,25.0,25.0,VIIRS S-NPP
+2018-04,32-34N,38.0,38.0,VIIRS S-NPP
+2018-04,34-36N,88.0,88.0,VIIRS S-NPP
+2018-04,36-38N,165.0,165.0,VIIRS S-NPP
+2018-04,38-40N,210.0,210.0,VIIRS S-NPP
+2018-04,40-44N,86.0,86.0,VIIRS S-NPP
+2018-05,32-34N,39.0,39.0,VIIRS S-NPP
+2018-05,34-36N,89.0,89.0,VIIRS S-NPP
+2018-05,36-38N,134.0,134.0,VIIRS S-NPP
+2018-05,38-40N,127.0,127.0,VIIRS S-NPP
+2018-05,40-44N,28.0,28.0,VIIRS S-NPP
+2018-06,32-34N,31.0,31.0,VIIRS S-NPP
+2018-06,34-36N,67.0,67.0,VIIRS S-NPP
+2018-06,36-38N,276.0,276.0,VIIRS S-NPP
+2018-06,38-40N,194.0,194.0,VIIRS S-NPP
+2018-06,40-44N,67.0,67.0,VIIRS S-NPP
+2018-07,32-34N,161.0,161.0,VIIRS S-NPP
+2018-07,34-36N,59.0,59.0,VIIRS S-NPP
+2018-07,36-38N,1222.0,1222.0,VIIRS S-NPP
+2018-07,38-40N,1141.0,1141.0,VIIRS S-NPP
+2018-07,40-44N,1645.0,1645.0,VIIRS S-NPP
+2018-08,32-34N,243.0,243.0,VIIRS S-NPP
+2018-08,34-36N,78.0,78.0,VIIRS S-NPP
+2018-08,36-38N,1287.0,1287.0,VIIRS S-NPP
+2018-08,38-40N,4995.0,4995.0,VIIRS S-NPP
+2018-08,40-44N,3834.0,3834.0,VIIRS S-NPP
+2018-09,32-34N,47.0,47.0,VIIRS S-NPP
+2018-09,34-36N,45.0,45.0,VIIRS S-NPP
+2018-09,36-38N,252.0,252.0,VIIRS S-NPP
+2018-09,38-40N,553.0,553.0,VIIRS S-NPP
+2018-09,40-44N,1734.0,1734.0,VIIRS S-NPP
+2018-10,32-34N,37.0,37.0,VIIRS S-NPP
+2018-10,34-36N,98.0,98.0,VIIRS S-NPP
+2018-10,36-38N,418.0,418.0,VIIRS S-NPP
+2018-10,38-40N,456.0,456.0,VIIRS S-NPP
+2018-10,40-44N,172.0,172.0,VIIRS S-NPP
+2018-11,32-34N,32.0,32.0,VIIRS S-NPP
+2018-11,34-36N,578.0,578.0,VIIRS S-NPP
+2018-11,36-38N,541.0,541.0,VIIRS S-NPP
+2018-11,38-40N,1389.0,1389.0,VIIRS S-NPP
+2018-11,40-44N,67.0,67.0,VIIRS S-NPP
+2018-12,32-34N,23.0,23.0,VIIRS S-NPP
+2018-12,34-36N,71.0,71.0,VIIRS S-NPP
+2018-12,36-38N,174.0,174.0,VIIRS S-NPP
+2018-12,38-40N,274.0,274.0,VIIRS S-NPP
+2018-12,40-44N,147.0,147.0,VIIRS S-NPP
+2019-01,32-34N,47.0,47.0,VIIRS S-NPP
+2019-01,34-36N,77.0,77.0,VIIRS S-NPP
+2019-01,36-38N,125.0,125.0,VIIRS S-NPP
+2019-01,38-40N,138.0,138.0,VIIRS S-NPP
+2019-01,40-44N,47.0,47.0,VIIRS S-NPP
+2019-02,32-34N,40.0,40.0,VIIRS S-NPP
+2019-02,34-36N,55.0,55.0,VIIRS S-NPP
+2019-02,36-38N,88.0,88.0,VIIRS S-NPP
+2019-02,38-40N,52.0,52.0,VIIRS S-NPP
+2019-02,40-44N,4.0,4.0,VIIRS S-NPP
+2019-03,32-34N,38.0,38.0,VIIRS S-NPP
+2019-03,34-36N,91.0,91.0,VIIRS S-NPP
+2019-03,36-38N,183.0,183.0,VIIRS S-NPP
+2019-03,38-40N,134.0,134.0,VIIRS S-NPP
+2019-03,40-44N,31.0,31.0,VIIRS S-NPP
+2019-04,32-34N,20.0,20.0,VIIRS S-NPP
+2019-04,34-36N,73.0,73.0,VIIRS S-NPP
+2019-04,36-38N,145.0,145.0,VIIRS S-NPP
+2019-04,38-40N,320.0,320.0,VIIRS S-NPP
+2019-04,40-44N,84.0,84.0,VIIRS S-NPP
+2019-05,32-34N,38.0,38.0,VIIRS S-NPP
+2019-05,34-36N,79.0,79.0,VIIRS S-NPP
+2019-05,36-38N,121.0,121.0,VIIRS S-NPP
+2019-05,38-40N,193.0,193.0,VIIRS S-NPP
+2019-05,40-44N,81.0,81.0,VIIRS S-NPP
+2019-06,32-34N,40.0,40.0,VIIRS S-NPP
+2019-06,34-36N,83.0,83.0,VIIRS S-NPP
+2019-06,36-38N,230.0,230.0,VIIRS S-NPP
+2019-06,38-40N,211.0,211.0,VIIRS S-NPP
+2019-06,40-44N,62.0,62.0,VIIRS S-NPP
+2019-07,32-34N,63.0,63.0,VIIRS S-NPP
+2019-07,34-36N,78.0,78.0,VIIRS S-NPP
+2019-07,36-38N,160.0,160.0,VIIRS S-NPP
+2019-07,38-40N,144.0,144.0,VIIRS S-NPP
+2019-07,40-44N,56.0,56.0,VIIRS S-NPP
+2019-08,32-34N,41.0,41.0,VIIRS S-NPP
+2019-08,34-36N,61.0,61.0,VIIRS S-NPP
+2019-08,36-38N,356.0,356.0,VIIRS S-NPP
+2019-08,38-40N,90.0,90.0,VIIRS S-NPP
+2019-08,40-44N,34.0,34.0,VIIRS S-NPP
+2019-09,32-34N,40.0,40.0,VIIRS S-NPP
+2019-09,34-36N,83.0,83.0,VIIRS S-NPP
+2019-09,36-38N,440.0,440.0,VIIRS S-NPP
+2019-09,38-40N,214.0,214.0,VIIRS S-NPP
+2019-09,40-44N,1220.0,1220.0,VIIRS S-NPP
+2019-10,32-34N,72.0,72.0,VIIRS S-NPP
+2019-10,34-36N,182.0,182.0,VIIRS S-NPP
+2019-10,36-38N,307.0,307.0,VIIRS S-NPP
+2019-10,38-40N,1065.0,1065.0,VIIRS S-NPP
+2019-10,40-44N,115.0,115.0,VIIRS S-NPP
+2019-11,32-34N,48.0,48.0,VIIRS S-NPP
+2019-11,34-36N,165.0,165.0,VIIRS S-NPP
+2019-11,36-38N,280.0,280.0,VIIRS S-NPP
+2019-11,38-40N,461.0,461.0,VIIRS S-NPP
+2019-11,40-44N,118.0,118.0,VIIRS S-NPP
+2019-12,32-34N,21.0,21.0,VIIRS S-NPP
+2019-12,34-36N,54.0,54.0,VIIRS S-NPP
+2019-12,36-38N,138.0,138.0,VIIRS S-NPP
+2019-12,38-40N,124.0,124.0,VIIRS S-NPP
+2019-12,40-44N,117.0,117.0,VIIRS S-NPP
+2020-01,32-34N,63.0,63.0,VIIRS S-NPP
+2020-01,34-36N,86.0,86.0,VIIRS S-NPP
+2020-01,36-38N,235.0,235.0,VIIRS S-NPP
+2020-01,38-40N,159.0,159.0,VIIRS S-NPP
+2020-01,40-44N,52.0,52.0,VIIRS S-NPP
+2020-02,32-34N,57.0,57.0,VIIRS S-NPP
+2020-02,34-36N,110.0,110.0,VIIRS S-NPP
+2020-02,36-38N,458.0,458.0,VIIRS S-NPP
+2020-02,38-40N,739.0,739.0,VIIRS S-NPP
+2020-02,40-44N,149.0,149.0,VIIRS S-NPP
+2020-03,32-34N,27.0,27.0,VIIRS S-NPP
+2020-03,34-36N,199.0,199.0,VIIRS S-NPP
+2020-03,36-38N,365.0,365.0,VIIRS S-NPP
+2020-03,38-40N,480.0,480.0,VIIRS S-NPP
+2020-03,40-44N,88.0,88.0,VIIRS S-NPP
+2020-04,32-34N,40.0,40.0,VIIRS S-NPP
+2020-04,34-36N,75.0,75.0,VIIRS S-NPP
+2020-04,36-38N,180.0,180.0,VIIRS S-NPP
+2020-04,38-40N,295.0,295.0,VIIRS S-NPP
+2020-04,40-44N,84.0,84.0,VIIRS S-NPP
+2020-05,32-34N,45.0,45.0,VIIRS S-NPP
+2020-05,34-36N,117.0,117.0,VIIRS S-NPP
+2020-05,36-38N,147.0,147.0,VIIRS S-NPP
+2020-05,38-40N,115.0,115.0,VIIRS S-NPP
+2020-05,40-44N,13.0,13.0,VIIRS S-NPP
+2020-06,32-34N,94.0,94.0,VIIRS S-NPP
+2020-06,34-36N,161.0,161.0,VIIRS S-NPP
+2020-06,36-38N,164.0,164.0,VIIRS S-NPP
+2020-06,38-40N,169.0,169.0,VIIRS S-NPP
+2020-06,40-44N,12.0,12.0,VIIRS S-NPP
+2020-07,32-34N,54.0,54.0,VIIRS S-NPP
+2020-07,34-36N,105.0,105.0,VIIRS S-NPP
+2020-07,36-38N,362.0,362.0,VIIRS S-NPP
+2020-07,38-40N,123.0,123.0,VIIRS S-NPP
+2020-07,40-44N,817.0,817.0,VIIRS S-NPP
+2020-08,32-34N,86.0,86.0,VIIRS S-NPP
+2020-08,34-36N,717.0,717.0,VIIRS S-NPP
+2020-08,36-38N,5254.0,5254.0,VIIRS S-NPP
+2020-08,38-40N,7198.0,7198.0,VIIRS S-NPP
+2020-08,40-44N,2381.0,2381.0,VIIRS S-NPP
+2020-09,32-34N,135.0,135.0,VIIRS S-NPP
+2020-09,34-36N,2116.0,2116.0,VIIRS S-NPP
+2020-09,36-38N,11026.0,11026.0,VIIRS S-NPP
+2020-09,38-40N,9119.0,9119.0,VIIRS S-NPP
+2020-09,40-44N,10009.0,10009.0,VIIRS S-NPP
+2020-10,32-34N,180.0,180.0,VIIRS S-NPP
+2020-10,34-36N,87.0,87.0,VIIRS S-NPP
+2020-10,36-38N,4516.0,4516.0,VIIRS S-NPP
+2020-10,38-40N,958.0,958.0,VIIRS S-NPP
+2020-10,40-44N,2248.0,2248.0,VIIRS S-NPP
+2020-11,32-34N,78.0,78.0,VIIRS S-NPP
+2020-11,34-36N,75.0,75.0,VIIRS S-NPP
+2020-11,36-38N,540.0,540.0,VIIRS S-NPP
+2020-11,38-40N,611.0,611.0,VIIRS S-NPP
+2020-11,40-44N,252.0,252.0,VIIRS S-NPP
+2020-12,32-34N,108.0,108.0,VIIRS S-NPP
+2020-12,34-36N,52.0,52.0,VIIRS S-NPP
+2020-12,36-38N,159.0,159.0,VIIRS S-NPP
+2020-12,38-40N,425.0,425.0,VIIRS S-NPP
+2020-12,40-44N,147.0,147.0,VIIRS S-NPP
+2021-01,32-34N,70.0,70.0,VIIRS S-NPP
+2021-01,34-36N,96.0,96.0,VIIRS S-NPP
+2021-01,36-38N,211.0,211.0,VIIRS S-NPP
+2021-01,38-40N,309.0,309.0,VIIRS S-NPP
+2021-01,40-44N,92.0,92.0,VIIRS S-NPP
+2021-02,32-34N,61.0,61.0,VIIRS S-NPP
+2021-02,34-36N,109.0,109.0,VIIRS S-NPP
+2021-02,36-38N,407.0,407.0,VIIRS S-NPP
+2021-02,38-40N,207.0,207.0,VIIRS S-NPP
+2021-02,40-44N,57.0,57.0,VIIRS S-NPP
+2021-03,32-34N,50.0,50.0,VIIRS S-NPP
+2021-03,34-36N,99.0,99.0,VIIRS S-NPP
+2021-03,36-38N,364.0,364.0,VIIRS S-NPP
+2021-03,38-40N,545.0,545.0,VIIRS S-NPP
+2021-03,40-44N,73.0,73.0,VIIRS S-NPP
+2021-04,32-34N,39.0,39.0,VIIRS S-NPP
+2021-04,34-36N,71.0,71.0,VIIRS S-NPP
+2021-04,36-38N,217.0,217.0,VIIRS S-NPP
+2021-04,38-40N,467.0,467.0,VIIRS S-NPP
+2021-04,40-44N,107.0,107.0,VIIRS S-NPP
+2021-05,32-34N,66.0,66.0,VIIRS S-NPP
+2021-05,34-36N,103.0,103.0,VIIRS S-NPP
+2021-05,36-38N,162.0,162.0,VIIRS S-NPP
+2021-05,38-40N,177.0,177.0,VIIRS S-NPP
+2021-05,40-44N,55.0,55.0,VIIRS S-NPP
+2021-06,32-34N,52.0,52.0,VIIRS S-NPP
+2021-06,34-36N,88.0,88.0,VIIRS S-NPP
+2021-06,36-38N,246.0,246.0,VIIRS S-NPP
+2021-06,38-40N,114.0,114.0,VIIRS S-NPP
+2021-06,40-44N,331.0,331.0,VIIRS S-NPP
+2021-07,32-34N,55.0,55.0,VIIRS S-NPP
+2021-07,34-36N,110.0,110.0,VIIRS S-NPP
+2021-07,36-38N,309.0,309.0,VIIRS S-NPP
+2021-07,38-40N,2391.0,2391.0,VIIRS S-NPP
+2021-07,40-44N,2540.0,2540.0,VIIRS S-NPP
+2021-08,32-34N,62.0,62.0,VIIRS S-NPP
+2021-08,34-36N,534.0,534.0,VIIRS S-NPP
+2021-08,36-38N,496.0,496.0,VIIRS S-NPP
+2021-08,38-40N,3789.0,3789.0,VIIRS S-NPP
+2021-08,40-44N,20488.0,20488.0,VIIRS S-NPP
+2021-09,32-34N,40.0,40.0,VIIRS S-NPP
+2021-09,34-36N,1075.0,1075.0,VIIRS S-NPP
+2021-09,36-38N,2489.0,2489.0,VIIRS S-NPP
+2021-09,38-40N,1782.0,1782.0,VIIRS S-NPP
+2021-09,40-44N,7614.0,7614.0,VIIRS S-NPP
+2021-10,32-34N,47.0,47.0,VIIRS S-NPP
+2021-10,34-36N,358.0,358.0,VIIRS S-NPP
+2021-10,36-38N,1302.0,1302.0,VIIRS S-NPP
+2021-10,38-40N,362.0,362.0,VIIRS S-NPP
+2021-10,40-44N,98.0,98.0,VIIRS S-NPP
+2021-11,32-34N,65.0,65.0,VIIRS S-NPP
+2021-11,34-36N,69.0,69.0,VIIRS S-NPP
+2021-11,36-38N,223.0,223.0,VIIRS S-NPP
+2021-11,38-40N,324.0,324.0,VIIRS S-NPP
+2021-11,40-44N,209.0,209.0,VIIRS S-NPP
+2021-12,32-34N,43.0,43.0,VIIRS S-NPP
+2021-12,34-36N,74.0,74.0,VIIRS S-NPP
+2021-12,36-38N,161.0,161.0,VIIRS S-NPP
+2021-12,38-40N,200.0,200.0,VIIRS S-NPP
+2021-12,40-44N,151.0,151.0,VIIRS S-NPP
+2022-01,32-34N,72.0,72.0,VIIRS S-NPP
+2022-01,34-36N,34.0,34.0,VIIRS S-NPP
+2022-01,36-38N,121.0,121.0,VIIRS S-NPP
+2022-01,38-40N,345.0,345.0,VIIRS S-NPP
+2022-01,40-44N,189.0,189.0,VIIRS S-NPP
+2022-02,32-34N,56.0,56.0,VIIRS S-NPP
+2022-02,34-36N,75.0,75.0,VIIRS S-NPP
+2022-02,36-38N,475.0,475.0,VIIRS S-NPP
+2022-02,38-40N,610.0,610.0,VIIRS S-NPP
+2022-02,40-44N,130.0,130.0,VIIRS S-NPP
+2022-03,32-34N,47.0,47.0,VIIRS S-NPP
+2022-03,34-36N,75.0,75.0,VIIRS S-NPP
+2022-03,36-38N,230.0,230.0,VIIRS S-NPP
+2022-03,38-40N,581.0,581.0,VIIRS S-NPP
+2022-03,40-44N,111.0,111.0,VIIRS S-NPP
+2022-04,32-34N,53.0,53.0,VIIRS S-NPP
+2022-04,34-36N,36.0,36.0,VIIRS S-NPP
+2022-04,36-38N,136.0,136.0,VIIRS S-NPP
+2022-04,38-40N,178.0,178.0,VIIRS S-NPP
+2022-04,40-44N,25.0,25.0,VIIRS S-NPP
+2022-05,32-34N,64.0,64.0,VIIRS S-NPP
+2022-05,34-36N,124.0,124.0,VIIRS S-NPP
+2022-05,36-38N,144.0,144.0,VIIRS S-NPP
+2022-05,38-40N,200.0,200.0,VIIRS S-NPP
+2022-05,40-44N,16.0,16.0,VIIRS S-NPP
+2022-06,32-34N,74.0,74.0,VIIRS S-NPP
+2022-06,34-36N,156.0,156.0,VIIRS S-NPP
+2022-06,36-38N,129.0,129.0,VIIRS S-NPP
+2022-06,38-40N,135.0,135.0,VIIRS S-NPP
+2022-06,40-44N,9.0,9.0,VIIRS S-NPP
+2022-07,32-34N,36.0,36.0,VIIRS S-NPP
+2022-07,34-36N,39.0,39.0,VIIRS S-NPP
+2022-07,36-38N,455.0,455.0,VIIRS S-NPP
+2022-07,38-40N,141.0,141.0,VIIRS S-NPP
+2022-07,40-44N,8.0,8.0,VIIRS S-NPP
+2022-08,32-34N,24.0,24.0,VIIRS S-NPP
+2022-08,34-36N,34.0,34.0,VIIRS S-NPP
+2022-08,36-38N,335.0,335.0,VIIRS S-NPP
+2022-08,38-40N,67.0,67.0,VIIRS S-NPP
+2022-08,40-44N,574.0,574.0,VIIRS S-NPP
+2022-09,32-34N,144.0,144.0,VIIRS S-NPP
+2022-09,34-36N,66.0,66.0,VIIRS S-NPP
+2022-09,36-38N,477.0,477.0,VIIRS S-NPP
+2022-09,38-40N,1122.0,1122.0,VIIRS S-NPP
+2022-09,40-44N,364.0,364.0,VIIRS S-NPP
+2022-10,32-34N,31.0,31.0,VIIRS S-NPP
+2022-10,34-36N,66.0,66.0,VIIRS S-NPP
+2022-10,36-38N,132.0,132.0,VIIRS S-NPP
+2022-10,38-40N,421.0,421.0,VIIRS S-NPP
+2022-10,40-44N,130.0,130.0,VIIRS S-NPP
+2022-11,32-34N,48.0,48.0,VIIRS S-NPP
+2022-11,34-36N,67.0,67.0,VIIRS S-NPP
+2022-11,36-38N,84.0,84.0,VIIRS S-NPP
+2022-11,38-40N,444.0,444.0,VIIRS S-NPP
+2022-11,40-44N,237.0,237.0,VIIRS S-NPP
+2022-12,32-34N,43.0,43.0,VIIRS S-NPP
+2022-12,34-36N,24.0,24.0,VIIRS S-NPP
+2022-12,36-38N,189.0,189.0,VIIRS S-NPP
+2022-12,38-40N,184.0,184.0,VIIRS S-NPP
+2022-12,40-44N,75.0,75.0,VIIRS S-NPP
+2023-01,32-34N,25.0,25.0,VIIRS S-NPP
+2023-01,34-36N,23.0,23.0,VIIRS S-NPP
+2023-01,36-38N,27.0,27.0,VIIRS S-NPP
+2023-01,38-40N,148.0,148.0,VIIRS S-NPP
+2023-01,40-44N,35.0,35.0,VIIRS S-NPP
+2023-02,32-34N,55.0,55.0,VIIRS S-NPP
+2023-02,34-36N,54.0,54.0,VIIRS S-NPP
+2023-02,36-38N,303.0,303.0,VIIRS S-NPP
+2023-02,38-40N,241.0,241.0,VIIRS S-NPP
+2023-02,40-44N,83.0,83.0,VIIRS S-NPP
+2023-03,32-34N,20.0,20.0,VIIRS S-NPP
+2023-03,34-36N,29.0,29.0,VIIRS S-NPP
+2023-03,36-38N,92.0,92.0,VIIRS S-NPP
+2023-03,38-40N,107.0,107.0,VIIRS S-NPP
+2023-03,40-44N,8.0,8.0,VIIRS S-NPP
+2023-04,32-34N,54.0,54.0,VIIRS S-NPP
+2023-04,34-36N,65.0,65.0,VIIRS S-NPP
+2023-04,36-38N,190.0,190.0,VIIRS S-NPP
+2023-04,38-40N,500.0,500.0,VIIRS S-NPP
+2023-04,40-44N,71.0,71.0,VIIRS S-NPP
+2023-05,32-34N,65.0,65.0,VIIRS S-NPP
+2023-05,34-36N,67.0,67.0,VIIRS S-NPP
+2023-05,36-38N,104.0,104.0,VIIRS S-NPP
+2023-05,38-40N,250.0,250.0,VIIRS S-NPP
+2023-05,40-44N,47.0,47.0,VIIRS S-NPP
+2023-06,32-34N,95.0,95.0,VIIRS S-NPP
+2023-06,34-36N,94.0,94.0,VIIRS S-NPP
+2023-06,36-38N,182.0,182.0,VIIRS S-NPP
+2023-06,38-40N,321.0,321.0,VIIRS S-NPP
+2023-06,40-44N,35.0,35.0,VIIRS S-NPP
+2023-07,32-34N,97.0,97.0,VIIRS S-NPP
+2023-07,34-36N,224.0,224.0,VIIRS S-NPP
+2023-07,36-38N,124.0,124.0,VIIRS S-NPP
+2023-07,38-40N,195.0,195.0,VIIRS S-NPP
+2023-07,40-44N,12.0,12.0,VIIRS S-NPP
+2023-08,32-34N,51.0,51.0,VIIRS S-NPP
+2023-08,34-36N,158.0,158.0,VIIRS S-NPP
+2023-08,36-38N,101.0,101.0,VIIRS S-NPP
+2023-08,38-40N,215.0,215.0,VIIRS S-NPP
+2023-08,40-44N,2782.0,2782.0,VIIRS S-NPP
+2023-09,32-34N,18.0,18.0,VIIRS S-NPP
+2023-09,34-36N,78.0,78.0,VIIRS S-NPP
+2023-09,36-38N,199.0,199.0,VIIRS S-NPP
+2023-09,38-40N,433.0,433.0,VIIRS S-NPP
+2023-09,40-44N,1491.0,1491.0,VIIRS S-NPP
+2023-10,32-34N,92.0,92.0,VIIRS S-NPP
+2023-10,34-36N,152.0,152.0,VIIRS S-NPP
+2023-10,36-38N,441.0,441.0,VIIRS S-NPP
+2023-10,38-40N,993.0,993.0,VIIRS S-NPP
+2023-10,40-44N,347.0,347.0,VIIRS S-NPP
+2023-11,32-34N,59.0,59.0,VIIRS S-NPP
+2023-11,34-36N,76.0,76.0,VIIRS S-NPP
+2023-11,36-38N,236.0,236.0,VIIRS S-NPP
+2023-11,38-40N,683.0,683.0,VIIRS S-NPP
+2023-11,40-44N,284.0,284.0,VIIRS S-NPP
+2023-12,32-34N,46.0,46.0,VIIRS S-NPP
+2023-12,34-36N,52.0,52.0,VIIRS S-NPP
+2023-12,36-38N,141.0,141.0,VIIRS S-NPP
+2023-12,38-40N,301.0,301.0,VIIRS S-NPP
+2023-12,40-44N,262.0,262.0,VIIRS S-NPP
+2024-01,32-34N,34.0,34.0,VIIRS S-NPP
+2024-01,34-36N,70.0,70.0,VIIRS S-NPP
+2024-01,36-38N,141.0,141.0,VIIRS S-NPP
+2024-01,38-40N,116.0,116.0,VIIRS S-NPP
+2024-01,40-44N,64.0,64.0,VIIRS S-NPP
+2024-02,32-34N,38.0,38.0,VIIRS S-NPP
+2024-02,34-36N,55.0,55.0,VIIRS S-NPP
+2024-02,36-38N,66.0,66.0,VIIRS S-NPP
+2024-02,38-40N,105.0,105.0,VIIRS S-NPP
+2024-02,40-44N,27.0,27.0,VIIRS S-NPP
+2024-03,32-34N,57.0,57.0,VIIRS S-NPP
+2024-03,34-36N,105.0,105.0,VIIRS S-NPP
+2024-03,36-38N,199.0,199.0,VIIRS S-NPP
+2024-03,38-40N,285.0,285.0,VIIRS S-NPP
+2024-03,40-44N,103.0,103.0,VIIRS S-NPP
+2024-04,32-34N,58.0,58.0,VIIRS S-NPP
+2024-04,34-36N,58.0,58.0,VIIRS S-NPP
+2024-04,36-38N,163.0,163.0,VIIRS S-NPP
+2024-04,38-40N,431.0,431.0,VIIRS S-NPP
+2024-04,40-44N,75.0,75.0,VIIRS S-NPP
+2024-05,32-34N,56.0,56.0,VIIRS S-NPP
+2024-05,34-36N,148.0,148.0,VIIRS S-NPP
+2024-05,36-38N,132.0,132.0,VIIRS S-NPP
+2024-05,38-40N,260.0,260.0,VIIRS S-NPP
+2024-05,40-44N,58.0,58.0,VIIRS S-NPP
+2024-06,32-34N,77.0,77.0,VIIRS S-NPP
+2024-06,34-36N,189.0,189.0,VIIRS S-NPP
+2024-06,36-38N,417.0,417.0,VIIRS S-NPP
+2024-06,38-40N,277.0,277.0,VIIRS S-NPP
+2024-06,40-44N,19.0,19.0,VIIRS S-NPP
+2024-07,32-34N,85.0,85.0,VIIRS S-NPP
+2024-07,34-36N,906.0,906.0,VIIRS S-NPP
+2024-07,36-38N,337.0,337.0,VIIRS S-NPP
+2024-07,38-40N,184.0,184.0,VIIRS S-NPP
+2024-07,40-44N,609.0,609.0,VIIRS S-NPP
+2024-08,32-34N,56.0,56.0,VIIRS S-NPP
+2024-08,34-36N,229.0,229.0,VIIRS S-NPP
+2024-08,36-38N,565.0,565.0,VIIRS S-NPP
+2024-08,38-40N,173.0,173.0,VIIRS S-NPP
+2024-08,40-44N,809.0,809.0,VIIRS S-NPP
+2024-09,32-34N,273.0,273.0,VIIRS S-NPP
+2024-09,34-36N,902.0,902.0,VIIRS S-NPP
+2024-09,36-38N,454.0,454.0,VIIRS S-NPP
+2024-09,38-40N,236.0,236.0,VIIRS S-NPP
+2024-09,40-44N,31.0,31.0,VIIRS S-NPP
+2024-10,32-34N,44.0,44.0,VIIRS S-NPP
+2024-10,34-36N,165.0,165.0,VIIRS S-NPP
+2024-10,36-38N,461.0,461.0,VIIRS S-NPP
+2024-10,38-40N,558.0,558.0,VIIRS S-NPP
+2024-10,40-44N,163.0,163.0,VIIRS S-NPP
+2024-11,32-34N,66.0,66.0,VIIRS S-NPP
+2024-11,34-36N,231.0,231.0,VIIRS S-NPP
+2024-11,36-38N,287.0,287.0,VIIRS S-NPP
+2024-11,38-40N,412.0,412.0,VIIRS S-NPP
+2024-11,40-44N,146.0,146.0,VIIRS S-NPP
+2024-12,32-34N,26.0,26.0,VIIRS S-NPP
+2024-12,34-36N,68.0,68.0,VIIRS S-NPP
+2024-12,36-38N,128.0,128.0,VIIRS S-NPP
+2024-12,38-40N,174.0,174.0,VIIRS S-NPP
+2024-12,40-44N,177.0,177.0,VIIRS S-NPP
+2025-01,32-34N,118.0,118.0,VIIRS S-NPP
+2025-01,34-36N,461.0,461.0,VIIRS S-NPP
+2025-01,36-38N,186.0,186.0,VIIRS S-NPP
+2025-01,38-40N,377.0,377.0,VIIRS S-NPP
+2025-01,40-44N,209.0,209.0,VIIRS S-NPP
+2025-02,32-34N,37.0,37.0,VIIRS S-NPP
+2025-02,34-36N,69.0,69.0,VIIRS S-NPP
+2025-02,36-38N,118.0,118.0,VIIRS S-NPP
+2025-02,38-40N,219.0,219.0,VIIRS S-NPP
+2025-02,40-44N,43.0,43.0,VIIRS S-NPP
+2025-03,32-34N,43.0,43.0,VIIRS S-NPP
+2025-03,34-36N,63.0,63.0,VIIRS S-NPP
+2025-03,36-38N,116.0,116.0,VIIRS S-NPP
+2025-03,38-40N,257.0,257.0,VIIRS S-NPP
+2025-03,40-44N,71.0,71.0,VIIRS S-NPP
+2025-04,32-34N,56.0,56.0,VIIRS S-NPP
+2025-04,34-36N,61.0,61.0,VIIRS S-NPP
+2025-04,36-38N,146.0,146.0,VIIRS S-NPP
+2025-04,38-40N,417.0,417.0,VIIRS S-NPP
+2025-04,40-44N,81.0,81.0,VIIRS S-NPP
+2025-05,32-34N,35.0,35.0,VIIRS S-NPP
+2025-05,34-36N,163.0,163.0,VIIRS S-NPP
+2025-05,36-38N,131.0,131.0,VIIRS S-NPP
+2025-05,38-40N,207.0,207.0,VIIRS S-NPP
+2025-05,40-44N,40.0,40.0,VIIRS S-NPP
+2025-06,32-34N,64.0,64.0,VIIRS S-NPP
+2025-06,34-36N,86.0,86.0,VIIRS S-NPP
+2025-06,36-38N,129.0,129.0,VIIRS S-NPP
+2025-06,38-40N,182.0,182.0,VIIRS S-NPP
+2025-06,40-44N,33.0,33.0,VIIRS S-NPP
+2025-07,32-34N,49.0,49.0,VIIRS S-NPP
+2025-07,34-36N,271.0,271.0,VIIRS S-NPP
+2025-07,36-38N,85.0,85.0,VIIRS S-NPP
+2025-07,38-40N,123.0,123.0,VIIRS S-NPP
+2025-07,40-44N,934.0,934.0,VIIRS S-NPP
+2025-08,32-34N,68.0,68.0,VIIRS S-NPP
+2025-08,34-36N,1026.0,1026.0,VIIRS S-NPP
+2025-08,36-38N,351.0,351.0,VIIRS S-NPP
+2025-08,38-40N,197.0,197.0,VIIRS S-NPP
+2025-08,40-44N,300.0,300.0,VIIRS S-NPP
+2025-09,32-34N,43.0,43.0,VIIRS S-NPP
+2025-09,34-36N,166.0,166.0,VIIRS S-NPP
+2025-09,36-38N,1229.0,1229.0,VIIRS S-NPP
+2025-09,38-40N,227.0,227.0,VIIRS S-NPP
+2025-09,40-44N,377.0,377.0,VIIRS S-NPP
+2025-10,32-34N,48.0,48.0,VIIRS S-NPP
+2025-10,34-36N,63.0,63.0,VIIRS S-NPP
+2025-10,36-38N,176.0,176.0,VIIRS S-NPP
+2025-10,38-40N,463.0,463.0,VIIRS S-NPP
+2025-10,40-44N,190.0,190.0,VIIRS S-NPP
+2025-11,32-34N,23.0,23.0,VIIRS S-NPP
+2025-11,34-36N,73.0,73.0,VIIRS S-NPP
+2025-11,36-38N,134.0,134.0,VIIRS S-NPP
+2025-11,38-40N,309.0,309.0,VIIRS S-NPP
+2025-11,40-44N,249.0,249.0,VIIRS S-NPP
+2025-12,32-34N,32.0,32.0,VIIRS S-NPP
+2025-12,34-36N,60.0,60.0,VIIRS S-NPP
+2025-12,36-38N,86.0,86.0,VIIRS S-NPP
+2025-12,38-40N,180.0,180.0,VIIRS S-NPP
+2025-12,40-44N,227.0,227.0,VIIRS S-NPP
+2026-01,32-34N,74.0,74.0,VIIRS S-NPP
+2026-01,34-36N,47.0,47.0,VIIRS S-NPP
+2026-01,36-38N,76.0,76.0,VIIRS S-NPP
+2026-01,38-40N,173.0,173.0,VIIRS S-NPP
+2026-01,40-44N,194.0,194.0,VIIRS S-NPP
+2026-02,32-34N,53.0,53.0,VIIRS S-NPP
+2026-02,34-36N,69.0,69.0,VIIRS S-NPP
+2026-02,36-38N,119.0,119.0,VIIRS S-NPP
+2026-02,38-40N,269.0,269.0,VIIRS S-NPP
+2026-02,40-44N,114.0,114.0,VIIRS S-NPP
+2026-03,32-34N,38.0,38.0,VIIRS S-NPP
+2026-03,34-36N,93.0,93.0,VIIRS S-NPP
+2026-03,36-38N,138.0,138.0,VIIRS S-NPP
+2026-03,38-40N,461.0,461.0,VIIRS S-NPP
+2026-03,40-44N,113.0,113.0,VIIRS S-NPP
+2026-04,32-34N,69.0,69.0,VIIRS S-NPP
+2026-04,34-36N,58.0,58.0,VIIRS S-NPP
+2026-04,36-38N,85.0,85.0,VIIRS S-NPP
+2026-04,38-40N,243.0,243.0,VIIRS S-NPP
+2026-04,40-44N,61.0,61.0,VIIRS S-NPP
+2026-05,32-34N,161.0,161.0,VIIRS S-NPP
+2026-05,34-36N,171.0,171.0,VIIRS S-NPP
+2026-05,36-38N,132.0,132.0,VIIRS S-NPP
+2026-05,38-40N,183.0,183.0,VIIRS S-NPP
+2026-05,40-44N,17.0,17.0,VIIRS S-NPP
+2026-06,32-34N,56.0,56.0,VIIRS S-NPP
+2026-06,34-36N,64.0,64.0,VIIRS S-NPP
+2026-06,36-38N,127.0,127.0,VIIRS S-NPP
+2026-06,38-40N,161.0,161.0,VIIRS S-NPP
+2026-06,40-44N,15.0,15.0,VIIRS S-NPP
+2026-07,32-34N,45.0,45.0,VIIRS S-NPP
+2026-07,34-36N,86.0,86.0,VIIRS S-NPP
+2026-07,36-38N,128.0,128.0,VIIRS S-NPP
+2026-07,38-40N,214.0,214.0,VIIRS S-NPP
+2026-07,40-44N,118.0,118.0,VIIRS S-NPP
+2026-08,32-34N,38.0,38.0,VIIRS S-NPP
+2026-08,34-36N,233.0,233.0,VIIRS S-NPP
+2026-08,36-38N,375.0,375.0,VIIRS S-NPP
+2026-08,38-40N,192.0,192.0,VIIRS S-NPP
+2026-08,40-44N,165.0,165.0,VIIRS S-NPP
+2026-09,32-34N,15.0,15.0,VIIRS S-NPP
+2026-09,34-36N,103.0,103.0,VIIRS S-NPP
+2026-09,36-38N,406.0,406.0,VIIRS S-NPP
+2026-09,38-40N,296.0,296.0,VIIRS S-NPP
+2026-09,40-44N,40.0,40.0,VIIRS S-NPP
+2026-10,32-34N,32.0,32.0,VIIRS S-NPP
+2026-10,34-36N,31.0,31.0,VIIRS S-NPP
+2026-10,36-38N,218.0,218.0,VIIRS S-NPP
+2026-10,38-40N,425.0,425.0,VIIRS S-NPP
+2026-10,40-44N,154.0,154.0,VIIRS S-NPP
+2026-11,32-34N,15.0,14.44,VIIRS NOAA-20 (scaled to S-NPP)
+2026-11,34-36N,30.0,28.87,VIIRS NOAA-20 (scaled to S-NPP)
+2026-11,36-38N,160.0,153.98,VIIRS NOAA-20 (scaled to S-NPP)
+2026-11,38-40N,334.0,321.44,VIIRS NOAA-20 (scaled to S-NPP)
+2026-11,40-44N,180.0,173.23,VIIRS NOAA-20 (scaled to S-NPP)
