@@ -20,6 +20,7 @@ const SPEEDS: Array[float] = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0]  # steps per secon
 const RETARDANT_RADIUS := 5.0
 const FIREBREAK_WIDTH := 2
 const MAX_VIEW_ZOOM := 8.0
+const WHEEL_ZOOM_PER_NOTCH := 1.1  # zoom factor for one notch of an ordinary mouse wheel
 const TOOL_IGNITE := 0
 const TOOL_FIREBREAK := 1
 const TOOL_RETARDANT := 2
@@ -530,14 +531,18 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _mouse_button(event: InputEventMouseButton) -> void:
+	# Presses over the side panel are the panel's: scrolling it must not zoom the grid, and a click on
+	# its empty parts must not ignite or drop anything on cells hidden under it.
+	if event.pressed and event.position.x > map_size().x:
+		return
 	var cell := mouse_cell()
 	match event.button_index:
 		MOUSE_BUTTON_WHEEL_UP:
 			if event.pressed:
-				zoom_at(event.position, view_zoom * 1.25)
+				zoom_at(event.position, view_zoom * pow(WHEEL_ZOOM_PER_NOTCH, UI.wheel_notches(event)))
 		MOUSE_BUTTON_WHEEL_DOWN:
 			if event.pressed:
-				zoom_at(event.position, view_zoom / 1.25)
+				zoom_at(event.position, view_zoom / pow(WHEEL_ZOOM_PER_NOTCH, UI.wheel_notches(event)))
 		MOUSE_BUTTON_MIDDLE:
 			_panning = event.pressed
 		MOUSE_BUTTON_LEFT:

@@ -8,6 +8,10 @@ const PANEL_BG := Color("#222220")
 const INK := Color("#f0efec")
 const INK_2 := Color("#c3c2b7")
 const INK_3 := Color("#8a897f")
+const BTN := Color("#34342f")          # button fill
+const BTN_HOVER := Color("#42423d")
+const BTN_PRESSED := Color("#55554f")
+const BTN_DISABLED := Color("#262624")
 const PANEL_W := 340.0
 const INNER_W := PANEL_W - 30.0
 
@@ -60,12 +64,10 @@ static func text(box: Node, t: String, color: Color = INK_3, size: int = 12) -> 
 	return l
 
 
-static func flat(bg: Color, border: Color) -> StyleBoxFlat:
+## A square-cornered fill with no outline: buttons are plain blocks, not outlined or rounded.
+static func flat(bg: Color) -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
 	s.bg_color = bg
-	s.border_color = border
-	s.set_border_width_all(1)
-	s.set_corner_radius_all(4)
 	s.content_margin_left = 6
 	s.content_margin_right = 6
 	s.content_margin_top = 5
@@ -75,11 +77,12 @@ static func flat(bg: Color, border: Color) -> StyleBoxFlat:
 
 ## Dark when off, light when on.
 static func style_toggle(b: Button) -> void:
-	b.add_theme_stylebox_override("normal", flat(Color("#2b2b29"), Color("#4a4a46")))
-	b.add_theme_stylebox_override("hover", flat(Color("#383835"), INK_3))
-	b.add_theme_stylebox_override("pressed", flat(Color("#e8e7e2"), Color("#e8e7e2")))
-	b.add_theme_stylebox_override("hover_pressed", flat(INK, INK))
-	b.add_theme_stylebox_override("disabled", flat(SURFACE, Color("#383835")))
+	b.add_theme_stylebox_override("normal", flat(BTN))
+	b.add_theme_stylebox_override("hover", flat(BTN_HOVER))
+	b.add_theme_stylebox_override("pressed", flat(Color("#e8e7e2")))
+	b.add_theme_stylebox_override("hover_pressed", flat(INK))
+	b.add_theme_stylebox_override("disabled", flat(BTN_DISABLED))
+	b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 	b.add_theme_color_override("font_color", INK_2)
 	b.add_theme_color_override("font_hover_color", INK)
 	b.add_theme_color_override("font_pressed_color", SURFACE)
@@ -95,10 +98,11 @@ static func button(box: Node, t: String, tip: String, cb: Callable) -> Button:
 	b.text = t
 	b.tooltip_text = tip
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	b.add_theme_stylebox_override("normal", flat(Color("#2b2b29"), INK_3))
-	b.add_theme_stylebox_override("hover", flat(Color("#383835"), INK_3))
-	b.add_theme_stylebox_override("pressed", flat(Color("#4a4a46"), INK))
-	b.add_theme_stylebox_override("disabled", flat(SURFACE, Color("#383835")))
+	b.add_theme_stylebox_override("normal", flat(BTN))
+	b.add_theme_stylebox_override("hover", flat(BTN_HOVER))
+	b.add_theme_stylebox_override("pressed", flat(BTN_PRESSED))
+	b.add_theme_stylebox_override("disabled", flat(BTN_DISABLED))
+	b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 	b.add_theme_color_override("font_color", INK)
 	b.add_theme_color_override("font_disabled_color", Color("#5c5b55"))
 	b.add_theme_font_size_override("font_size", 13)
@@ -183,6 +187,33 @@ static func swatch(box: Node, color: Color, t: String) -> void:
 	l.add_theme_font_size_override("font_size", 11)
 	l.add_theme_color_override("font_color", INK_2)
 	row.add_child(l)
+
+
+## How far a mouse wheel event scrolled, in notches of an ordinary wheel. Desktop reports 1.0 per
+## notch, a browser 3.0 (checked in Chromium); trackpads send many small ones. Capped, so one huge
+## event can't throw the zoom. Zoom by `step * wheel_notches(event)`, not by a fixed step per event.
+static func wheel_notches(event: InputEventMouseButton) -> float:
+	var f: float = event.factor
+	if f <= 0.0:
+		f = 1.0
+	if OS.has_feature("web"):
+		f /= 3.0
+	return clampf(f, 0.02, 3.0)
+
+
+## Makes everything that is not styled by hand square-cornered and drops the focus outline:
+## text fields, scroll bars, lists and tooltips come from Godot's default theme, which is rounded.
+## Call once at start (the AppState autoload does).
+static func square_default_theme() -> void:
+	var theme := ThemeDB.get_default_theme()
+	for type in theme.get_stylebox_type_list():
+		for sb_name in theme.get_stylebox_list(type):
+			if sb_name == "focus":
+				theme.set_stylebox(sb_name, type, StyleBoxEmpty.new())
+				continue
+			var sb := theme.get_stylebox(sb_name, type)
+			if sb is StyleBoxFlat:
+				sb.set_corner_radius_all(0)
 
 
 ## 12345 -> "12,345".

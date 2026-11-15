@@ -41,6 +41,8 @@ All DOIs below were checked to resolve on 2026-11-14.
   We acknowledge the use of imagery provided by services from NASA's Global Imagery Browse Services (GIBS), part of NASA's Earth Science Data and Information System (ESDIS).
 - USGS The National Map base maps (USGSImageryOnly, USGSImageryTopo, USGSTopo tile services), U.S. Geological Survey, public domain. https://basemap.nationalmap.gov/arcgis/rest/services (**used**: map base layers; USGSImageryOnly `export` for the sim's aerial view)
   Map services and data available from U.S. Geological Survey, National Geospatial Program.
+- Esri Reference tiles, World Boundaries and Places (place names and boundaries over the USGS aerial map). https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer (**used**: the transparent names layer of the "Labels" base map)
+  Names and boundaries: Esri, HERE, Garmin, © OpenStreetMap contributors, and the GIS User Community. Esri's terms of use apply; check them before using the app beyond the hackathon.
 - US Census Bureau cartographic boundary file `cb_2018_us_state_5m` (public domain). https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html (**used**: California outline, `pipeline/build_boundary.py`)
 - NASA GIBS OSM Land/Water Map (`OSM_Land_Water_Map`, EPSG:3857 tiles), NASA ESDIS / GIBS, derived from OpenStreetMap land polygons. https://nasa-gibs.github.io/gibs-api-docs/available-visualizations/ (**used**: land / water mask for the dark map backdrop outside California)
   Contains data from OpenStreetMap, © OpenStreetMap contributors, ODbL: https://www.openstreetmap.org/copyright

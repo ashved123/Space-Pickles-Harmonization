@@ -101,10 +101,12 @@ func _ready() -> void:
 
 func _build_controls() -> void:
 	for b in [all_button, sim_button, map_button]:
-		b.add_theme_stylebox_override("normal", _button_style(Color("#2b2b29"), INK_3))
-		b.add_theme_stylebox_override("hover", _button_style(Color("#383835"), INK_2))
-		b.add_theme_stylebox_override("pressed", _button_style(Color("#383835"), INK))
-		b.add_theme_stylebox_override("disabled", _button_style(SURFACE, GRID_LINE))
+		b.add_theme_stylebox_override("normal", _button_style(UI.BTN))
+		b.add_theme_stylebox_override("hover", _button_style(UI.BTN_HOVER))
+		b.add_theme_stylebox_override("pressed", _button_style(UI.BTN_PRESSED))
+		b.add_theme_stylebox_override("disabled", _button_style(UI.BTN_DISABLED))
+		b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+		b.focus_mode = Control.FOCUS_NONE
 		b.add_theme_color_override("font_color", INK)
 	_update_title()
 	title.position = Vector2(16, 10)
@@ -178,12 +180,10 @@ func _notification(what: int) -> void:
 		layout()
 
 
-func _button_style(bg: Color, border: Color) -> StyleBoxFlat:
+## A square-cornered fill with no outline.
+func _button_style(bg: Color) -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
 	s.bg_color = bg
-	s.border_color = border
-	s.set_border_width_all(1)
-	s.set_corner_radius_all(4)
 	s.content_margin_left = 12
 	s.content_margin_right = 12
 	s.content_margin_top = 6

@@ -5,6 +5,7 @@
 extends MultiMeshInstance2D
 
 const MIN_PX := 7.0
+const OPACITY := 0.78  # slightly see-through, so the ground and overlapping hotspots show
 const CORE_COLOR := Color("#e5383b")  # red centre: an observed hotspot, whatever the satellite
 # The quad's colour (set per detection) is the ring; the centre is painted red on top.
 const SHADER := "
@@ -28,6 +29,7 @@ func _init() -> void:
 	multimesh.transform_format = MultiMesh.TRANSFORM_2D
 	multimesh.use_colors = true
 	multimesh.mesh = _quad
+	modulate = Color(1, 1, 1, OPACITY)
 	var shader := Shader.new()
 	shader.code = SHADER
 	var mat := ShaderMaterial.new()

@@ -12,6 +12,7 @@ const RegionClip = preload("res://map/region_clip.gd")
 const WindLayer = preload("res://map/wind_layer.gd")
 const CalendarData = preload("res://data/calendar_data.gd")
 const HotspotData = preload("res://data/hotspot_data.gd")
+const UI = preload("res://ui/ui_kit.gd")
 const SimRegion = preload("res://data/sim_region.gd")
 
 const SURFACE := Color("#1a1a19")
@@ -31,12 +32,18 @@ const FRP_STEPS := [0, 10, 50, 100]      # MW
 const SIZE_STEPS := [0, 10, 50, 200]     # km2
 const MONTH_NAMES := ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 const MIN_ZOOM := 5.0
+const WHEEL_ZOOM_PER_NOTCH := 0.2   # zoom levels for one notch of an ordinary mouse wheel
 const MAX_ZOOM := 15.0
 const GIBS_DAILY := "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/{date}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg"
+# Place names are their own transparent layer, drawn above the hotspots (base map 0 only; the
+# topo map has its names baked in). Esri's reference tiles, keyless, free with attribution.
+const LABEL_BASE := 0
+const LABELS_URL := "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
+const LABELS_MAX_ZOOM := 15
 const USGS := "https://basemap.nationalmap.gov/arcgis/rest/services/%s/MapServer/tile/{z}/{y}/{x}"
 # Base maps: [name, url template, max zoom]. USGS National Map tiles are public domain.
 const BASES := [
-	["Aerial imagery + roads and names (USGS)", USGS % "USGSImageryTopo", 16],
+	["Aerial imagery + place names (USGS aerial, Esri labels)", USGS % "USGSImageryOnly", 16],
 	["Aerial imagery (USGS, cloud-free)", USGS % "USGSImageryOnly", 16],
 	["Topographic map (USGS)", USGS % "USGSTopo", 16],
 	["None", "", 0],
@@ -124,7 +131,11 @@ var outlook_result := Label.new()
 var world := Node2D.new()
 var region_clip: RegionClip = RegionClip.new()
 var backdrop_tiles: TileLayer = TileLayer.new()  # greyed-out surroundings, not clipped to the state
+var wind_toggle: Button
+var wind_popup := Control.new()  # modal notice shown the first time the wind layer is turned on
 var base_tiles: TileLayer = TileLayer.new()
+var label_tiles: TileLayer = TileLayer.new()  # place names above the hotspots
+var labels_clip: RegionClip = RegionClip.new()
 var sat_tiles: TileLayer = TileLayer.new()
 var wind: WindLayer = WindLayer.new()
 var _wind_timer := Timer.new()
@@ -182,6 +193,9 @@ func _ready() -> void:
 	viirs_layer.footprint_world = 375.0 * m2
 	for n in [vector, modis_layer, viirs_layer]:
 		world.add_child(n)
+	label_tiles.setup(LABELS_URL, LABELS_MAX_ZOOM)
+	labels_clip.add_child(label_tiles)
+	world.add_child(labels_clip)  # last, so the names sit on top of hotspots and outlines
 	add_child(world)
 	# Flat on the ground: in map coordinates and clipped to the state, below hotspots and outlines.
 	region_clip.add_child(wind)
@@ -191,6 +205,7 @@ func _ready() -> void:
 	add_child(_wind_timer)
 	_build_panel()
 	_build_overlay()
+	_build_wind_popup()
 	_built = true
 	_refresh_data()
 	_apply_view()
@@ -208,6 +223,7 @@ func _load_region() -> void:
 			pts.append(Mercator.to_world(p[0], p[1]))
 		rings.append(pts)
 	region_clip.rings = rings
+	labels_clip.rings = rings
 	vector.outline_rings = rings
 	var a := Mercator.to_world(ca.bbox[2], ca.bbox[1])
 	var b := Mercator.to_world(ca.bbox[0], ca.bbox[3])
@@ -296,7 +312,7 @@ func _build_panel() -> void:
 	_toggle(layers, "Burning grid", "Harmonized MODIS + VIIRS burning per 25 km cell", show_grid, func(on): show_grid = on; _refresh_data())
 	outlook_toggle = _toggle(layers, "Outlook", "Outlook from past patterns, not a forecast of actual fires", show_outlook, func(on): show_outlook = on; _refresh_data())
 	_toggle(layers, "Clouds + smoke", "NASA satellite image for that day, over the base map", show_sat, func(on): show_sat = on; _apply_view())
-	_toggle(layers, "Wind", "Wind that day (ERA5 reanalysis, modelled)", show_wind, func(on): show_wind = on; _apply_view())
+	wind_toggle = _toggle(layers, "Wind", "Wind that day (ERA5 reanalysis, modelled). Can slow the map down", show_wind, _on_wind_toggled)
 	_toggle(layers, "Satellite colours", "Ring each hotspot in its satellite's colour: MODIS blue, VIIRS S-NPP yellow, VIIRS NOAA-20 aqua",
 		color_by_satellite, func(on): color_by_satellite = on; _refresh_data())
 	wind_row.visible = show_wind
@@ -374,12 +390,10 @@ func _text(box: Container, t: String, c: Color) -> void:
 	box.add_child(l)
 
 
-func _flat(bg: Color, border: Color, width: int = 1) -> StyleBoxFlat:
+## A square-cornered fill with no outline.
+func _flat(bg: Color) -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
 	s.bg_color = bg
-	s.border_color = border
-	s.set_border_width_all(width)
-	s.set_corner_radius_all(4)
 	s.content_margin_left = 6
 	s.content_margin_right = 6
 	s.content_margin_top = 5
@@ -389,10 +403,10 @@ func _flat(bg: Color, border: Color, width: int = 1) -> StyleBoxFlat:
 
 ## Dark when off, light when on (or pressed).
 func _style_toggle(b: Button) -> void:
-	b.add_theme_stylebox_override("normal", _flat(Color("#2b2b29"), Color("#4a4a46")))
-	b.add_theme_stylebox_override("hover", _flat(Color("#383835"), INK_3))
-	b.add_theme_stylebox_override("pressed", _flat(Color("#e8e7e2"), Color("#e8e7e2")))
-	b.add_theme_stylebox_override("hover_pressed", _flat(INK, INK))
+	b.add_theme_stylebox_override("normal", _flat(UI.BTN))
+	b.add_theme_stylebox_override("hover", _flat(UI.BTN_HOVER))
+	b.add_theme_stylebox_override("pressed", _flat(Color("#e8e7e2")))
+	b.add_theme_stylebox_override("hover_pressed", _flat(INK))
 	b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 	b.add_theme_color_override("font_color", INK_2)
 	b.add_theme_color_override("font_hover_color", INK)
@@ -545,14 +559,12 @@ func _rebuild_calendar() -> void:
 		b.custom_minimum_size = Vector2(DAY_W, 26)
 		b.tooltip_text = "%d %s %d: %s hotspots detected" % [d, MONTH_NAMES[cal_month - 1], year, _thousands(n)]
 		var shade := Color("#262624") if n == 0 else VectorLayer._ramp(VectorLayer.REDS, log(1.0 + n) / log(1.0 + peak))
-		var chosen := month == cal_month and (day == d or day == 0)
 		var exact := month == cal_month and day == d
-		# Selected day: a thick ring that contrasts with the cell's own shade.
-		var ring := SURFACE if shade.get_luminance() > 0.45 else INK
-		var border := ring if exact else (INK_3 if chosen else shade)
-		b.add_theme_stylebox_override("normal", _flat(shade, border, 3 if exact else 1))
-		b.add_theme_stylebox_override("hover", _flat(shade.lightened(0.15), INK, 1))
-		b.add_theme_stylebox_override("pressed", _flat(shade, INK, 2))
+		# Selected day: a bar along the bottom that contrasts with the cell's own shade (no outline).
+		var bar := SURFACE if shade.get_luminance() > 0.45 else INK
+		b.add_theme_stylebox_override("normal", _day_style(shade, bar, exact))
+		b.add_theme_stylebox_override("hover", _day_style(shade.lightened(0.15), bar, exact))
+		b.add_theme_stylebox_override("pressed", _day_style(shade.lightened(0.15), bar, exact))
 		b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 		var ink := SURFACE if shade.get_luminance() > 0.45 else (INK_3 if n == 0 else INK)
 		for c in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
@@ -566,23 +578,30 @@ func _rebuild_calendar() -> void:
 		cal_note.text = "Brighter day = more hotspots detected (observed). %s this month. Click a day." % _thousands(month_total)
 
 
+## A day button's fill, with a thick bar along the bottom when it is the selected day.
+func _day_style(fill: Color, bar: Color, selected: bool) -> StyleBoxFlat:
+	var s := _flat(fill)
+	if selected:
+		s.border_width_bottom = 3
+		s.border_color = bar
+	return s
+
+
 func _style_button(b: Button) -> void:
 	for state in ["normal", "hover", "pressed", "disabled"]:
 		var s := StyleBoxFlat.new()
-		s.bg_color = Color("#383835") if state in ["hover", "pressed"] else (SURFACE if state == "disabled" else Color("#2b2b29"))
-		s.border_color = Color("#383835") if state == "disabled" else INK_3
-		s.set_border_width_all(1)
-		s.set_corner_radius_all(4)
+		s.bg_color = UI.BTN_HOVER if state == "hover" else (UI.BTN_PRESSED if state == "pressed" else (UI.BTN_DISABLED if state == "disabled" else UI.BTN))
 		s.content_margin_top = 6
 		s.content_margin_bottom = 6
 		b.add_theme_stylebox_override(state, s)
+	b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+	b.focus_mode = Control.FOCUS_NONE
 
 
 func _build_overlay() -> void:
 	var back := PanelContainer.new()
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color(0.1, 0.1, 0.098, 0.82)
-	sb.set_corner_radius_all(4)
 	sb.set_content_margin_all(8)
 	back.add_theme_stylebox_override("panel", sb)
 	back.anchor_top = 1.0
@@ -606,6 +625,64 @@ func _build_overlay() -> void:
 	status.add_theme_color_override("default_color", INK_2)
 	status.add_theme_font_size_override("normal_font_size", 12)
 	back.add_child(status)
+
+
+# ---------- wind notice ----------
+
+## Turning the wind on asks first (once per session): drawing the flow lines is heavy, most of all
+## in a web browser, and the notice says so. Cancel leaves the layer off.
+func _on_wind_toggled(on: bool) -> void:
+	if on and not AppState.wind_ok:
+		wind_toggle.set_pressed_no_signal(false)
+		wind_popup.visible = true
+		return
+	show_wind = on
+	_apply_view()
+
+
+func _wind_popup_accept() -> void:
+	AppState.wind_ok = true
+	wind_popup.visible = false
+	wind_toggle.set_pressed_no_signal(true)
+	show_wind = true
+	_apply_view()
+
+
+func _wind_popup_cancel() -> void:
+	wind_popup.visible = false
+
+
+func _build_wind_popup() -> void:
+	wind_popup.set_anchors_preset(Control.PRESET_FULL_RECT)
+	wind_popup.visible = false
+	add_child(wind_popup)  # added last, so it is on top
+	var scrim := ColorRect.new()
+	scrim.color = Color(0, 0, 0, 0.55)
+	scrim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	scrim.mouse_filter = Control.MOUSE_FILTER_STOP  # blocks the map and panel behind it
+	wind_popup.add_child(scrim)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	wind_popup.add_child(center)
+	var panel := PanelContainer.new()
+	var sb := _flat(PANEL_BG)
+	sb.set_content_margin_all(20)
+	sb.set_border_width_all(1)  # a dialog frame, not a button outline
+	sb.border_color = INK_3
+	panel.add_theme_stylebox_override("panel", sb)
+	center.add_child(panel)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 10)
+	panel.add_child(box)
+	UI.heading(box, "The wind layer can slow things down", 17)
+	var body := UI.text(box, "Drawing the wind lines is heavy, most of all in a web browser. The map may stutter when you pan or zoom with it on. If it gets laggy, turn the Wind layer off again.", INK_2, 13)
+	body.custom_minimum_size.x = 400
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	box.add_child(row)
+	UI.button(row, "Cancel", "Keep the wind layer off (Esc)", _wind_popup_cancel)
+	UI.button(row, "Show wind anyway", "", _wind_popup_accept)
 
 
 # ---------- dates ----------
@@ -765,6 +842,10 @@ func _apply_view() -> void:
 	var bias := clampf(log(get_viewport().get_stretch_transform().get_scale().x) / log(2.0), 0.0, 1.5)
 	base_tiles.pixel_bias = bias
 	sat_tiles.pixel_bias = bias
+	label_tiles.pixel_bias = bias
+	label_tiles.visible = base_choice == LABEL_BASE
+	if label_tiles.visible:
+		label_tiles.update_view(rect, zoom)
 	backdrop_tiles.update_view(rect, zoom)
 	base_tiles.visible = BASES[base_choice][1] != ""
 	if base_tiles.visible:
@@ -821,7 +902,7 @@ func _zoom_at(screen_pos: Vector2, new_zoom: float) -> void:
 
 func _process(_delta: float) -> void:
 	# Keep the loading counter fresh while tiles stream in.
-	var n := sat_tiles.loading_count() + base_tiles.loading_count() + (1000 if wind.status == "loading" else 0)
+	var n := sat_tiles.loading_count() + base_tiles.loading_count() + label_tiles.loading_count() + (1000 if wind.status == "loading" else 0)
 	if n != _last_loading:
 		_last_loading = n
 		_update_status()
@@ -829,8 +910,10 @@ func _process(_delta: float) -> void:
 
 func _update_status() -> void:
 	var n_hot := shown_idx_modis.size() + shown_idx_viirs.size()
-	var loading := sat_tiles.loading_count() + base_tiles.loading_count()
+	var loading := sat_tiles.loading_count() + base_tiles.loading_count() + label_tiles.loading_count()
 	var base := "Base map: USGS National Map" if base_tiles.visible else "No base map"
+	if label_tiles.visible:
+		base += " · names: Esri, HERE, Garmin, © OpenStreetMap contributors"
 	if show_sat:
 		if _imagery_date() > _latest_imagery_date():
 			base += " · Satellite: no NASA image for %s yet (latest %s)" % [_imagery_date(), _latest_imagery_date()]
@@ -886,10 +969,10 @@ func _gui_input(event: InputEvent) -> void:
 						_zoom_to_fire(selected_fire)
 			MOUSE_BUTTON_WHEEL_UP:
 				if event.pressed:
-					_zoom_at(event.position, zoom + 0.5)
+					_zoom_at(event.position, zoom + WHEEL_ZOOM_PER_NOTCH * UI.wheel_notches(event))
 			MOUSE_BUTTON_WHEEL_DOWN:
 				if event.pressed:
-					_zoom_at(event.position, zoom - 0.5)
+					_zoom_at(event.position, zoom - WHEEL_ZOOM_PER_NOTCH * UI.wheel_notches(event))
 	elif event is InputEventMouseMotion and _drag:
 		_drag_moved += event.relative.length()
 		center -= event.relative / _scale()
@@ -903,6 +986,10 @@ func _gui_input(event: InputEvent) -> void:
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event.pressed:
+		return
+	if wind_popup.visible:
+		if event.keycode == KEY_ESCAPE:
+			_wind_popup_cancel()
 		return
 	var mid := _map_size() / 2.0
 	match event.keycode:
