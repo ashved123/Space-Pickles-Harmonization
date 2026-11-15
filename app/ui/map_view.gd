@@ -116,6 +116,7 @@ var shown_idx_viirs := PackedInt32Array()
 var shown_fires: Array = []
 var selected_fire := {}
 var selected_info := ""
+var _built := false          # _ready has built the view
 var picked_hotspot := -1   # index into hs of the clicked hotspot, -1 = none
 var outlook_month := -1    # month the outlook layer shows (0 = each cell's peak); -1 = follow the map's month
 var outlook_toggle: Button
@@ -156,6 +157,8 @@ func _ready() -> void:
 	_restore_state()
 
 	_load_region()
+	if AppState.map_state.is_empty():
+		_fit_state()  # first visit: show the whole state, sized for this window
 	base_tiles.setup(BASES[base_choice][1], BASES[base_choice][2])
 	sat_tiles.setup(GIBS_DAILY, 9)
 	# Keep the whole state in memory at low zoom, so zooming always has something to show.
@@ -190,6 +193,7 @@ func _ready() -> void:
 	add_child(_wind_timer)
 	_build_panel()
 	_build_overlay()
+	_built = true
 	_refresh_data()
 	_apply_view()
 
@@ -787,9 +791,21 @@ func _apply_view() -> void:
 
 
 func _show_state() -> void:
-	zoom = 6.0
-	center = Mercator.to_world(37.3, -119.4)
+	_fit_state()
 	_apply_view()
+
+
+## Zoom and centre that fit the whole state in the map area (left of the panel), with a margin.
+## Uses the window's current size, so it is sharper on big windows than a fixed zoom would be.
+func _fit_state() -> void:
+	if not region_bbox.has_area():
+		zoom = 6.0
+		center = Mercator.to_world(37.3, -119.4)
+		return
+	var area := get_viewport_rect().size - Vector2(PANEL_W, 0.0)
+	var px_per_world := minf(area.x / region_bbox.size.x, area.y / region_bbox.size.y) * 0.88
+	zoom = clampf(Mercator.ZREF + log(px_per_world) / log(2.0), MIN_ZOOM, MAX_ZOOM)
+	center = region_bbox.get_center()
 
 
 func _zoom_at(screen_pos: Vector2, new_zoom: float) -> void:
@@ -839,7 +855,8 @@ static func _thousands(n: int) -> String:
 
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_RESIZED and is_inside_tree():
+	# Before _ready the view isn't built yet (and saving it would count as a first visit).
+	if what == NOTIFICATION_RESIZED and is_inside_tree() and _built:
 		_apply_view()
 
 

@@ -55,6 +55,16 @@ docs/               specs, pitch notes, SOURCES.md
 - **No backend.** Everything heavy is precomputed in `pipeline/` and shipped as static files.
 - Python pipeline: `rasterio`, `numpy`, `pyproj`, `geopandas`, `pandas`, `requests`, `pillow`, `matplotlib` (diagnostic plots only), `scikit-learn` (risk outlook only). Setup: `python3 -m venv --system-site-packages .venv && .venv/bin/pip install -r pipeline/requirements.txt`.
 
+## Resolution scaling (for the web build)
+- `project.godot` [display]: design size 1200 x 800, stretch mode `canvas_items`, aspect **`expand`**, scale mode `fractional`, `allow_hidpi` on. Any window shape fills with no letterbox bars, text stays sharp on HiDPI, and the layout size (`get_viewport_rect().size`) is **always at least 1200 x 800** in layout units: a wider window adds width, a taller one adds height.
+- So never hard-code positions for 1200 x 800. Anchors / containers, or compute from `get_viewport_rect().size`:
+  - map: full-rect anchors; the first view is fitted to the window (`_fit_state`, also the CA button); after that the zoom is the user's.
+  - calendar: `layout()` gives extra width to the map and heatmap cells (cap 90 px) and extra height to the heatmap rows and fire list. It reruns on resize.
+  - sim: `apply_view()` re-fits the grid on resize.
+- Check a layout at a given size with a real (non-headless) window: `godot --path app -s screenshot.gd -- <map|calendar|sim> 1600 900`. Sizes tried: 1200x800, 1366x768, 1600x900, 1900x1000, 1000x1100, 900x600.
+- Known limit: windows narrower than 3:2 (portrait phones) just scale the whole 1200-wide layout down, so text gets small. A real mobile layout would be separate work.
+- The web export preset (`export_presets.cfg`, canvas resize policy) is not set up yet; the page should let the canvas fill the browser window (Godot's default "adaptive" policy).
+
 ## Fire sim model (`app/sim/fire_sim.gd`)
 - A 2D grid, about 200×200 cells at 150 m. The **sim stays 2D**; only the visuals may be 3D (heightmap terrain, voxel-style columns). Don't make the sim voxel-based.
 - Cell states: `NO_FUEL 0`, `UNBURNT 1`, `BURNING 2`, `BURNT 3`.

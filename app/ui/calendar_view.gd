@@ -28,17 +28,27 @@ const VIEWS := ["Harmonized", "MODIS", "VIIRS S-NPP", "VIIRS NOAA-20"]
 const MONTHS := ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
 # Map geometry (equirectangular, x scaled by cos 37.5°).
-const MAP_RECT := Rect2(16, 76, 410, 500)
 const LAT_TOP := 42.25
 const LAT_BOTTOM := 32.5
 const LON_LEFT := -124.6
 const LON_RIGHT := -113.9
-# Heatmap geometry.
-const HEAT_X := 478.0
+# Layout. The project stretches to the window with the 1200 x 800 design size as the minimum
+# (stretch aspect "expand"), so the screen is always at least that big; layout() gives the
+# extra width and height to the map, the heatmap cells and the fire list.
+const DESIGN_SIZE := Vector2(1200, 800)
 const HEAT_Y := 96.0
-const CELL_W := 46.0
-const CELL_H := 18.0
 const OUTLOOK_GAP := 12.0
+const LABEL_W := 172.0        # room right of the heatmap for the side notes
+const MAX_CELL_W := 90.0
+const MAX_CELL_H := 34.0
+const SIDE_BUTTON_W := 180.0  # "Open in fire sim"
+const MAP_ASPECT := 0.8706    # width / height of the drawn map: 10.7° lon x cos 37.5° over 9.75° lat
+# Set by layout():
+var map_rect := Rect2(16, 76, 410, 500)
+var heat_x := 478.0
+var cell_w := 46.0
+var cell_h := 18.0
+var heat_font := 12
 
 var data: CalendarData = CalendarData.new()
 var selection := PackedInt32Array()
@@ -53,6 +63,7 @@ var view := 0            # index into VIEWS now shown; satellite views are senso
 var wanted_view := 0     # view picked by the user; shown once its counts are ready
 var counting_year := 0   # next hotspot year to count for the satellite views, 0 = not started
 var view_buttons: Array = []
+var view_row := VBoxContainer.new()
 var sel_year := 0
 var sel_month := 0
 var hover_text := ""
@@ -79,6 +90,7 @@ func _ready() -> void:
 		return
 	_compute_cell_means()
 	_build_controls()
+	layout()
 	if AppState.selection.is_empty():
 		set_selection(data.all_cells())
 	else:
@@ -107,36 +119,63 @@ func _build_controls() -> void:
 	all_button.pressed.connect(func(): set_selection(data.all_cells()))
 	add_child(all_button)
 	map_button.text = "← Back to map"
-	map_button.position = Vector2(1040, 8)
 	map_button.pressed.connect(back_to_map)
 	add_child(map_button)
 
-	var view_row := VBoxContainer.new()
-	view_row.position = Vector2(HEAT_X, 38)
-	view_row.size = Vector2(12 * CELL_W, 30)
+	view_row.size.y = 30
 	add_child(view_row)
 	view_buttons = UI.segmented(view_row, VIEWS, view, set_view)
 
-	info.position = Vector2(16, 612)
-	info.size = Vector2(440, 180)
 	info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	info.add_theme_color_override("font_color", INK_2)
 	add_child(info)
 
-	fire_title.position = Vector2(HEAT_X, 660)
 	fire_title.add_theme_color_override("font_color", INK)
 	add_child(fire_title)
-	fire_list.position = Vector2(HEAT_X, 686)
-	fire_list.size = Vector2(500, 104)
 	fire_list.item_selected.connect(func(_i): sim_button.disabled = false)
 	fire_list.item_activated.connect(func(_i): open_sim())
 	add_child(fire_list)
 	sim_button.text = "Open in fire sim"
-	sim_button.position = Vector2(HEAT_X + 512, 686)
-	sim_button.size = Vector2(180, 36)
 	sim_button.disabled = true
 	sim_button.pressed.connect(open_sim)
 	add_child(sim_button)
+
+
+## Sizes and places everything for the current window: the design layout at 1200 x 800, with
+## any extra width or height going to the map, the heatmap cells and the fire list.
+func layout() -> void:
+	var vs := get_viewport_rect().size
+	vs = vs.max(DESIGN_SIZE)
+	var rows := data.OUTLOOK_YEAR - data.FIRST_YEAR + 1  # one row per year, plus the outlook row
+	# Map: as big as the left third and the height allow, at the map's own aspect.
+	var avail := Vector2(vs.x * 0.34, vs.y - 300.0)
+	var h := minf(avail.y, avail.x / MAP_ASPECT)
+	map_rect = Rect2(16, 76, h * MAP_ASPECT, h)
+	heat_x = map_rect.end.x + 52.0
+	cell_w = clampf((vs.x - heat_x - LABEL_W) / 12.0, 30.0, MAX_CELL_W)
+	# Rows take 70% of any extra height; the fire list gets the rest.
+	var spare := maxf(vs.y - DESIGN_SIZE.y, 0.0)
+	cell_h = clampf((vs.y - 296.0 - spare * 0.3) / rows, 12.0, MAX_CELL_H)
+	heat_font = clampi(roundi(cell_h * 0.67), 11, 16)
+	var list_y := HEAT_Y + rows * cell_h + OUTLOOK_GAP + 18.0 + 30.0 + 26.0
+	title.position = Vector2(16, 10)
+	area_label.position = Vector2(16, 42)
+	map_button.position = Vector2(vs.x - 160.0, 8)
+	view_row.position = Vector2(heat_x, 38)
+	view_row.size.x = 12.0 * cell_w
+	info.position = Vector2(16, map_rect.end.y + 36.0)
+	info.size = Vector2(maxf(heat_x - 52.0 - 16.0, 300.0), maxf(vs.y - info.position.y - 10.0, 60.0))
+	fire_title.position = Vector2(heat_x, list_y - 26.0)
+	fire_list.position = Vector2(heat_x, list_y)
+	fire_list.size = Vector2(maxf(vs.x - heat_x - 16.0 - SIDE_BUTTON_W - 12.0, 300.0), maxf(vs.y - list_y - 10.0, 60.0))
+	sim_button.position = Vector2(fire_list.position.x + fire_list.size.x + 12.0, list_y)
+	sim_button.size = Vector2(SIDE_BUTTON_W, 36)
+	queue_redraw()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_RESIZED and is_inside_tree() and font != null and not grid.is_empty():
+		layout()
 
 
 func _button_style(bg: Color, border: Color) -> StyleBoxFlat:
@@ -288,7 +327,7 @@ func _gui_input(event: InputEvent) -> void:
 		queue_redraw()
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed:
-			if MAP_RECT.has_point(event.position):
+			if map_rect.has_point(event.position):
 				drag_from = event.position
 				drag_to = event.position
 			else:
@@ -329,33 +368,33 @@ func _finish_map_click(pos: Vector2, shift: bool) -> void:
 
 func _map_scale() -> float:
 	var w := (LON_RIGHT - LON_LEFT) * cos(deg_to_rad(37.5))
-	return minf(MAP_RECT.size.x / w, MAP_RECT.size.y / (LAT_TOP - LAT_BOTTOM))
+	return minf(map_rect.size.x / w, map_rect.size.y / (LAT_TOP - LAT_BOTTOM))
 
 
 func _to_screen(lat: float, lon: float) -> Vector2:
 	var s := _map_scale()
-	return MAP_RECT.position + Vector2((lon - LON_LEFT) * cos(deg_to_rad(37.5)) * s, (LAT_TOP - lat) * s)
+	return map_rect.position + Vector2((lon - LON_LEFT) * cos(deg_to_rad(37.5)) * s, (LAT_TOP - lat) * s)
 
 
 func _to_latlon(p: Vector2) -> Vector2:
 	var s := _map_scale()
-	var q := p - MAP_RECT.position
+	var q := p - map_rect.position
 	return Vector2(LAT_TOP - q.y / s, LON_LEFT + q.x / (cos(deg_to_rad(37.5)) * s))
 
 
 func _row_y(year: int) -> float:
-	var y := HEAT_Y + (year - data.FIRST_YEAR) * CELL_H
+	var y := HEAT_Y + (year - data.FIRST_YEAR) * cell_h
 	return y + OUTLOOK_GAP if year > data.last_year else y
 
 
 ## (year, month) under the mouse in the heatmap, or (0, 0).
 func _heat_cell_at(p: Vector2) -> Vector2i:
-	var m := int(floor((p.x - HEAT_X) / CELL_W)) + 1
+	var m := int(floor((p.x - heat_x) / cell_w)) + 1
 	if m < 1 or m > 12:
 		return Vector2i.ZERO
 	for y in range(data.FIRST_YEAR, data.OUTLOOK_YEAR + 1):
 		var top := _row_y(y)
-		if p.y >= top and p.y < top + CELL_H:
+		if p.y >= top and p.y < top + cell_h:
 			return Vector2i(y, m)
 	return Vector2i.ZERO
 
@@ -417,22 +456,22 @@ func _draw_map() -> void:
 		draw_rect(Rect2(drag_from, drag_to - drag_from).abs(), SELECT, false, 1.0)
 	var caption := "Map: %s" % ("%s %d, %s per 25 km cell" % [MONTHS[sel_month - 1], sel_year, unit_text()]
 		if month_mode else "average monthly %s per 25 km cell" % unit_text())
-	draw_string(font, Vector2(MAP_RECT.position.x, MAP_RECT.end.y + 4), caption,
+	draw_string(font, Vector2(map_rect.position.x, map_rect.end.y + 4), caption,
 		HORIZONTAL_ALIGNMENT_LEFT, -1, 12, INK_3)
-	draw_string(font, Vector2(MAP_RECT.position.x, MAP_RECT.end.y + 20), "Click a cell · shift+click to add · drag a box",
+	draw_string(font, Vector2(map_rect.position.x, map_rect.end.y + 20), "Click a cell · shift+click to add · drag a box",
 		HORIZONTAL_ALIGNMENT_LEFT, -1, 12, INK_3)
 
 
 func _draw_heatmap() -> void:
 	for m in 12:
-		draw_string(font, Vector2(HEAT_X + m * CELL_W, HEAT_Y - 6), MONTHS[m], HORIZONTAL_ALIGNMENT_CENTER,
-			CELL_W, 12, INK_2)
+		draw_string(font, Vector2(heat_x + m * cell_w, HEAT_Y - 6), MONTHS[m], HORIZONTAL_ALIGNMENT_CENTER,
+			cell_w, heat_font, INK_2)
 	for y in range(data.FIRST_YEAR, data.last_year + 1):
 		var top := _row_y(y)
-		draw_string(font, Vector2(HEAT_X - 46, top + 13), str(y), HORIZONTAL_ALIGNMENT_RIGHT, 40, 12, INK_2)
+		draw_string(font, Vector2(heat_x - 46, top + _text_dy()), str(y), HORIZONTAL_ALIGNMENT_RIGHT, 40, heat_font, INK_2)
 		for m in 12:
 			var v: float = grid[y - data.FIRST_YEAR][m]
-			var r := Rect2(HEAT_X + m * CELL_W + 1, top + 1, CELL_W - 2, CELL_H - 2)
+			var r := Rect2(heat_x + m * cell_w + 1, top + 1, cell_w - 2, cell_h - 2)
 			draw_rect(r, heat_color(v, heat_max, heat_min))
 			if is_nan(v):
 				_hatch(r)
@@ -445,46 +484,46 @@ func _draw_heatmap() -> void:
 				_triangle(r.position + Vector2(4, r.size.y - 4))
 	# Sensor change markers (the harmonized series switches source in 2012).
 	if view == 0:
-		var y2012 := _row_y(2012) + CELL_H / 18.0  # Feb 2012 sits in the 2012 row
-		draw_line(Vector2(HEAT_X - 50, _row_y(2012)), Vector2(HEAT_X + 12 * CELL_W, _row_y(2012)), INK_3, 1.0)
-		draw_string(font, Vector2(HEAT_X + 12 * CELL_W + 6, y2012 + 4), "↑ MODIS, harmonized",
+		var y2012 := _row_y(2012) + cell_h / 18.0  # Feb 2012 sits in the 2012 row (a fraction of the row)
+		draw_line(Vector2(heat_x - 50, _row_y(2012)), Vector2(heat_x + 12 * cell_w, _row_y(2012)), INK_3, 1.0)
+		draw_string(font, Vector2(heat_x + 12 * cell_w + 6, y2012 + 4), "↑ MODIS, harmonized",
 			HORIZONTAL_ALIGNMENT_LEFT, -1, 11, INK_3)
-		draw_string(font, Vector2(HEAT_X + 12 * CELL_W + 6, y2012 + 18), "↓ VIIRS S-NPP, observed",
+		draw_string(font, Vector2(heat_x + 12 * cell_w + 6, y2012 + 18), "↓ VIIRS S-NPP, observed",
 			HORIZONTAL_ALIGNMENT_LEFT, -1, 11, INK_3)
 	else:
-		draw_string(font, Vector2(HEAT_X + 12 * CELL_W + 6, _row_y(data.FIRST_YEAR) + 13), "raw counts: don't compare",
+		draw_string(font, Vector2(heat_x + 12 * cell_w + 6, _row_y(data.FIRST_YEAR) + _text_dy()), "raw counts: don't compare",
 			HORIZONTAL_ALIGNMENT_LEFT, -1, 11, INK_3)
-		draw_string(font, Vector2(HEAT_X + 12 * CELL_W + 6, _row_y(data.FIRST_YEAR) + 27), "between satellites",
+		draw_string(font, Vector2(heat_x + 12 * cell_w + 6, _row_y(data.FIRST_YEAR) + _text_dy() + 14), "between satellites",
 			HORIZONTAL_ALIGNMENT_LEFT, -1, 11, INK_3)
 	if view == 0 or view == 2:
 		var y26 := _row_y(data.last_year)
-		draw_string(font, Vector2(HEAT_X + 12 * CELL_W + 6, y26 + 13), "S-NPP ended 2 Nov",
+		draw_string(font, Vector2(heat_x + 12 * cell_w + 6, y26 + _text_dy()), "S-NPP ended 2 Nov",
 			HORIZONTAL_ALIGNMENT_LEFT, -1, 11, INK_3)
 	# Outlook row.
 	var oy := _row_y(data.OUTLOOK_YEAR)
-	draw_string(font, Vector2(HEAT_X - 70, oy + 13), "%d" % data.OUTLOOK_YEAR, HORIZONTAL_ALIGNMENT_RIGHT, 64, 12, BLUES[4])
+	draw_string(font, Vector2(heat_x - 70, oy + _text_dy()), "%d" % data.OUTLOOK_YEAR, HORIZONTAL_ALIGNMENT_RIGHT, 64, heat_font, BLUES[4])
 	var omax := 0.001
 	for v in outlook:
 		omax = maxf(omax, v)
 	for m in 12:
-		var r := Rect2(HEAT_X + m * CELL_W + 1, oy + 1, CELL_W - 2, CELL_H - 2)
+		var r := Rect2(heat_x + m * cell_w + 1, oy + 1, cell_w - 2, cell_h - 2)
 		draw_rect(r, ramp(BLUES, outlook[m] / omax))
-	draw_string(font, Vector2(HEAT_X + 12 * CELL_W + 6, oy + 13), "OUTLOOK: past patterns,",
+	draw_string(font, Vector2(heat_x + 12 * cell_w + 6, oy + _text_dy()), "OUTLOOK: past patterns,",
 		HORIZONTAL_ALIGNMENT_LEFT, -1, 11, BLUES[4])
-	draw_string(font, Vector2(HEAT_X + 12 * CELL_W + 6, oy + 27), "not a fire forecast",
+	draw_string(font, Vector2(heat_x + 12 * cell_w + 6, oy + _text_dy() + 14), "not a fire forecast",
 		HORIZONTAL_ALIGNMENT_LEFT, -1, 11, BLUES[4])
 	# Selected month.
 	if sel_year > 0:
-		draw_rect(Rect2(HEAT_X + (sel_month - 1) * CELL_W, _row_y(sel_year), CELL_W, CELL_H), SELECT, false, 2.0)
+		draw_rect(Rect2(heat_x + (sel_month - 1) * cell_w, _row_y(sel_year), cell_w, cell_h), SELECT, false, 2.0)
 	# Hover.
 	var h := _heat_cell_at(get_local_mouse_position())
 	if h.x > 0:
-		draw_rect(Rect2(HEAT_X + (h.y - 1) * CELL_W, _row_y(h.x), CELL_W, CELL_H), INK_2, false, 1.0)
+		draw_rect(Rect2(heat_x + (h.y - 1) * cell_w, _row_y(h.x), cell_w, cell_h), INK_2, false, 1.0)
 
 
 func _draw_legend() -> void:
-	var x := HEAT_X
-	var y := _row_y(data.OUTLOOK_YEAR) + CELL_H + 18
+	var x := heat_x
+	var y := _row_y(data.OUTLOOK_YEAR) + cell_h + 18
 	draw_string(font, Vector2(x, y), "less", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, INK_3)
 	for i in 24:
 		draw_rect(Rect2(x + 30 + i * 6, y - 9, 6, 10), ramp(REDS, i / 23.0))
@@ -500,6 +539,11 @@ func _draw_legend() -> void:
 		HORIZONTAL_ALIGNMENT_LEFT, -1, 11, INK_3)
 	draw_circle(Vector2(x + 420, y - 4), 2.0, INK_2)
 	draw_string(font, Vector2(x + 426, y), "preliminary (NRT)", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, INK_3)
+
+
+## Baseline offset that centres text in a heatmap row (13 px in a 18 px row at 12 pt).
+func _text_dy() -> float:
+	return cell_h * 0.5 + heat_font * 0.34
 
 
 func _hatch(r: Rect2) -> void:
@@ -519,7 +563,7 @@ func _triangle(p: Vector2) -> void:
 # ---------- hover text ----------
 
 func _describe(p: Vector2) -> String:
-	if MAP_RECT.has_point(p):
+	if map_rect.has_point(p):
 		var ll := _to_latlon(p)
 		var c: int = data.cell_at(ll.x, ll.y)
 		if c < 0:
