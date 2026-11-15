@@ -40,6 +40,22 @@ const BASES := [
 	["Topographic map (USGS)", USGS % "USGSTopo", 16],
 	["None", "", 0],
 ]
+# Backdrop outside California: low-zoom USGS topo tiles, greyed out, with water in blue.
+# Context only, so it stays coarse (blurry when zoomed in) and dimmer than the state.
+const BACKDROP_MAX_ZOOM := 8
+const BACKDROP_LAND := Color("#454541")
+const BACKDROP_WATER := Color("#1f3a52")
+const BACKDROP_SHADER := "
+shader_type canvas_item;
+uniform vec4 land : source_color;
+uniform vec4 water : source_color;
+void fragment() {
+	vec4 c = texture(TEXTURE, UV);
+	float lum = dot(c.rgb, vec3(0.299, 0.587, 0.114));
+	float is_water = smoothstep(0.03, 0.12, c.b - c.r);  // the topo map draws water in blue
+	COLOR = vec4(mix(land.rgb * (0.3 + 0.8 * lum), water.rgb, is_water), 1.0);
+}
+"
 const FIRST_IMAGERY := "2000-02-24"     # MODIS Terra true colour starts here in GIBS
 const MONTHS := ["All months", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
@@ -88,6 +104,7 @@ var outlook_result := Label.new()
 # Nodes.
 var world := Node2D.new()
 var region_clip: RegionClip = RegionClip.new()
+var backdrop_tiles: TileLayer = TileLayer.new()  # greyed-out surroundings, not clipped to the state
 var base_tiles: TileLayer = TileLayer.new()
 var sat_tiles: TileLayer = TileLayer.new()
 var wind: WindLayer = WindLayer.new()
@@ -123,6 +140,16 @@ func _ready() -> void:
 	# Keep the whole state in memory at low zoom, so zooming always has something to show.
 	base_tiles.preload_region(region_bbox, 6, 9)
 	get_window().size_changed.connect(_apply_view)
+	backdrop_tiles.setup(USGS % "USGSTopo", BACKDROP_MAX_ZOOM)
+	var backdrop_shader := Shader.new()
+	backdrop_shader.code = BACKDROP_SHADER
+	var backdrop_mat := ShaderMaterial.new()
+	backdrop_mat.shader = backdrop_shader
+	backdrop_mat.set_shader_parameter("land", BACKDROP_LAND)
+	backdrop_mat.set_shader_parameter("water", BACKDROP_WATER)
+	backdrop_tiles.material = backdrop_mat
+	backdrop_tiles.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	world.add_child(backdrop_tiles)
 	region_clip.add_child(base_tiles)
 	region_clip.add_child(sat_tiles)
 	world.add_child(region_clip)
@@ -703,6 +730,7 @@ func _apply_view() -> void:
 	var bias := clampf(log(get_viewport().get_stretch_transform().get_scale().x) / log(2.0), 0.0, 1.5)
 	base_tiles.pixel_bias = bias
 	sat_tiles.pixel_bias = bias
+	backdrop_tiles.update_view(rect, zoom)
 	base_tiles.visible = BASES[base_choice][1] != ""
 	if base_tiles.visible:
 		base_tiles.set_template(BASES[base_choice][1], BASES[base_choice][2])
