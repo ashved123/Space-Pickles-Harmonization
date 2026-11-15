@@ -27,8 +27,35 @@ func _init() -> void:
 	check(names.has("CA-20181108-0021"), "Camp Fire listed for Butte, Nov 2018 %s" % [names])
 	var o: PackedFloat32Array = d.outlook_area(all)
 	check(o[8] > o[2], "outlook: September above March (%.1f vs %.1f)" % [o[8], o[2]])
+	var s: Dictionary = d.outlook_summary(9)
+	check(absf(s.expected - o[8]) < 0.01 and s.high > 0 and s.medium > s.high, "outlook summary: Sept %.1f cells expected, %d high, %d medium" % [s.expected, s.high, s.medium])
+	check(d.outlook_summary(0).high >= s.high, "peak-month summary has at least as many High cells")
+	test_date_queries()
 	print("FAILED: %d" % failures if failures > 0 else "all tests passed")
 	quit(1 if failures > 0 else 0)
+
+
+func test_date_queries() -> void:
+	var cases := {
+		"2031": [2031, 0, 0], "2031-09": [2031, 9, 0], "9/2031": [2031, 9, 0], "Sep 2031": [2031, 9, 0],
+		"september": [0, 9, 0], "Sept. 2030": [2030, 9, 0], "2031-09-15": [2031, 9, 15],
+		"9/15/2031": [2031, 9, 15], "15/9/2031": [2031, 9, 15], "15 Sep 2031": [2031, 9, 15],
+		"September 15th, 2031": [2031, 9, 15], "  2028-02-29 ": [2028, 2, 29], "feb 29": [0, 2, 29],
+	}
+	var ok := true
+	for text in cases:
+		var q: Dictionary = CalendarData.parse_date_query(text)
+		var want: Array = cases[text]
+		if q.is_empty() or q.year != want[0] or q.month != want[1] or q.day != want[2]:
+			print("       wrong: '%s' -> %s" % [text, q])
+			ok = false
+	check(ok, "typed dates are read (%d forms)" % cases.size())
+	var bad := true
+	for text in ["", "soon", "13/2031", "2027-02-30", "2031 2032", "0/2031", "15", "1 2 3 2031", "mar apr 2030"]:
+		if not CalendarData.parse_date_query(text).is_empty():
+			print("       should be rejected: '%s'" % text)
+			bad = false
+	check(bad, "unreadable dates are rejected")
 
 
 func check(cond: bool, name: String) -> void:

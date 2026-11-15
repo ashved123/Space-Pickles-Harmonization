@@ -1,8 +1,10 @@
 ## Draws many hotspots at once with a MultiMesh (one quad per detection, one draw call).
-## The quad size is the sensor's pixel footprint, but never smaller than MIN_PX on screen.
+## Each quad carries a round dot texture, so detections show as circles. The circle's diameter
+## is the sensor's pixel footprint, but never smaller than MIN_PX on screen.
 extends MultiMeshInstance2D
 
-const MIN_PX := 3.0
+const MIN_PX := 4.0
+const DOT_PX := 64  # size of the dot texture
 
 var footprint_world := 33.0  # sensor pixel size in world px (set by the map)
 var _quad := QuadMesh.new()
@@ -13,6 +15,20 @@ func _init() -> void:
 	multimesh.transform_format = MultiMesh.TRANSFORM_2D
 	multimesh.use_colors = true
 	multimesh.mesh = _quad
+	texture = _dot_texture()
+	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+
+
+## White disc with a soft edge; each instance's colour tints it.
+static func _dot_texture() -> ImageTexture:
+	var img := Image.create(DOT_PX, DOT_PX, false, Image.FORMAT_RGBA8)
+	var mid := DOT_PX / 2.0
+	for y in DOT_PX:
+		for x in DOT_PX:
+			var d := Vector2(x + 0.5 - mid, y + 0.5 - mid).length()
+			img.set_pixel(x, y, Color(1, 1, 1, clampf(mid - 0.5 - d, 0.0, 1.0)))
+	img.generate_mipmaps()
+	return ImageTexture.create_from_image(img)
 
 
 ## Rebuild instances for the given detection indices.

@@ -78,6 +78,10 @@ var shown_fires: Array = []
 var selected_fire := {}
 var selected_info := ""
 var picked_hotspot := -1   # index into hs of the clicked hotspot, -1 = none
+var outlook_month := -1    # month the outlook layer shows (0 = each cell's peak); -1 = follow the map's month
+var outlook_toggle: Button
+var outlook_edit := LineEdit.new()
+var outlook_result := Label.new()
 
 # Nodes.
 var world := Node2D.new()
@@ -236,7 +240,7 @@ func _build_panel() -> void:
 	_toggle(layers, "Hotspots", "Individual satellite fire detections (observed)", show_hotspots, func(on): show_hotspots = on; _refresh_data())
 	_toggle(layers, "Fire outlines", "Hotspots grouped into fire events", show_fires, func(on): show_fires = on; _refresh_data())
 	_toggle(layers, "Burning grid", "Harmonized MODIS + VIIRS burning per 25 km cell", show_grid, func(on): show_grid = on; _refresh_data())
-	_toggle(layers, "2027 outlook", "Outlook from past patterns, not a forecast of actual fires", show_outlook, func(on): show_outlook = on; _refresh_data())
+	outlook_toggle = _toggle(layers, "Outlook", "Outlook from past patterns, not a forecast of actual fires", show_outlook, func(on): show_outlook = on; _refresh_data())
 	_toggle(layers, "Clouds + smoke", "NASA satellite image for that day, over the base map", show_sat, func(on): show_sat = on; _apply_view())
 	_toggle(layers, "Wind", "Wind that day (ERA5 reanalysis, modelled)", show_wind, func(on): show_wind = on; _apply_view())
 	wind_row.visible = show_wind
@@ -248,6 +252,20 @@ func _build_panel() -> void:
 	hour_label.add_theme_color_override("font_color", INK_2)
 	wind_row.add_child(hour_label)
 	_nav_button(wind_row, "›", "One hour later", func(): wind_hour = (wind_hour + 1) % 24; _apply_view())
+
+	# ----- outlook for a typed date -----
+	_heading(box, "Fire season outlook", 15)
+	_text(box, "Type a year, month or date, then press Enter.", INK_3)
+	outlook_edit.placeholder_text = "2031   Sep 2030   2028-08-15"
+	outlook_edit.add_theme_font_size_override("font_size", 13)
+	outlook_edit.text_submitted.connect(_on_outlook_query)
+	box.add_child(outlook_edit)
+	outlook_result.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	outlook_result.custom_minimum_size.x = INNER_W
+	outlook_result.add_theme_font_size_override("font_size", 12)
+	outlook_result.add_theme_color_override("font_color", INK_2)
+	outlook_result.visible = false
+	box.add_child(outlook_result)
 
 	# ----- filters -----
 	_heading(box, "Filters", 15)
@@ -328,7 +346,7 @@ func _style_toggle(b: Button) -> void:
 	b.add_theme_font_size_override("font_size", 13)
 
 
-func _toggle(box: Container, t: String, tip: String, on: bool, cb: Callable) -> void:
+func _toggle(box: Container, t: String, tip: String, on: bool, cb: Callable) -> Button:
 	var b := Button.new()
 	b.text = t
 	b.tooltip_text = tip
@@ -338,6 +356,7 @@ func _toggle(box: Container, t: String, tip: String, on: bool, cb: Callable) -> 
 	_style_toggle(b)
 	b.toggled.connect(cb)
 	box.add_child(b)
+	return b
 
 
 ## A row of buttons where exactly one is on. Returns the buttons.
@@ -436,6 +455,7 @@ func _pick_day(d: int) -> void:
 
 
 func _date_changed() -> void:
+	outlook_month = -1  # the outlook layer follows the map's month again
 	if day > 0:
 		_last_day = day
 	for i in scope_buttons.size():
@@ -638,9 +658,10 @@ func _refresh_data() -> void:
 			vector.grid_max = maxf(vector.grid_max, v)
 	vector.outlook_cells = []
 	if show_outlook and not cal.outlook_p.is_empty():
+		var om := month if outlook_month < 0 else outlook_month
 		for c in cal.cell_count():
 			var p: Array = cal.outlook_p[c]
-			var v: float = p[month - 1] if month > 0 else p.max()
+			var v: float = p[om - 1] if om > 0 else p.max()
 			if v >= 0.02:
 				vector.outlook_cells.append([_cell_rect(c), v])
 	vector.queue_redraw()
@@ -741,7 +762,7 @@ func _update_status() -> void:
 	status.text = "%s%s\n%s hotspots (observed, NASA FIRMS) · %d fire events · zoom %.1f\n%s" % [
 		base, ("   loading %d tiles…" % loading) if loading > 0 else "",
 		_thousands(n_hot), shown_fires.size(), zoom,
-		"[color=#3987e5]■[/color] MODIS 1 km   [color=#d95926]■[/color] VIIRS 375 m   [color=#f0efec]□[/color] fire event outline (observed detections, grouped)"]
+		"[color=#3987e5]●[/color] MODIS 1 km   [color=#d95926]●[/color] VIIRS 375 m   [color=#f0efec]□[/color] fire event outline (observed detections, grouped)"]
 
 
 static func _thousands(n: int) -> String:
@@ -865,6 +886,62 @@ func _zoom_to_fire(f: Dictionary) -> void:
 
 
 # ---------- screens ----------
+
+## A typed year, month or date. Dates in the satellite record move the map there (observed);
+## later dates show the risk outlook for that month (the outlook is monthly, not daily).
+func _on_outlook_query(text: String) -> void:
+	outlook_edit.release_focus()
+	outlook_result.visible = true
+	var q := CalendarData.parse_date_query(text)
+	if q.is_empty():
+		outlook_result.text = "Couldn't read that. Try 2031, Sep 2030 or 2028-08-15."
+		return
+	var y: int = q.year if q.year > 0 else CalendarData.OUTLOOK_YEAR
+	var m: int = q.month
+	var last: String = cal.months[cal.months.size() - 1]  # last "YYYY-MM" with a record
+	var after_record := y > cal.last_year if m == 0 else "%04d-%02d" % [y, m] > last
+	if after_record:
+		outlook_month = m
+		show_outlook = true
+		outlook_toggle.set_pressed_no_signal(true)
+		_refresh_data()
+		outlook_result.text = _outlook_text(y, m, q.day)
+	elif y < CalendarData.FIRST_YEAR or (m > 0 and not cal.has_data(y, m)):
+		outlook_result.text = "No satellite record for %s. The record starts in November 2000. Missing data is not zero fire." % (
+			"%s %d" % [MONTH_NAMES[m - 1], y] if m > 0 else str(y))
+	else:
+		year = y
+		month = m
+		day = q.day if m > 0 else 0
+		if m > 0:
+			cal_month = m
+		_date_changed()
+		outlook_result.text = "%s is in the satellite record, so the map now shows what was observed. The outlook applies to dates after %s %s." % [
+			_date_text(), MONTH_NAMES[int(last.substr(5, 2)) - 1], last.substr(0, 4)]
+
+
+func _outlook_text(y: int, m: int, d: int) -> String:
+	var by_month: PackedFloat32Array = cal.outlook_area(cal.all_cells())
+	var order := range(12)
+	order.sort_custom(func(a, b): return by_month[a] > by_month[b])
+	var s: Dictionary = cal.outlook_summary(m)
+	var t := ""
+	if m > 0:
+		t = "OUTLOOK for %s %d\nAbout %.0f of %d map cells (25 km each) are expected to have notable burning. %s ranks %d of 12 for the year; the peak is %s (%.0f cells).\nHigh risk: %d cells. Medium: %d cells. Shown in orange on the map." % [
+			MONTH_NAMES[m - 1], y, s.expected, cal.cell_count(), MONTH_NAMES[m - 1], order.find(m - 1) + 1,
+			MONTH_NAMES[order[0]], by_month[order[0]], s.high, s.medium]
+		if d > 0:
+			t += "\nThe outlook is monthly: %d %s gets the values for all of %s." % [d, MONTH_NAMES[m - 1], MONTH_NAMES[m - 1]]
+	else:
+		t = "OUTLOOK for %d\nBusiest months: %s (%.0f cells expected to have notable burning), %s (%.0f), %s (%.0f). Quietest: %s (%.0f).\n%d of %d cells reach High risk in at least one month, %d more reach Medium. The map shows each cell's peak month in orange." % [
+			y, MONTH_NAMES[order[0]], by_month[order[0]], MONTH_NAMES[order[1]], by_month[order[1]],
+			MONTH_NAMES[order[2]], by_month[order[2]], MONTH_NAMES[order[11]], by_month[order[11]],
+			s.high, cal.cell_count(), s.medium]
+	if y != CalendarData.OUTLOOK_YEAR:
+		t += "\n\nThe model was built for %d from the 10 years of record before it. It has no newer data and no year input, so every date after the record gets this same outlook. The further from %d, the less it tells you." % [
+			CalendarData.OUTLOOK_YEAR, CalendarData.OUTLOOK_YEAR]
+	return t + "\n\nOutlook from historical patterns, not a forecast of actual fires. It can't foresee extreme years. Notable burning includes farm and prescribed burns."
+
 
 ## True if an exact day is selected and the fire was burning on it.
 func _fire_on_selected_day(f: Dictionary) -> bool:

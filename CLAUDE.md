@@ -118,7 +118,8 @@ data/regions/<id>/
 - GIBS `Reference_Features_15m` / `Reference_Labels_15m` return solid black tiles in EPSG:3857: don't use them.
 - Tile loading (`map/tile_layer.gd`): visible tiles first, then prefetch of the next zoom level and a ring around the view; zoom 6–9 for the whole state is preloaded and pinned in memory (376 tiles, ~3 s); 12 parallel requests; up to 900 tiles in memory; desktop also caches tiles on disk in `user://tile_cache` (the browser cache does this on web). Tile zoom is raised on high-DPI / enlarged windows. Don't set `HTTPRequest.use_threads` (requests stalled in testing).
 - Everything is clipped to the California outline (`region_clip.gd`, CanvasItem clip_children); panning is limited to the state's bounding box.
-- Hotspot colours: MODIS `#3987e5`, VIIRS `#d95926` (validated colour-blind safe on the dark surface).
+- Hotspot colours: MODIS `#3987e5`, VIIRS `#d95926` (validated colour-blind safe on the dark surface). Hotspots are drawn as circles (a dot texture on the MultiMesh quads), diameter = sensor footprint, at least 4 px.
+- "Fire season outlook" box: the user types a year, month or date (`CalendarData.parse_date_query`). A date inside the satellite record moves the map there (observed). A later date turns on the outlook layer for that month and prints a summary. The outlook is monthly and exists only for 2027; the model has no year input, so every later date gets the same values, and the panel says so. Per-year outlooks would need `risk_model.py` re-run for each target year.
 
 ## Live sim regions (`app/data/sim_region.gd`, `app/sim/region_loader.gd`)
 "Option B": any hotspot or fire on the map opens the sim on real inputs, fetched live from keyless, CORS-enabled services (checked 2026-11-14). Pipeline region files (`data/regions/<id>/`) are still planned for flagship fires and will take priority when they exist.

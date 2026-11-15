@@ -7,6 +7,9 @@ const FIRST_YEAR := 2000
 const OUTLOOK_YEAR := 2027
 const BASELINE_YEARS := [2001, 2025]  # same-month baseline for "unusual" flags
 const UNUSUAL_PERCENTILE := 0.9
+const OUTLOOK_HIGH := 0.25    # same levels as outlook.json
+const OUTLOOK_MEDIUM := 0.08
+const MONTH_WORDS := ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"]
 
 var unit := ""
 var months: PackedStringArray = []       # "YYYY-MM"
@@ -215,6 +218,87 @@ static func _snap(x: float) -> float:
 
 static func _cell_key(lat: float, lon: float) -> String:
 	return "%.3f,%.3f" % [lat, lon]
+
+
+static func days_in_month(y: int, m: int) -> int:
+	if m == 2:
+		return 29 if (y % 4 == 0 and (y % 100 != 0 or y % 400 == 0)) else 28
+	return 30 if m in [4, 6, 9, 11] else 31
+
+
+## Reads a typed date: a year ("2031"), a month ("2031-09", "9/2031", "Sep 2031", "september")
+## or a day ("2031-09-15", "9/15/2031", "15 Sep 2031"). A year needs 4 digits; other numbers
+## are month then day (swapped when only day-first makes sense).
+## Returns {year, month, day} with 0 for the parts not given, or {} if it can't be read.
+static func parse_date_query(text: String) -> Dictionary:
+	var year := 0
+	var month := 0
+	var day := 0
+	var has_month := false
+	var nums: Array[int] = []
+	var cleaned := text.to_lower()
+	for ch in [",", ".", "/", "-"]:
+		cleaned = cleaned.replace(ch, " ")
+	for word in cleaned.split(" ", false):
+		var tok: String = word
+		for suffix in ["st", "nd", "rd", "th"]:  # 15th, 1st
+			if tok.ends_with(suffix) and tok.trim_suffix(suffix).is_valid_int():
+				tok = tok.trim_suffix(suffix)
+		if tok.is_valid_int():
+			if tok.length() == 4 and year == 0:
+				year = int(tok)
+			else:
+				nums.append(int(tok))
+		else:
+			month = _month_from_word(tok)
+			if month == 0 or has_month:
+				return {}
+			has_month = true
+	if not has_month and not nums.is_empty():
+		if nums.size() == 2 and nums[0] > 12 and nums[1] <= 12:
+			nums.reverse()  # day first, e.g. 15/9/2031
+		month = nums.pop_front()
+		has_month = true
+	if not nums.is_empty():
+		day = nums.pop_front()
+		if day < 1:
+			return {}
+	if not nums.is_empty() or (year == 0 and not has_month):
+		return {}
+	if has_month and (month < 1 or month > 12):
+		return {}
+	if year != 0 and (year < 1900 or year > 2200):
+		return {}
+	# Without a year, allow 29 Feb.
+	if day > days_in_month(year if year != 0 else 2028, maxi(month, 1)):
+		return {}
+	return {"year": year, "month": month, "day": day}
+
+
+## 1-12 for a month name or a prefix of it of 3+ letters ("sep", "sept", "september"), else 0.
+static func _month_from_word(word: String) -> int:
+	if word.length() < 3:
+		return 0
+	for i in MONTH_WORDS.size():
+		if MONTH_WORDS[i].begins_with(word):
+			return i + 1
+	return 0
+
+
+## Outlook over all cells for a month (1-12), or for each cell's peak month (0):
+## {expected: cells expected to have notable burning, high: cells at High, medium: at Medium}.
+func outlook_summary(month: int) -> Dictionary:
+	var expected := 0.0
+	var high := 0
+	var medium := 0
+	for p in outlook_p:
+		var v: float = p[month - 1] if month > 0 else p.max()
+		expected += v
+		if v >= OUTLOOK_HIGH:
+			high += 1
+		elif v >= OUTLOOK_MEDIUM:
+			medium += 1
+	return {"expected": expected, "high": high, "medium": medium}
 
 
 static func _read_json(path: String):
