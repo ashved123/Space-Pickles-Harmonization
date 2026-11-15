@@ -56,6 +56,7 @@ var step_timer := 0.0
 var terrain_seed := 1
 var tool := TOOL_IGNITE
 var break_start := Vector2i(-1, -1)
+var base_fuel := PackedByteArray()  # fuel before any firebreak, restored by Reset
 
 # View: `view` holds the grid in cell units (1 cell = 1 unit) and is scaled / moved to zoom and pan.
 var view := Node2D.new()
@@ -178,6 +179,7 @@ func _on_region_loaded(loader: Node) -> void:
 
 ## Paints every cell and fits the whole grid in the window.
 func build_view() -> void:
+	base_fuel = sim.fuel.duplicate()  # packed arrays are shared on assignment, so copy
 	compute_shade()
 	image = Image.create(sim.cols, sim.rows, false, Image.FORMAT_RGBA8)
 	for i in sim.rows * sim.cols:
@@ -187,9 +189,19 @@ func build_view() -> void:
 	fit_view()
 
 
-## Clears the fire, goes back to the recorded weather and re-seeds from the detections.
-func restart_region_fire() -> void:
+## Puts out the fire and removes every firebreak and retardant drop. (The engine's own
+## reset_fire() keeps interventions, so they are undone here by restoring the cell data.)
+func clear_fire() -> void:
+	sim.fuel = base_fuel.duplicate()
+	sim.retardant.fill(1.0)
 	sim.reset_fire()
+	break_start = Vector2i(-1, -1)
+
+
+## Clears the fire and the interventions, goes back to the recorded weather and re-seeds
+## from the detections.
+func restart_region_fire() -> void:
+	clear_fire()
 	playing = false
 	manual_weather = not region.weather_ok
 	if manual_weather:
@@ -420,7 +432,7 @@ func reset_fire() -> void:
 	if region != null:
 		restart_region_fire()
 	else:
-		sim.reset_fire()
+		clear_fire()
 		repaint_all()
 		playing = false
 
@@ -579,7 +591,7 @@ func build_panel() -> void:
 	box.add_child(run_row)
 	play_button = UI.button(run_row, "Play", "Space", toggle_play)
 	UI.button(run_row, "One step", "N", step_button)
-	UI.button(run_row, "Reset", "R: put the fire back to its start", reset_fire)
+	UI.button(run_row, "Reset", "R: put the fire back to its start and remove firebreaks and retardant", reset_fire)
 	UI.text(box, "Speed (steps per second)")
 	speed_buttons = UI.segmented(box, ["1", "2", "4", "8", "16", "32"], speed_index, set_speed)
 	stats_label = UI.text(box, "", UI.INK_2, 13)
