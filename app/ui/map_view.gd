@@ -19,8 +19,10 @@ const PANEL_BG := Color("#222220")
 const INK := Color("#f0efec")
 const INK_2 := Color("#c3c2b7")
 const INK_3 := Color("#8a897f")
-const MODIS_COLOR := Color("#3987e5")  # categorical slot 1 (dark mode)
-const VIIRS_COLOR := Color("#d95926")  # categorical slot 2 (dark mode)
+# Ring colour per sensor code (0 MODIS, 1 VIIRS S-NPP, 2 VIIRS NOAA-20): blue, yellow, aqua from the
+# categorical palette, validated all-pairs colour-blind safe on the dark surface. The red centre
+# of every hotspot (HotspotLayer.CORE_COLOR) means "observed fire detection", whatever the satellite.
+const SENSOR_COLORS: Array[Color] = [Color("#3987e5"), Color("#c98500"), Color("#199e70")]
 const PANEL_W := 340.0
 const INNER_W := PANEL_W - 30.0
 const DAY_W := 42.0
@@ -616,8 +618,8 @@ func _refresh_data() -> void:
 				shown_idx_modis.append(i)
 			else:
 				shown_idx_viirs.append(i)
-	modis_layer.build(hs.pos, shown_idx_modis, Color(MODIS_COLOR, 0.9))
-	viirs_layer.build(hs.pos, shown_idx_viirs, Color(VIIRS_COLOR, 0.9))
+	modis_layer.build(hs.pos, shown_idx_modis, hs.sensor, SENSOR_COLORS)
+	viirs_layer.build(hs.pos, shown_idx_viirs, hs.sensor, SENSOR_COLORS)
 
 	# Fires burning at any time in the date range.
 	shown_fires = []
@@ -762,7 +764,8 @@ func _update_status() -> void:
 	status.text = "%s%s\n%s hotspots (observed, NASA FIRMS) · %d fire events · zoom %.1f\n%s" % [
 		base, ("   loading %d tiles…" % loading) if loading > 0 else "",
 		_thousands(n_hot), shown_fires.size(), zoom,
-		"[color=#3987e5]●[/color] MODIS 1 km   [color=#d95926]●[/color] VIIRS 375 m   [color=#f0efec]□[/color] fire event outline (observed detections, grouped)"]
+		"[color=#e5383b]●[/color] hotspot (observed)   ring = satellite: [color=#3987e5]●[/color] MODIS 1 km   [color=#c98500]●[/color] VIIRS S-NPP   [color=#199e70]●[/color] VIIRS NOAA-20 (375 m)
+[color=#f0efec]□[/color] fire event outline (observed detections, grouped)"]
 
 
 static func _thousands(n: int) -> String:

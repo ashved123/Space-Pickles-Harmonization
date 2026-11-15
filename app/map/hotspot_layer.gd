@@ -1,10 +1,23 @@
 ## Draws many hotspots at once with a MultiMesh (one quad per detection, one draw call).
-## Each quad carries a round dot texture, so detections show as circles. The circle's diameter
-## is the sensor's pixel footprint, but never smaller than MIN_PX on screen.
+## Each detection is a circle with a red centre (the fire) and a ring in its satellite's
+## colour. The circle's diameter is the sensor's pixel footprint, but never smaller than
+## MIN_PX on screen.
 extends MultiMeshInstance2D
 
-const MIN_PX := 4.0
-const DOT_PX := 64  # size of the dot texture
+const MIN_PX := 7.0
+const CORE_COLOR := Color("#e5383b")  # red centre: an observed hotspot, whatever the satellite
+# The quad's colour (set per detection) is the ring; the centre is painted red on top.
+const SHADER := "
+shader_type canvas_item;
+uniform vec4 core : source_color;
+void fragment() {
+	float d = length(UV - vec2(0.5)) * 2.0;  // 0 at the centre, 1 at the edge
+	float aa = fwidth(d);
+	float in_ring = smoothstep(0.55 - aa, 0.55, d);
+	float inside = 1.0 - smoothstep(1.0 - aa, 1.0, d);
+	COLOR = vec4(mix(core.rgb, COLOR.rgb, in_ring), COLOR.a * inside);
+}
+"
 
 var footprint_world := 33.0  # sensor pixel size in world px (set by the map)
 var _quad := QuadMesh.new()
@@ -15,24 +28,17 @@ func _init() -> void:
 	multimesh.transform_format = MultiMesh.TRANSFORM_2D
 	multimesh.use_colors = true
 	multimesh.mesh = _quad
-	texture = _dot_texture()
-	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	var shader := Shader.new()
+	shader.code = SHADER
+	var mat := ShaderMaterial.new()
+	mat.shader = shader
+	mat.set_shader_parameter("core", CORE_COLOR)
+	material = mat
 
 
-## White disc with a soft edge; each instance's colour tints it.
-static func _dot_texture() -> ImageTexture:
-	var img := Image.create(DOT_PX, DOT_PX, false, Image.FORMAT_RGBA8)
-	var mid := DOT_PX / 2.0
-	for y in DOT_PX:
-		for x in DOT_PX:
-			var d := Vector2(x + 0.5 - mid, y + 0.5 - mid).length()
-			img.set_pixel(x, y, Color(1, 1, 1, clampf(mid - 0.5 - d, 0.0, 1.0)))
-	img.generate_mipmaps()
-	return ImageTexture.create_from_image(img)
-
-
-## Rebuild instances for the given detection indices.
-func build(positions: PackedVector2Array, indices: PackedInt32Array, color: Color) -> void:
+## Rebuild instances for the given detection indices. `sensors` holds a sensor code per
+## detection and `ring_colors` the ring colour for each code.
+func build(positions: PackedVector2Array, indices: PackedInt32Array, sensors: PackedByteArray, ring_colors: Array[Color]) -> void:
 	var n := indices.size()
 	multimesh.instance_count = n
 	if n == 0:
@@ -42,6 +48,7 @@ func build(positions: PackedVector2Array, indices: PackedInt32Array, color: Colo
 	var k := 0
 	for i in indices:
 		var p := positions[i]
+		var color := ring_colors[sensors[i]]
 		# 2D transform rows (x.x, y.x, pad, origin.x, x.y, y.y, pad, origin.y), then colour.
 		buf[k] = 1.0
 		buf[k + 1] = 0.0
