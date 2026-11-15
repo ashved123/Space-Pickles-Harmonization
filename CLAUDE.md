@@ -16,7 +16,10 @@ If time runs short, cut from the bottom. Never ship 2 or 3 without 1.
 ```
 app/                Godot 4.5+ project (GDScript only, exported to web)
   project.godot
-  main.tscn / main.gd      sim view + input (opened from the calendar; Esc/B goes back)
+  main.tscn / main.gd      sim screen: grid view (zoom/pan), side panel with run / tool / weather / view
+                           controls, legend, cursor readout (opened from the map or calendar; Esc/B goes back)
+  ui/ui_kit.gd             shared panel, button, toggle, stepper and legend helpers in the map's dark palette
+                           (used by the sim screen; the map and calendar still have their own copies)
   sim/fire_sim.gd          fire engine (pure logic, no rendering)
   ui/map_view.*            START SCREEN: pan/zoom map of California, layers + filters, opens calendar and sim
   ui/calendar_view.*       year x month heatmap + area picker + fire list (opened from the map)
@@ -117,7 +120,8 @@ data/regions/<id>/
   - Wind: Open-Meteo archive with `models=era5`, 1° grid (58 points), one request per date, cached. Don't use the default model mix (times out) or `era5_land` (returns no wind). Label it modelled reanalysis, not observed.
 - GIBS `Reference_Features_15m` / `Reference_Labels_15m` return solid black tiles in EPSG:3857: don't use them.
 - Tile loading (`map/tile_layer.gd`): visible tiles first, then prefetch of the next zoom level and a ring around the view; zoom 6–9 for the whole state is preloaded and pinned in memory (376 tiles, ~3 s); 12 parallel requests; up to 900 tiles in memory; desktop also caches tiles on disk in `user://tile_cache` (the browser cache does this on web). Tile zoom is raised on high-DPI / enlarged windows. Don't set `HTTPRequest.use_threads` (requests stalled in testing).
-- Everything is clipped to the California outline (`region_clip.gd`, CanvasItem clip_children); panning is limited to the state's bounding box.
+- The base map, satellite layer and data are clipped to the California outline (`region_clip.gd`, CanvasItem clip_children); panning is limited to the state's bounding box.
+- Backdrop outside the state: USGSTopo tiles capped at zoom 8, drawn unclipped under everything and recoloured by a canvas shader (land grey, anything the topo map draws blue becomes dark blue water). It is context only and gets blurry when zoomed in, on purpose. Without internet it falls back to the plain dark surface.
 - Hotspot colours: every hotspot is a circle with a red centre `#e5383b` (= observed fire detection) and a ring in its satellite's colour: MODIS `#3987e5` (blue), VIIRS S-NPP `#c98500` (yellow), VIIRS NOAA-20 `#199e70` (aqua). The three ring colours are validated all-pairs colour-blind safe on the dark surface; keep orange and red out of the ring set so they can't be confused with the centre. Drawn by a small canvas shader on the MultiMesh quads (`map/hotspot_layer.gd`), diameter = sensor footprint, at least 7 px.
 - "Fire season outlook" box: the user types a year, month or date (`CalendarData.parse_date_query`). A date inside the satellite record moves the map there (observed). A later date turns on the outlook layer for that month and prints a summary. The outlook is monthly and exists only for 2027; the model has no year input, so every later date gets the same values, and the panel says so. Per-year outlooks would need `risk_model.py` re-run for each target year.
 
