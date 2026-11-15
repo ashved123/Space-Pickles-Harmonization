@@ -23,6 +23,7 @@ const INK_3 := Color("#8a897f")
 # categorical palette, validated all-pairs colour-blind safe on the dark surface. The red centre
 # of every hotspot (HotspotLayer.CORE_COLOR) means "observed fire detection", whatever the satellite.
 const SENSOR_COLORS: Array[Color] = [Color("#3987e5"), Color("#c98500"), Color("#199e70")]
+const ALL_RED: Array[Color] = [HotspotLayer.CORE_COLOR, HotspotLayer.CORE_COLOR, HotspotLayer.CORE_COLOR]
 const PANEL_W := 340.0
 const INNER_W := PANEL_W - 30.0
 const DAY_W := 42.0
@@ -40,20 +41,39 @@ const BASES := [
 	["Topographic map (USGS)", USGS % "USGSTopo", 16],
 	["None", "", 0],
 ]
-# Backdrop outside California: low-zoom USGS topo tiles, greyed out, with water in blue.
-# Context only, so it stays coarse (blurry when zoomed in) and dimmer than the state.
-const BACKDROP_MAX_ZOOM := 8
-const BACKDROP_LAND := Color("#454541")
-const BACKDROP_WATER := Color("#1f3a52")
+# Backdrop outside California: a dark silhouette, not a map. Land is flat dark grey with
+# thin diagonal white stripes ("not covered here"), water is dark blue, and a light line
+# marks the shore. The land / water shapes come from low-zoom USGS topo tiles (the topo map
+# draws water in blue); nothing else from the tiles is shown.
+const BACKDROP_MAX_ZOOM := 7
+const BACKDROP_LAND := Color("#2b2b29")
+const BACKDROP_WATER := Color("#122436")
+const BACKDROP_STRIPE := Color(1, 1, 1, 0.13)
+const BACKDROP_BORDER := Color("#8a897f")
 const BACKDROP_SHADER := "
 shader_type canvas_item;
 uniform vec4 land : source_color;
 uniform vec4 water : source_color;
+uniform vec4 stripe : source_color;
+uniform vec4 border : source_color;
+float water_at(sampler2D tex, vec2 uv) {
+	vec4 c = texture(tex, uv);
+	return smoothstep(0.03, 0.12, c.b - c.r);  // the topo map draws water in blue
+}
 void fragment() {
-	vec4 c = texture(TEXTURE, UV);
-	float lum = dot(c.rgb, vec3(0.299, 0.587, 0.114));
-	float is_water = smoothstep(0.03, 0.12, c.b - c.r);  // the topo map draws water in blue
-	COLOR = vec4(mix(land.rgb * (0.3 + 0.8 * lum), water.rgb, is_water), 1.0);
+	// Water only where the pixels 3 texels away on every side are water too: this drops
+	// rivers, blue labels and road shields, and keeps the ocean and real lakes.
+	vec2 d = TEXTURE_PIXEL_SIZE * 3.0;
+	float w = water_at(TEXTURE, UV);
+	w = min(w, min(water_at(TEXTURE, UV + vec2(d.x, 0.0)), water_at(TEXTURE, UV - vec2(d.x, 0.0))));
+	w = min(w, min(water_at(TEXTURE, UV + vec2(0.0, d.y)), water_at(TEXTURE, UV - vec2(0.0, d.y))));
+	float aa = fwidth(w) + 0.0001;
+	float is_water = smoothstep(0.5 - aa, 0.5 + aa, w);  // sharp edge at any zoom
+	float shore = 1.0 - smoothstep(aa * 0.75, aa * 1.5, abs(w - 0.5));
+	// Stripes are fixed to the screen: 1.5 px wide, every 14 px, running bottom-left to top-right.
+	float on_stripe = step(fract((FRAGCOORD.x + FRAGCOORD.y) / 14.0), 0.11);
+	vec3 col = mix(mix(land.rgb, stripe.rgb, on_stripe * stripe.a), water.rgb, is_water);
+	COLOR = vec4(mix(col, border.rgb, shore), 1.0);
 }
 "
 const FIRST_IMAGERY := "2000-02-24"     # MODIS Terra true colour starts here in GIBS
@@ -86,6 +106,7 @@ var show_outlook := false
 var base_choice := 0       # index into BASES
 var show_sat := false      # daily MODIS image (clouds, smoke) over the base map
 var show_wind := false
+var color_by_satellite := false  # off: every hotspot is plain red
 var wind_hour := 20        # UTC
 var _wind_date := ""
 
@@ -147,6 +168,8 @@ func _ready() -> void:
 	backdrop_mat.shader = backdrop_shader
 	backdrop_mat.set_shader_parameter("land", BACKDROP_LAND)
 	backdrop_mat.set_shader_parameter("water", BACKDROP_WATER)
+	backdrop_mat.set_shader_parameter("stripe", BACKDROP_STRIPE)
+	backdrop_mat.set_shader_parameter("border", BACKDROP_BORDER)
 	backdrop_tiles.material = backdrop_mat
 	backdrop_tiles.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	world.add_child(backdrop_tiles)
@@ -272,6 +295,8 @@ func _build_panel() -> void:
 	outlook_toggle = _toggle(layers, "Outlook", "Outlook from past patterns, not a forecast of actual fires", show_outlook, func(on): show_outlook = on; _refresh_data())
 	_toggle(layers, "Clouds + smoke", "NASA satellite image for that day, over the base map", show_sat, func(on): show_sat = on; _apply_view())
 	_toggle(layers, "Wind", "Wind that day (ERA5 reanalysis, modelled)", show_wind, func(on): show_wind = on; _apply_view())
+	_toggle(layers, "Satellite colours", "Ring each hotspot in its satellite's colour: MODIS blue, VIIRS S-NPP yellow, VIIRS NOAA-20 aqua",
+		color_by_satellite, func(on): color_by_satellite = on; _refresh_data())
 	wind_row.visible = show_wind
 	box.add_child(wind_row)
 	_nav_button(wind_row, "‹", "One hour earlier", func(): wind_hour = (wind_hour + 23) % 24; _apply_view())
@@ -645,8 +670,10 @@ func _refresh_data() -> void:
 				shown_idx_modis.append(i)
 			else:
 				shown_idx_viirs.append(i)
-	modis_layer.build(hs.pos, shown_idx_modis, hs.sensor, SENSOR_COLORS)
-	viirs_layer.build(hs.pos, shown_idx_viirs, hs.sensor, SENSOR_COLORS)
+	# Plain red unless "Satellite colours" is on; then the ring shows which satellite saw it.
+	var rings: Array[Color] = SENSOR_COLORS if color_by_satellite else ALL_RED
+	modis_layer.build(hs.pos, shown_idx_modis, hs.sensor, rings)
+	viirs_layer.build(hs.pos, shown_idx_viirs, hs.sensor, rings)
 
 	# Fires burning at any time in the date range.
 	shown_fires = []
@@ -792,8 +819,14 @@ func _update_status() -> void:
 	status.text = "%s%s\n%s hotspots (observed, NASA FIRMS) · %d fire events · zoom %.1f\n%s" % [
 		base, ("   loading %d tiles…" % loading) if loading > 0 else "",
 		_thousands(n_hot), shown_fires.size(), zoom,
-		"[color=#e5383b]●[/color] hotspot (observed)   ring = satellite: [color=#3987e5]●[/color] MODIS 1 km   [color=#c98500]●[/color] VIIRS S-NPP   [color=#199e70]●[/color] VIIRS NOAA-20 (375 m)
-[color=#f0efec]□[/color] fire event outline (observed detections, grouped)"]
+		_legend_text()]
+
+
+func _legend_text() -> String:
+	var t := "[color=#e5383b]●[/color] hotspot (observed)"
+	if color_by_satellite:
+		t += "   ring = satellite: [color=#3987e5]●[/color] MODIS 1 km   [color=#c98500]●[/color] VIIRS S-NPP   [color=#199e70]●[/color] VIIRS NOAA-20 (375 m)"
+	return t + "\n[color=#f0efec]□[/color] fire event outline (observed detections, grouped)"
 
 
 static func _thousands(n: int) -> String:
@@ -1016,7 +1049,8 @@ func _save_state() -> void:
 	AppState.map_state = {"zoom": zoom, "center": center, "year": year, "month": month, "day": day,
 		"sensor": sensor_choice, "min_frp": min_frp, "min_km2": min_km2, "base": base_choice,
 		"hotspots": show_hotspots, "fires": show_fires, "grid": show_grid, "outlook": show_outlook,
-		"cal_month": cal_month, "sat": show_sat, "wind": show_wind, "hour": wind_hour}
+		"cal_month": cal_month, "sat": show_sat, "wind": show_wind, "hour": wind_hour,
+		"by_satellite": color_by_satellite}
 
 
 func _restore_state() -> void:
@@ -1039,4 +1073,5 @@ func _restore_state() -> void:
 	show_outlook = s.outlook
 	show_sat = s.sat
 	show_wind = s.wind
+	color_by_satellite = s.get("by_satellite", false)
 	wind_hour = s.hour
