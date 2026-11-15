@@ -23,3 +23,6 @@ app/export/
 .DS_Store
 .vscode/
 .idea/
+
+# Web build output (godot --export-release "Web"; see CLAUDE.md)
+build/

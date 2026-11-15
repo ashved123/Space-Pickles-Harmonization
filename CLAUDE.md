@@ -1,4 +1,4 @@
-# CLAUDE.md — FireSim (NASA Space Apps 2026)
+# CLAUDE.md — Unisim (NASA Space Apps 2026)
 
 ## What this is
 Entry for NASA Space Apps 2026, challenge **"Harmonization of MODIS and VIIRS Hot Spots"** (Nov 14–15, 2026).
@@ -46,6 +46,8 @@ data/               pipeline output, shipped with the web build
   regions/<id>/            sim inputs (see Data contract)
   calendar/                harmonized series + risk_outlook_<year>.json, risk_validation.json
   fires/                   fire_events.csv + fire_event_days.csv (observed detections grouped into events)
+tools/              serve_web.js (try the web build locally)
+build/              web build output, git-ignored (see "Web build")
 docs/               specs, pitch notes, SOURCES.md
 ```
 
@@ -64,6 +66,15 @@ docs/               specs, pitch notes, SOURCES.md
 - Check a layout at a given size with a real (non-headless) window: `godot --path app -s screenshot.gd -- <map|calendar|sim> 1600 900`. Sizes tried: 1200x800, 1366x768, 1600x900, 1900x1000, 1000x1100, 900x600.
 - Known limit: windows narrower than 3:2 (portrait phones) just scale the whole 1200-wide layout down, so text gets small. A real mobile layout would be separate work.
 - The web export preset (`export_presets.cfg`, canvas resize policy) is not set up yet; the page should let the canvas fill the browser window (Godot's default "adaptive" policy).
+
+## Web build
+- Preset "Web" in `app/export_presets.cfg` (committed): single-threaded (no special headers needed), canvas fills the browser window (resize policy adaptive), `include_filter "*.json, *.bin"` (the datasets are raw files, not Godot resources, and are left out of the pack without it), test / bench / calibrate / screenshot scripts excluded, output `build/web/index.html` (outside the project, so Godot doesn't import the export's icons).
+- Templates: only `web_nothreads_*.zip` and `version.txt` are needed, in `%APPDATA%/Godot/export_templates/4.5.2.stable`. The official .tpz is 1.35 GB; the web files can be pulled out of it with HTTP range requests (about 19 MB) instead of downloading the whole thing.
+- Build (the output folder must exist): `mkdir -p build/web && godot --headless --path app --export-release "Web" ../build/web/index.html`. Try it: `node tools/serve_web.js`, then open http://127.0.0.1:8060/.
+- Size: `index.wasm` 38 MB (about 9 MB gzipped), `index.pck` 19 MB. Some free hosts cap single files (I believe Cloudflare Pages is 25 MiB, which the wasm would break; GitHub Pages, itch.io and Netlify take it). itch.io wants a zip with `index.html` at its root: `cd build/web && tar -a -cf ../unisim-web.zip index.*` (no `./` prefix on the entries).
+- itch.io (the chosen host; custom domains aren't possible there): page text, settings and image list are in `docs/ITCH_PAGE.md`; images go in `build/itch/` (made with `app/screenshot.gd` plus a one-off script for the cover and the real-region sim shot).
+- Hosting needs HTTPS: the page calls NASA, USGS, LANDFIRE and Open-Meteo over https.
+- Checked 2026-11-14 in the browser pane (Chromium, 1280x800): map, backdrop tiles, hotspots and datasets load; the sim region loads all four live sources (LANDFIRE, Terrarium, Open-Meteo, USGS aerial) in about 1 s, so cross-origin access works; 600 sim steps on the 400x400 Camp Fire region averaged 4.7 ms with a 29 ms worst step, and `finish_terrain` took about 0.9 s (a visible freeze when the sim opens). Not yet tried on phones, Safari or Firefox.
 
 ## Fire sim model (`app/sim/fire_sim.gd`)
 - A 2D grid, about 200×200 cells at 150 m. The **sim stays 2D**; only the visuals may be 3D (heightmap terrain, voxel-style columns). Don't make the sim voxel-based.
@@ -128,10 +139,12 @@ data/regions/<id>/
   - Base map: USGS National Map tiles (public domain, sharp to zoom 16): imagery + names, imagery only, or topo.
   - "Satellite view that day": NASA GIBS MODIS Terra true colour (max zoom 9), a toggle on top of the base.
   - Wind: Open-Meteo archive with `models=era5`, 1° grid (58 points), one request per date, cached. Don't use the default model mix (times out) or `era5_land` (returns no wind). Label it modelled reanalysis, not observed.
+  - Wind drawing (`map/wind_layer.gd`): weather-broadcast style flow lines, not arrows. The 1° ERA5 points are smoothed onto a ~24 km world-space field (inverse-distance weighting, bilinear lookup); lines are traced through it (midpoint steps, so they curve) and drawn as a faint tail fading to a bright head with a dot (the head is downwind); length and thickness grow with speed. The layer is a child of `region_clip`, so it lies flat on the map in map coordinates: it pans and zooms with the ground and is clipped to California. Density follows the zoom in whole levels (a lattice that halves each level, jittered per node and the same every time), generated only for the part in view plus 20%, so panning inside that area doesn't change or redraw anything. A rebuild (new zoom level, new hour, leaving the area) takes about 70 ms on desktop. ERA5 has no data for future days (the request returns HTTP 400).
 - GIBS `Reference_Features_15m` / `Reference_Labels_15m` return solid black tiles in EPSG:3857: don't use them.
 - Tile loading (`map/tile_layer.gd`): visible tiles first, then prefetch of the next zoom level and a ring around the view; zoom 6–9 for the whole state is preloaded and pinned in memory (376 tiles, ~3 s); 12 parallel requests; up to 900 tiles in memory; desktop also caches tiles on disk in `user://tile_cache` (the browser cache does this on web). Tile zoom is raised on high-DPI / enlarged windows. Don't set `HTTPRequest.use_threads` (requests stalled in testing).
 - The base map, satellite layer and data are clipped to the California outline (`region_clip.gd`, CanvasItem clip_children); panning is limited to the state's bounding box.
-- Backdrop outside the state: a dark silhouette, kept dark on purpose (no colour, relief or labels). USGSTopo tiles capped at zoom 7 are drawn unclipped under everything, and a canvas shader uses them only as a land / water mask: land is flat dark grey with thin diagonal white stripes fixed to the screen, water is dark blue, with a light shoreline. Thin water (rivers, blue labels) is filtered out by requiring water 3 texels away on every side; a few specks of big rivers survive. Without internet it falls back to the plain dark surface.
+- Backdrop outside the state: a dark silhouette, kept dark on purpose (no colour, relief or labels). NASA GIBS `OSM_Land_Water_Map` tiles (OpenStreetMap land polygons; water = grey 128, land = grey 75; zoom 9 is the finest it has, we cap at 8) are drawn unclipped under everything, and a canvas shader uses them only as a land / water mask: land is flat dark grey with thin diagonal white stripes fixed to the screen, water is dark blue, with a light shore line drawn **on the land side only** so it sits under the state along California's own coast. Don't use topo tiles with an erosion filter for this again: the filter works in tile pixels, so it grew a striped band along every coast as you zoomed in. Without internet it falls back to the plain dark surface.
+- "Clouds + smoke" (GIBS MODIS Terra) only exists up to yesterday (UTC): today's tiles come back solid black until NASA has processed the day, and later days are 404. `TileLayer.skip_black` drops all-black tiles, and the layer is hidden with a status note for days after `_latest_imagery_date()`. Before this, picking today (or a month whose mid-month day was today) turned California black.
 - Hotspot colours: every hotspot is a plain red circle `#e5383b` (= observed fire detection) by default. With the "Satellite colours" layer toggle on, it keeps the red centre and gets a ring in its satellite's colour: MODIS `#3987e5` (blue), VIIRS S-NPP `#c98500` (yellow), VIIRS NOAA-20 `#199e70` (aqua). The three ring colours are validated all-pairs colour-blind safe on the dark surface; keep orange and red out of the ring set so they can't be confused with the centre. Drawn by a small canvas shader on the MultiMesh quads (`map/hotspot_layer.gd`), diameter = sensor footprint, at least 7 px.
 - Sequential colours: burning (the map's month calendar, the burning grid, the big calendar heatmap) is a **red** ramp; the outlook is a **blue** ramp so the two can't be mixed up. "Unusual" markers are yellow so they show on red.
 - Big calendar satellite toggle (`calendar_view.gd`): Harmonized (default) / MODIS / VIIRS S-NPP / VIIRS NOAA-20. The satellite views show **raw detection counts** per cell and month, counted in the app from `datasets/hotspots/<year>.bin` the first time one is picked (`CalendarData.count_sensor_year`, one year per frame, ~1.4 s in total on desktop). They are labelled observed and "not comparable between satellites"; months outside a satellite's record are "no record", and unusual flags are off (records too short for a baseline).
@@ -167,7 +180,7 @@ data/regions/<id>/
 ## Current status
 - [x] Fire engine + top-down view (fake terrain), calibrated and benchmarked on desktop
 - [x] Fire events from hotspots (`find_fires.py`) and risk outlook (`risk_model.py`)
-- [ ] Web export benchmark in a browser (target < 30 ms/step)
+- [x] Web export benchmark in a browser (target < 30 ms/step): 4.7 ms average, 29 ms worst on the 400x400 Camp Fire region (Chromium, 2026-11-14). Preset, build steps and notes are in "Web build". Not yet hosted.
 - [ ] Pipeline: first region (Camp Fire, Butte County CA, 2018-11-08)
 - [ ] Load real region files in place of `make_test_terrain()`
 - [x] Harmonization + calendar UI (year × month; harmonized data is monthly)
