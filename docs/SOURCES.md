@@ -27,17 +27,20 @@ All DOIs below were checked to resolve on 2026-11-14.
   NRT: https://doi.org/10.5067/VIIRS/VJ214IMG_NRT.002
 
 ## Sim inputs
-- LANDFIRE FBFM40 (40 Scott & Burgan fire behavior fuel models), USGS / USFS. https://landfire.gov/ (**planned**)
-  - TODO: record the exact LANDFIRE version used (must predate the fire, e.g. pre-Nov 2018 for Camp Fire).
+- LANDFIRE FBFM40 (40 Scott & Burgan fire behavior fuel models), USGS / USFS. https://landfire.gov/ (**used**: sim fuel grid, fetched live by the app from the LANDFIRE image services, https://lfps.usgs.gov/arcgis/rest/services, `LF<year>_FBFM40_CONUS/ImageServer/exportImage`, nearest-neighbour)
+  - Releases used: LF 2016 Remap, 2022, 2023, 2024, 2025. The app picks the newest release from before the fire's year (`app/data/sim_region.gd`); fires before 2017 get LF 2016, which is newer than the fire, and the sim screen says so.
+  - TODO (pipeline regions): record the exact LANDFIRE version used (must predate the fire, e.g. pre-Nov 2018 for Camp Fire).
+- Terrain Tiles (Terrarium-encoded elevation, originally by Mapzen), hosted on AWS Open Data. https://registry.opendata.aws/terrain-tiles/ (**used**: sim elevation and slope, zoom 10 tiles fetched live)
+  Built from open elevation data; in the US mainly USGS 3DEP and SRTM. Full source list and required attribution: https://github.com/tilezen/joerd/blob/master/docs/attribution.md
 - Copernicus DEM GLO-30, ESA. https://doi.org/10.5270/ESA-c5d3d65 (**planned**)
   "Produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved."
 - USGS 3D Elevation Program (3DEP), alternative DEM. https://www.usgs.gov/3d-elevation-program (**planned**)
 - MODIS MOD13Q1 v6.1 vegetation indices (NDVI), 16-day 250 m. Didan, K. (2021). NASA LP DAAC. https://doi.org/10.5067/MODIS/MOD13Q1.061 (**planned**)
-- Open-Meteo Historical Weather API. Zippenfenig, P. (2023). Open-Meteo.com Weather API [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.7970649 · data CC BY 4.0, https://open-meteo.com/en/license (**used**: map wind layer, fetched live with `models=era5`; **planned** for sim day files)
+- Open-Meteo Historical Weather API. Zippenfenig, P. (2023). Open-Meteo.com Weather API [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.7970649 · data CC BY 4.0, https://open-meteo.com/en/license (**used**: map wind layer and the sim's hourly wind, humidity and temperature, fetched live with `models=era5`; **planned** for sim day files)
 - ERA5 reanalysis (behind Open-Meteo archive). Hersbach, H. et al. (2020). The ERA5 global reanalysis. *Q. J. R. Meteorol. Soc.* 146, 1999–2049. https://doi.org/10.1002/qj.3803 · dataset: https://doi.org/10.24381/cds.adbb2d47 (**used**: map wind layer)
 - NASA Global Imagery Browse Services (GIBS), NASA ESDIS. Map tiles streamed by the app: MODIS Terra Corrected Reflectance (True Color), daily. https://www.earthdata.nasa.gov/engage/open-data-services-software/earthdata-developer-portal/gibs-api (**used**: "satellite view that day" layer)
   We acknowledge the use of imagery provided by services from NASA's Global Imagery Browse Services (GIBS), part of NASA's Earth Science Data and Information System (ESDIS).
-- USGS The National Map base maps (USGSImageryOnly, USGSImageryTopo, USGSTopo tile services), U.S. Geological Survey, public domain. https://basemap.nationalmap.gov/arcgis/rest/services (**used**: map base layers)
+- USGS The National Map base maps (USGSImageryOnly, USGSImageryTopo, USGSTopo tile services), U.S. Geological Survey, public domain. https://basemap.nationalmap.gov/arcgis/rest/services (**used**: map base layers; USGSImageryOnly `export` for the sim's aerial view)
   Map services and data available from U.S. Geological Survey, National Geospatial Program.
 - US Census Bureau cartographic boundary file `cb_2018_us_state_5m` (public domain). https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html (**used**: California outline, `pipeline/build_boundary.py`)
 - NASA Worldview Snapshots (background imagery), NASA ESDIS / GIBS. https://wvs.earthdata.nasa.gov/ (**planned**)

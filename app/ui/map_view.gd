@@ -12,6 +12,7 @@ const RegionClip = preload("res://map/region_clip.gd")
 const WindLayer = preload("res://map/wind_layer.gd")
 const CalendarData = preload("res://data/calendar_data.gd")
 const HotspotData = preload("res://data/hotspot_data.gd")
+const SimRegion = preload("res://data/sim_region.gd")
 
 const SURFACE := Color("#1a1a19")
 const PANEL_BG := Color("#222220")
@@ -76,6 +77,7 @@ var shown_idx_viirs := PackedInt32Array()
 var shown_fires: Array = []
 var selected_fire := {}
 var selected_info := ""
+var picked_hotspot := -1   # index into hs of the clicked hotspot, -1 = none
 
 # Nodes.
 var world := Node2D.new()
@@ -585,6 +587,8 @@ func _refresh_data() -> void:
 	shown_idx_modis = PackedInt32Array()
 	shown_idx_viirs = PackedInt32Array()
 	hs.load_year(year)
+	picked_hotspot = -1  # indices change with the year and filters
+	sim_button.disabled = selected_fire.is_empty()
 	if show_hotspots:
 		var idx := hs.filter(r.x, r.y, mask, min_frp)
 		for i in idx:
@@ -814,6 +818,7 @@ func _pick(screen_pos: Vector2) -> void:
 	for f in shown_fires:
 		if Geometry2D.is_point_in_polygon(wp, f.hull_world) and (fire.is_empty() or f.km2 < fire.km2):
 			fire = f
+	picked_hotspot = best
 	_select_fire(fire)
 	if best >= 0:
 		var ll := hs.lat_lon(best)
@@ -821,8 +826,10 @@ func _pick(screen_pos: Vector2) -> void:
 			hs.SENSOR_NAMES[hs.sensor[best]], hs.frp[best], hs.doy[best], hs.year, hs.hour[best], ll.x, ll.y]
 		if not fire.is_empty():
 			selected_info += "\n\nInside fire event:\n" + _fire_text(fire)
+		selected_info += "\n\nOpen in fire sim: 60 km around this hotspot, started from that day's detections."
 	elif not fire.is_empty():
-		selected_info = _fire_text(fire) + "\n\nDouble-click to zoom to it."
+		selected_info = _fire_text(fire) + "\n\nDouble-click to zoom to it.\nOpen in fire sim: the whole fire, started from %s." % (
+			"the selected day" if _fire_on_selected_day(fire) else "its first day")
 	else:
 		selected_info = "Nothing here. Click a hotspot or inside a fire outline."
 	if show_wind:
@@ -843,7 +850,7 @@ func _select_fire(f: Dictionary) -> void:
 	selected_fire = f
 	vector.selected_fire = f
 	vector.queue_redraw()
-	sim_button.disabled = f.is_empty()
+	sim_button.disabled = f.is_empty() and picked_hotspot < 0
 	_apply_view()
 
 
@@ -859,8 +866,27 @@ func _zoom_to_fire(f: Dictionary) -> void:
 
 # ---------- screens ----------
 
+## True if an exact day is selected and the fire was burning on it.
+func _fire_on_selected_day(f: Dictionary) -> bool:
+	if month == 0 or day == 0:
+		return false
+	var d := "%04d-%02d-%02d" % [year, month, day]
+	return d >= f.start and d <= f.end
+
+
+## A clicked hotspot opens 60 km around it, seeded from its day. A fire outline opens the
+## whole fire, seeded from the selected day if it was burning then, else from its first day.
 func _open_sim() -> void:
-	if selected_fire.is_empty():
+	if picked_hotspot >= 0:
+		var ll := hs.lat_lon(picked_hotspot)
+		AppState.sim_request = {"lat": ll.x, "lon": ll.y, "year": hs.year, "doy": hs.doy[picked_hotspot],
+			"label": "hotspot %.4f, %.4f" % [ll.x, ll.y]}
+	elif not selected_fire.is_empty():
+		if _fire_on_selected_day(selected_fire):
+			AppState.sim_request = SimRegion.request_for_fire(selected_fire, year, _doy(year, month, day))
+		else:
+			AppState.sim_request = SimRegion.request_for_fire(selected_fire)
+	else:
 		return
 	AppState.sim_event = selected_fire
 	AppState.return_scene = "res://ui/map_view.tscn"

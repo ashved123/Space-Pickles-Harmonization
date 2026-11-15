@@ -206,6 +206,7 @@ func open_sim() -> void:
 	if picked.is_empty():
 		return
 	AppState.sim_event = shown_fires[picked[0]]
+	AppState.sim_request = {}  # the sim builds the region from the fire event
 	AppState.return_scene = "res://ui/calendar_view.tscn"
 	get_tree().change_scene_to_file("res://main.tscn")
 
