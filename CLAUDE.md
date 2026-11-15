@@ -114,6 +114,7 @@ data/regions/<id>/
   - "Satellite view that day": NASA GIBS MODIS Terra true colour (max zoom 9), a toggle on top of the base.
   - Wind: Open-Meteo archive with `models=era5`, 1° grid (58 points), one request per date, cached. Don't use the default model mix (times out) or `era5_land` (returns no wind). Label it modelled reanalysis, not observed.
 - GIBS `Reference_Features_15m` / `Reference_Labels_15m` return solid black tiles in EPSG:3857: don't use them.
+- Tile loading (`map/tile_layer.gd`): visible tiles first, then prefetch of the next zoom level and a ring around the view; zoom 6–9 for the whole state is preloaded and pinned in memory (376 tiles, ~3 s); 12 parallel requests; up to 900 tiles in memory; desktop also caches tiles on disk in `user://tile_cache` (the browser cache does this on web). Tile zoom is raised on high-DPI / enlarged windows. Don't set `HTTPRequest.use_threads` (requests stalled in testing).
 - Everything is clipped to the California outline (`region_clip.gd`, CanvasItem clip_children); panning is limited to the state's bounding box.
 - Hotspot colours: MODIS `#3987e5`, VIIRS `#d95926` (validated colour-blind safe on the dark surface).
 

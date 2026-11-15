@@ -107,6 +107,9 @@ func _ready() -> void:
 	_load_region()
 	base_tiles.setup(BASES[base_choice][1], BASES[base_choice][2])
 	sat_tiles.setup(GIBS_DAILY, 9)
+	# Keep the whole state in memory at low zoom, so zooming always has something to show.
+	base_tiles.preload_region(region_bbox, 6, 9)
+	get_window().size_changed.connect(_apply_view)
 	region_clip.add_child(base_tiles)
 	region_clip.add_child(sat_tiles)
 	world.add_child(region_clip)
@@ -457,6 +460,10 @@ func _apply_view() -> void:
 	world.position = ms / 2.0 - center * s
 	var rect := Rect2(center - ms / 2.0 / s, ms / s)
 	var img_date := _imagery_date()
+	# On high-DPI or enlarged windows one map pixel covers several screen pixels: load sharper tiles.
+	var bias := clampf(log(get_viewport().get_stretch_transform().get_scale().x) / log(2.0), 0.0, 1.5)
+	base_tiles.pixel_bias = bias
+	sat_tiles.pixel_bias = bias
 	base_tiles.visible = BASES[base_choice][1] != ""
 	if base_tiles.visible:
 		base_tiles.set_template(BASES[base_choice][1], BASES[base_choice][2])
