@@ -9,9 +9,11 @@ const FIRE_FILL := Color(0.94, 0.94, 0.92, 0.10)
 const FIRE_SELECTED := Color("#ec835a")
 const BLUES: Array[Color] = [Color("#0d366b"), Color("#184f95"), Color("#256abf"), Color("#3987e5"),
 	Color("#6da7ec"), Color("#9ec5f4"), Color("#cde2fb")]
-# Burning (observed / harmonized) is red everywhere; the outlook is blue so the two can't be mixed up.
-const REDS: Array[Color] = [Color("#4d0f0f"), Color("#7a1818"), Color("#ab2525"), Color("#d93a3a"),
-	Color("#ec7070"), Color("#f4a3a3"), Color("#fbd3d3")]
+# Burning (observed / harmonized) uses a heat scale everywhere: dark red = little, through red and
+# orange to bright yellow = most. (A red-to-pale-pink ramp read as "washed out = low" at the top.)
+# The outlook is blue so the two can't be mixed up.
+const HEAT: Array[Color] = [Color("#3d0c0c"), Color("#7a1414"), Color("#b3201a"), Color("#e0401a"),
+	Color("#f47a1c"), Color("#fbb62e"), Color("#ffe97a")]
 const ORANGES: Array[Color] = [Color("#4a1f0d"), Color("#7a3415"), Color("#b14a1e"), Color("#eb6834"),
 	Color("#f29a73"), Color("#f8c7b0")]
 
@@ -32,7 +34,7 @@ func _draw() -> void:
 		draw_polyline(closed, Color(0.76, 0.76, 0.72, 0.9), 1.2 * px, true)
 	for g in grid_cells:
 		var t := log(1.0 + float(g[1])) / log(1.0 + grid_max)
-		var c := _ramp(REDS, t)
+		var c := _ramp(HEAT, t)
 		c.a = 0.55
 		draw_rect(g[0], c)
 	for g in outlook_cells:

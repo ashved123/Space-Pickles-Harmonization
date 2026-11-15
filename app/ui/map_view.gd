@@ -48,22 +48,21 @@ const BASES := [
 	["Topographic map (USGS)", USGS % "USGSTopo", 16],
 	["None", "", 0],
 ]
-# Backdrop outside California: a dark silhouette, not a map. Land is flat dark grey with
-# thin diagonal white stripes ("not covered here"), water is dark blue, and a light line
-# marks the shore. The shapes come from NASA GIBS's OSM land/water mask (OpenStreetMap land
+# Backdrop outside California: a dark silhouette, not a map. Land is flat dark grey (no hatch:
+# reviewers found the diagonal stripes harsh), water is dark blue, and a light line marks the
+# shore. Dimmed place names (context_labels) give the surroundings some geography. The shapes come from NASA GIBS's OSM land/water mask (OpenStreetMap land
 # polygons: water 128 grey, land 75 grey), so coasts, bays and islands are clean and rivers
 # don't show. Nothing else from the tiles is used. Zoom 9 is the finest the service has.
 const BACKDROP_URL := "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/OSM_Land_Water_Map/default/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png"
 const BACKDROP_MAX_ZOOM := 8
 const BACKDROP_LAND := Color("#2b2b29")
 const BACKDROP_WATER := Color("#122436")
-const BACKDROP_STRIPE := Color(1, 1, 1, 0.13)
+const CONTEXT_LABEL_ALPHA := 0.38   # place names outside the state: there for context, clearly secondary
 const BACKDROP_BORDER := Color("#8a897f")
 const BACKDROP_SHADER := "
 shader_type canvas_item;
 uniform vec4 land : source_color;
 uniform vec4 water : source_color;
-uniform vec4 stripe : source_color;
 uniform vec4 border : source_color;
 void fragment() {
 	// 0 on land (grey 75/255), 1 on water (grey 128/255), in between on anti-aliased edges.
@@ -74,9 +73,7 @@ void fragment() {
 	// it sits under the state and doesn't peek out past it.
 	float px_inside = (0.5 - w) / aa;
 	float shore = (1.0 - is_water) * (1.0 - smoothstep(1.0, 2.0, px_inside));
-	// Stripes are fixed to the screen: 1.5 px wide, every 14 px, running bottom-left to top-right.
-	float on_stripe = step(fract((FRAGCOORD.x + FRAGCOORD.y) / 14.0), 0.11);
-	vec3 col = mix(mix(land.rgb, stripe.rgb, on_stripe * stripe.a), water.rgb, is_water);
+	vec3 col = mix(land.rgb, water.rgb, is_water);
 	COLOR = vec4(mix(col, border.rgb, shore), 1.0);
 }
 "
@@ -132,9 +129,11 @@ var world := Node2D.new()
 var region_clip: RegionClip = RegionClip.new()
 var backdrop_tiles: TileLayer = TileLayer.new()  # greyed-out surroundings, not clipped to the state
 var wind_toggle: Button
+var layer_buttons := {}  # layer name -> its toggle button (the presentation demo sets them)
 var wind_popup := Control.new()  # modal notice shown the first time the wind layer is turned on
 var base_tiles: TileLayer = TileLayer.new()
 var label_tiles: TileLayer = TileLayer.new()  # place names above the hotspots
+var context_labels: TileLayer = TileLayer.new()  # the same names, dimmed, outside the state
 var labels_clip: RegionClip = RegionClip.new()
 var sat_tiles: TileLayer = TileLayer.new()
 var wind: WindLayer = WindLayer.new()
@@ -150,6 +149,7 @@ var vector: VectorLayer = VectorLayer.new()
 var modis_layer: HotspotLayer = HotspotLayer.new()
 var viirs_layer: HotspotLayer = HotspotLayer.new()
 var status := RichTextLabel.new()
+var legend := Control.new()  # drawn symbols under the status text
 var info := Label.new()
 var date_label := Label.new()
 var sim_button := Button.new()
@@ -180,11 +180,13 @@ func _ready() -> void:
 	backdrop_mat.shader = backdrop_shader
 	backdrop_mat.set_shader_parameter("land", BACKDROP_LAND)
 	backdrop_mat.set_shader_parameter("water", BACKDROP_WATER)
-	backdrop_mat.set_shader_parameter("stripe", BACKDROP_STRIPE)
 	backdrop_mat.set_shader_parameter("border", BACKDROP_BORDER)
 	backdrop_tiles.material = backdrop_mat
 	backdrop_tiles.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	world.add_child(backdrop_tiles)
+	context_labels.setup(LABELS_URL, 10)
+	context_labels.modulate = Color(1, 1, 1, CONTEXT_LABEL_ALPHA)
+	world.add_child(context_labels)  # under the state: only shows around it
 	region_clip.add_child(base_tiles)
 	region_clip.add_child(sat_tiles)
 	world.add_child(region_clip)
@@ -292,6 +294,7 @@ func _build_panel() -> void:
 	cal_note.add_theme_color_override("font_color", INK_3)
 	cal_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	cal_note.custom_minimum_size.x = INNER_W
+	box.add_child(_heat_legend())
 	box.add_child(cal_note)
 	var step := HBoxContainer.new()
 	box.add_child(step)
@@ -307,14 +310,16 @@ func _build_panel() -> void:
 	layers.add_theme_constant_override("h_separation", 4)
 	layers.add_theme_constant_override("v_separation", 4)
 	box.add_child(layers)
-	_toggle(layers, "Hotspots", "Individual satellite fire detections (observed)", show_hotspots, func(on): show_hotspots = on; _refresh_data())
-	_toggle(layers, "Fire outlines", "Hotspots grouped into fire events", show_fires, func(on): show_fires = on; _refresh_data())
-	_toggle(layers, "Burning grid", "Harmonized MODIS + VIIRS burning per 25 km cell", show_grid, func(on): show_grid = on; _refresh_data())
+	layer_buttons["hotspots"] = _toggle(layers, "Hotspots", "Individual satellite fire detections (observed)", show_hotspots, func(on): show_hotspots = on; _refresh_data())
+	layer_buttons["fires"] = _toggle(layers, "Fire outlines", "Hotspots grouped into fire events", show_fires, func(on): show_fires = on; _refresh_data())
+	layer_buttons["grid"] = _toggle(layers, "Burning grid", "Harmonized MODIS + VIIRS burning per 25 km cell", show_grid, func(on): show_grid = on; _refresh_data())
 	outlook_toggle = _toggle(layers, "Outlook", "Outlook from past patterns, not a forecast of actual fires", show_outlook, func(on): show_outlook = on; _refresh_data())
-	_toggle(layers, "Clouds + smoke", "NASA satellite image for that day, over the base map", show_sat, func(on): show_sat = on; _apply_view())
+	layer_buttons["clouds"] = _toggle(layers, "Clouds + smoke", "NASA satellite image for that day, over the base map", show_sat, func(on): show_sat = on; _apply_view())
 	wind_toggle = _toggle(layers, "Wind", "Wind that day (ERA5 reanalysis, modelled). Can slow the map down", show_wind, _on_wind_toggled)
-	_toggle(layers, "Satellite colours", "Ring each hotspot in its satellite's colour: MODIS blue, VIIRS S-NPP yellow, VIIRS NOAA-20 aqua",
+	layer_buttons["satellite_colours"] = _toggle(layers, "Satellite colours", "Ring each hotspot in its satellite's colour: MODIS blue, VIIRS S-NPP yellow, VIIRS NOAA-20 aqua",
 		color_by_satellite, func(on): color_by_satellite = on; _refresh_data())
+	layer_buttons["outlook"] = outlook_toggle
+	layer_buttons["wind"] = wind_toggle
 	wind_row.visible = show_wind
 	box.add_child(wind_row)
 	_nav_button(wind_row, "‹", "One hour earlier", func(): wind_hour = (wind_hour + 23) % 24; _apply_view())
@@ -327,11 +332,27 @@ func _build_panel() -> void:
 
 	# ----- outlook for a typed date -----
 	_heading(box, "Fire season outlook", 15)
-	_text(box, "Type a year, month or date, then press Enter.", INK_3)
-	outlook_edit.placeholder_text = "2031   Sep 2030   2028-08-15"
+	_text(box, "Type a year, month or date (2031, Sep 2030, 2028-08-15).", INK_3)
+	var outlook_row := HBoxContainer.new()
+	outlook_row.add_theme_constant_override("separation", 4)
+	box.add_child(outlook_row)
+	outlook_edit.placeholder_text = "e.g. Sep 2030"
+	outlook_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	outlook_edit.add_theme_font_size_override("font_size", 13)
+	outlook_edit.add_theme_color_override("font_color", INK)
+	outlook_edit.add_theme_color_override("font_placeholder_color", INK_3)
+	# A text field keeps its frame (and a brighter one when typing), so it reads as a place to type.
+	for state in ["normal", "focus"]:
+		var field := _flat(Color("#141413"))
+		field.set_border_width_all(1)
+		field.border_color = INK if state == "focus" else INK_3
+		field.content_margin_left = 8
+		outlook_edit.add_theme_stylebox_override(state, field)
 	outlook_edit.text_submitted.connect(_on_outlook_query)
-	box.add_child(outlook_edit)
+	outlook_row.add_child(outlook_edit)
+	var go := UI.button(outlook_row, "Show", "Show the outlook for the date typed (or press Enter)", func(): _on_outlook_query(outlook_edit.text))
+	go.size_flags_horizontal = Control.SIZE_SHRINK_END
+	go.custom_minimum_size.x = 64
 	outlook_result.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	outlook_result.custom_minimum_size.x = INNER_W
 	outlook_result.add_theme_font_size_override("font_size", 12)
@@ -370,6 +391,39 @@ func _build_panel() -> void:
 	box.add_child(cal_button)
 	for b in [sim_button, cal_button]:
 		_style_button(b)
+
+
+## "few [dark red ... yellow] most" strip under the month calendar.
+func _heat_legend() -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	var grad := Gradient.new()
+	var n := VectorLayer.HEAT.size()
+	var offsets := PackedFloat32Array()
+	for i in n:
+		offsets.append(float(i) / (n - 1))
+	grad.offsets = offsets
+	grad.colors = PackedColorArray(VectorLayer.HEAT)
+	var tex := GradientTexture1D.new()
+	tex.gradient = grad
+	tex.width = 128
+	var strip := TextureRect.new()
+	strip.texture = tex
+	strip.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	strip.stretch_mode = TextureRect.STRETCH_SCALE
+	strip.custom_minimum_size = Vector2(120, 8)
+	strip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	strip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	for part in ["few hotspots", strip, "most"]:
+		if part is String:
+			var l := Label.new()
+			l.text = part
+			l.add_theme_font_size_override("font_size", 11)
+			l.add_theme_color_override("font_color", INK_3)
+			row.add_child(l)
+		else:
+			row.add_child(part)
+	return row
 
 
 func _heading(box: Container, t: String, size: int) -> void:
@@ -416,17 +470,9 @@ func _style_toggle(b: Button) -> void:
 	b.add_theme_font_size_override("font_size", 13)
 
 
+## A layer switch: a check box, since several can be on at once (unlike _segmented).
 func _toggle(box: Container, t: String, tip: String, on: bool, cb: Callable) -> Button:
-	var b := Button.new()
-	b.text = t
-	b.tooltip_text = tip
-	b.toggle_mode = true
-	b.button_pressed = on
-	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_style_toggle(b)
-	b.toggled.connect(cb)
-	box.add_child(b)
-	return b
+	return UI.toggle(box, t, tip, on, cb)
 
 
 ## A row of buttons where exactly one is on. Returns the buttons.
@@ -558,7 +604,7 @@ func _rebuild_calendar() -> void:
 		b.text = str(d)
 		b.custom_minimum_size = Vector2(DAY_W, 26)
 		b.tooltip_text = "%d %s %d: %s hotspots detected" % [d, MONTH_NAMES[cal_month - 1], year, _thousands(n)]
-		var shade := Color("#262624") if n == 0 else VectorLayer._ramp(VectorLayer.REDS, log(1.0 + n) / log(1.0 + peak))
+		var shade := Color("#262624") if n == 0 else VectorLayer._ramp(VectorLayer.HEAT, log(1.0 + n) / log(1.0 + peak))
 		var exact := month == cal_month and day == d
 		# Selected day: a bar along the bottom that contrasts with the cell's own shade (no outline).
 		var bar := SURFACE if shade.get_luminance() > 0.45 else INK
@@ -575,7 +621,7 @@ func _rebuild_calendar() -> void:
 	if not has_record:
 		cal_note.text = "No satellite record for this month (the record starts in Nov 2000). Missing data is not zero fire."
 	else:
-		cal_note.text = "Brighter day = more hotspots detected (observed). %s this month. Click a day." % _thousands(month_total)
+		cal_note.text = "Hotspots detected each day (observed). %s this month. Click a day." % _thousands(month_total)
 
 
 ## A day button's fill, with a thick bar along the bottom when it is the selected day.
@@ -607,7 +653,7 @@ func _build_overlay() -> void:
 	back.anchor_top = 1.0
 	back.anchor_bottom = 1.0
 	back.offset_left = 10
-	back.offset_top = -86
+	back.offset_top = -100
 	back.offset_bottom = -10
 	back.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(back)
@@ -618,13 +664,108 @@ func _build_overlay() -> void:
 	_nav_button(zoom_box, "+", "Zoom in", func(): _zoom_at(_map_size() / 2.0, zoom + 1.0))
 	_nav_button(zoom_box, "−", "Zoom out", func(): _zoom_at(_map_size() / 2.0, zoom - 1.0))
 	_nav_button(zoom_box, "CA", "Show the whole state", _show_state)
+	_nav_button(zoom_box, "Demo", "Presentation demo (F9)", func(): Demo.start())
+	var demo_button: Button = zoom_box.get_child(zoom_box.get_child_count() - 1)
+	demo_button.custom_minimum_size.x = 58
+	demo_button.add_theme_font_size_override("font_size", 12)
+	var status_box := VBoxContainer.new()
+	status_box.add_theme_constant_override("separation", 4)
+	status_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	back.add_child(status_box)
+	legend.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	legend.draw.connect(_draw_legend)
 	status.bbcode_enabled = true
 	status.fit_content = true
 	status.autowrap_mode = TextServer.AUTOWRAP_OFF
 	status.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	status.add_theme_color_override("default_color", INK_2)
 	status.add_theme_font_size_override("normal_font_size", 12)
-	back.add_child(status)
+	status_box.add_child(status)
+	status_box.add_child(legend)
+
+
+# ---------- presentation demo ----------
+
+## Applies one step of the presentation demo (see demo/demo.gd). Keys, all optional: year / month /
+## day (0 = whole month or whole year), layers {name: bool} (layers not named get DEMO_LAYERS, so a
+## step always shows the same thing however you got to it), fire (event id to select), view "fit",
+## fly {lat, lon, zoom, secs}, outlook (text typed in the outlook box).
+## Returns numbers for the caption.
+func demo_apply(args: Dictionary) -> Dictionary:
+	if args.has("year"):
+		year = args.year
+		month = args.get("month", 0)
+		day = args.get("day", 0)
+		if month > 0:
+			cal_month = month
+		_date_changed()
+	if args.has("layers"):
+		for key in DEMO_LAYERS:
+			_demo_layer(key, args.layers.get(key, DEMO_LAYERS[key]))
+		_refresh_data()
+		_apply_view()
+	if args.has("layers") and not args.has("outlook"):
+		outlook_result.visible = false  # an old outlook answer would be stale here
+	if args.has("outlook"):
+		_on_outlook_query(args.outlook)
+	if args.get("view", "") == "fit":
+		_fit_state()
+		_apply_view()
+	if args.has("fire"):
+		for f in shown_fires:
+			if f.id == args.fire:
+				_select_fire(f)
+	if args.has("fly"):
+		_demo_fly(args.fly)
+	var summary: Dictionary = cal.outlook_summary(outlook_month if outlook_month > 0 else maxi(month, 1))
+	return {
+		"hotspots": _thousands(shown_idx_modis.size() + shown_idx_viirs.size()),
+		"modis": _thousands(shown_idx_modis.size()),
+		"viirs": _thousands(shown_idx_viirs.size()),
+		"fires": str(shown_fires.size()),
+		"cells": str(cal.cell_count()),
+		"high": str(summary.high),
+		"medium": str(summary.medium),
+		"auc": "%.2f" % cal.outlook_info.get("auc_model", 0.0),
+		"auc_base": "%.2f" % cal.outlook_info.get("auc_climatology", 0.0),
+		"test_years": str(cal.outlook_info.get("test_years", "")),
+	}
+
+
+const DEMO_LAYERS := {"hotspots": true, "fires": true, "grid": false, "outlook": false, "clouds": false, "wind": false, "satellite_colours": false}
+
+
+func _demo_layer(key: String, on: bool) -> void:
+	match key:
+		"hotspots":
+			show_hotspots = on
+		"fires":
+			show_fires = on
+		"grid":
+			show_grid = on
+		"outlook":
+			show_outlook = on
+			if not on:
+				outlook_month = -1
+		"clouds":
+			show_sat = on
+		"wind":
+			show_wind = on  # no slow-down notice: the demo asked for it
+		"satellite_colours":
+			color_by_satellite = on
+	if layer_buttons.has(key):
+		layer_buttons[key].set_pressed_no_signal(on)
+
+
+## Glides the map to a place and zoom.
+func _demo_fly(f: Dictionary) -> void:
+	var c0 := center
+	var z0 := zoom
+	var c1 := Mercator.to_world(f.lat, f.lon)
+	var z1: float = f.zoom
+	var tw := create_tween()
+	tw.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+	tw.tween_method(func(t: float): zoom = lerpf(z0, z1, t); center = c0.lerp(c1, t); _apply_view(), 0.0, 1.0, f.get("secs", 1.5))
 
 
 # ---------- wind notice ----------
@@ -847,6 +988,8 @@ func _apply_view() -> void:
 	if label_tiles.visible:
 		label_tiles.update_view(rect, zoom)
 	backdrop_tiles.update_view(rect, zoom)
+	context_labels.pixel_bias = bias
+	context_labels.update_view(rect, zoom)
 	base_tiles.visible = BASES[base_choice][1] != ""
 	if base_tiles.visible:
 		base_tiles.set_template(BASES[base_choice][1], BASES[base_choice][2])
@@ -922,17 +1065,39 @@ func _update_status() -> void:
 	if show_wind:
 		var ws := "loading…" if wind.status == "loading" else ("lines follow the wind, bright end = downwind, longer = faster" if wind.status == "ready" else wind.status)
 		base += "\nWind %s %02d:00 UTC · ERA5 via Open-Meteo, modelled · %s" % [_imagery_date(), wind_hour, ws]
-	status.text = "%s%s\n%s hotspots (observed, NASA FIRMS) · %d fire events · zoom %.1f\n%s" % [
+	status.text = "%s%s\n%s hotspots (observed, NASA FIRMS) · %d fire events · zoom %.1f" % [
 		base, ("   loading %d tiles…" % loading) if loading > 0 else "",
-		_thousands(n_hot), shown_fires.size(), zoom,
-		_legend_text()]
+		_thousands(n_hot), shown_fires.size(), zoom]
+	legend.custom_minimum_size = Vector2(_legend_items(false), 36)
+	legend.queue_redraw()
 
 
-func _legend_text() -> String:
-	var t := "[color=#e5383b]●[/color] hotspot (observed)"
+## The map legend's symbols are drawn (circles, an outline), not typed: the web build's font has no
+## geometric-shape characters, so typed ones showed as empty boxes.
+func _draw_legend() -> void:
+	_legend_items(true)
+
+
+## Lays out the first legend row and returns its width; draws both rows when `paint` is true.
+func _legend_items(paint: bool) -> float:
+	var items := [[HotspotLayer.CORE_COLOR, HotspotLayer.CORE_COLOR, "hotspot (observed)"]]
 	if color_by_satellite:
-		t += "   ring = satellite: [color=#3987e5]●[/color] MODIS 1 km   [color=#c98500]●[/color] VIIRS S-NPP   [color=#199e70]●[/color] VIIRS NOAA-20 (375 m)"
-	return t + "\n[color=#f0efec]□[/color] fire event outline (observed detections, grouped)"
+		items[0][2] = "hotspot (observed), ring = satellite:"
+		items.append([HotspotLayer.CORE_COLOR, SENSOR_COLORS[0], "MODIS 1 km"])
+		items.append([HotspotLayer.CORE_COLOR, SENSOR_COLORS[1], "VIIRS S-NPP"])
+		items.append([HotspotLayer.CORE_COLOR, SENSOR_COLORS[2], "VIIRS NOAA-20 (375 m)"])
+	var x := 0.0
+	for it in items:
+		if paint:
+			legend.draw_circle(Vector2(x + 6, 8), 6.0, it[1])
+			legend.draw_circle(Vector2(x + 6, 8), 3.3 if it[0] != it[1] else 6.0, it[0])
+			legend.draw_string(font, Vector2(x + 17, 12.5), it[2], HORIZONTAL_ALIGNMENT_LEFT, -1, 12, INK_2)
+		x += 17 + font.get_string_size(it[2], HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x + 14
+	if paint:
+		var shape := PackedVector2Array([Vector2(1, 25), Vector2(7, 21), Vector2(12, 26), Vector2(9, 33), Vector2(2, 32), Vector2(1, 25)])
+		legend.draw_polyline(shape, INK, 1.4, true)
+		legend.draw_string(font, Vector2(17, 31.5), "fire event outline (observed detections, grouped)", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, INK_2)
+	return maxf(x, 17 + font.get_string_size("fire event outline (observed detections, grouped)", HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x)
 
 
 static func _thousands(n: int) -> String:
@@ -1038,7 +1203,7 @@ func _pick(screen_pos: Vector2) -> void:
 
 
 func _fire_text(f: Dictionary) -> String:
-	return "Fire event %s\n%s → %s (peak %s)\n%.0f km² footprint · %d detections\nObserved detections grouped in space and time; footprint is hotspot pixels, not burned area." % [
+	return "Fire event %s\n%s to %s (peak %s)\n%.0f km² footprint · %d detections\nObserved detections grouped in space and time; footprint is hotspot pixels, not burned area." % [
 		f.id, f.start, f.end, f.peak, f.km2, f.det]
 
 

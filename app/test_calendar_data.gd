@@ -38,12 +38,31 @@ func _init() -> void:
 
 ## Raw detections per satellite, counted from the hotspot files.
 func test_sensor_counts(d, butte: PackedInt32Array) -> void:
-	check(not d.sensor_ready(), "satellite counts start empty")
+	check(d.sensor_ready(), "the shipped counts file loads with the calendar")
+	# Count again from the hotspot files, without the file: the file must match (not stale).
+	var fresh = d.get_script().new()
+	fresh.load_all("res://datasets", false)
+	check(not fresh.sensor_ready(), "without the file the counts start empty")
 	var t := Time.get_ticks_msec()
-	for y in range(d.FIRST_YEAR, d.last_year + 1):
-		d.count_sensor_year(y)
-	check(d.sensor_ready(), "all years counted in %d ms" % (Time.get_ticks_msec() - t))
+	for y in range(fresh.FIRST_YEAR, fresh.last_year + 1):
+		fresh.count_sensor_year(y)
+	check(fresh.sensor_ready(), "all years counted in %d ms" % (Time.get_ticks_msec() - t))
 	var all: PackedInt32Array = d.all_cells()
+	var same := true
+	for sensor in 3:
+		var a: Array = d.sensor_area_grid(sensor, all)
+		var b: Array = fresh.sensor_area_grid(sensor, all)
+		for y in a.size():
+			for m in 12:
+				if not (is_nan(a[y][m]) and is_nan(b[y][m])) and a[y][m] != b[y][m]:
+					same = false
+	check(same, "counts file equals a fresh count (regenerate it with build_sensor_counts.gd if not)")
+	var one_cell_same := true
+	for c in [0, 100, 300, 600]:
+		for sensor in 3:
+			if d.sensor_cell_value(sensor, c, 2020, 8) != fresh.sensor_cell_value(sensor, c, 2020, 8) and not is_nan(d.sensor_cell_value(sensor, c, 2020, 8)):
+				one_cell_same = false
+	check(one_cell_same, "single cells match too")
 	var modis: Array = d.sensor_area_grid(0, all)
 	var snpp: Array = d.sensor_area_grid(1, all)
 	var noaa20: Array = d.sensor_area_grid(2, all)

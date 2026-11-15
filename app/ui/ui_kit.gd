@@ -112,18 +112,58 @@ static func button(box: Node, t: String, tip: String, cb: Callable) -> Button:
 	return b
 
 
-## An on/off button. `cb` gets the new state.
+## An on/off option that can be combined with others: a check box (a square that fills when on).
+## It must not look like segmented(), where exactly one button is on. `cb` gets the new state.
 static func toggle(box: Node, t: String, tip: String, on: bool, cb: Callable) -> Button:
-	var b := Button.new()
+	var b := CheckBox.new()
 	b.text = t
 	b.tooltip_text = tip
-	b.toggle_mode = true
 	b.button_pressed = on
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	style_toggle(b)
+	for state in ["normal", "pressed", "disabled"]:
+		b.add_theme_stylebox_override(state, flat(BTN_DISABLED if state == "disabled" else BTN))
+	for state in ["hover", "hover_pressed"]:
+		b.add_theme_stylebox_override(state, flat(BTN_HOVER))
+	b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+	b.add_theme_icon_override("checked", _check_icon(true))
+	b.add_theme_icon_override("unchecked", _check_icon(false))
+	b.add_theme_icon_override("checked_disabled", _check_icon(true))
+	b.add_theme_icon_override("unchecked_disabled", _check_icon(false))
+	b.add_theme_constant_override("h_separation", 7)
+	b.add_theme_color_override("font_color", INK_2)
+	b.add_theme_color_override("font_hover_color", INK)
+	b.add_theme_color_override("font_pressed_color", INK)
+	b.add_theme_color_override("font_hover_pressed_color", INK)
+	b.add_theme_color_override("font_disabled_color", Color("#5c5b55"))
+	b.add_theme_font_size_override("font_size", 13)
+	b.focus_mode = Control.FOCUS_NONE
 	b.toggled.connect(cb)
 	box.add_child(b)
 	return b
+
+
+static var _check_icons := {}
+
+
+## 14 px square: an outline when off, filled with a dark tick when on.
+static func _check_icon(on: bool) -> ImageTexture:
+	if _check_icons.has(on):
+		return _check_icons[on]
+	var n := 14
+	var img := Image.create(n, n, false, Image.FORMAT_RGBA8)
+	img.fill(INK if on else Color(0, 0, 0, 0))
+	if on:
+		# Tick: a short stroke down to (5, 10), then a long one up to (11, 3), 2 px thick.
+		for p in [[3, 7], [4, 8], [5, 9], [6, 8], [7, 7], [8, 6], [9, 5], [10, 4]]:
+			img.set_pixel(p[0], p[1], SURFACE)
+			img.set_pixel(p[0], p[1] + 1, SURFACE)
+	else:
+		for i in n:
+			for edge in [0, 1, n - 2, n - 1]:
+				img.set_pixel(i, edge, INK_3)
+				img.set_pixel(edge, i, INK_3)
+	_check_icons[on] = ImageTexture.create_from_image(img)
+	return _check_icons[on]
 
 
 ## A row of buttons where exactly one is on. `cb` gets the index. Returns the buttons.

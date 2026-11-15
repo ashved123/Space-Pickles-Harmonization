@@ -44,6 +44,7 @@ const FUEL_COLORS: Array[Color] = [
 const FIRE_COLOR := Color(1.0, 0.35, 0.05)
 const BURNT_COLOR := Color(0.12, 0.10, 0.09)
 const RETARDANT_COLOR := Color(0.85, 0.25, 0.45)
+const FIREBREAK_COLOR := Color(0.9, 0.9, 0.88, 0.92)  # cells cleared of fuel by the user
 const OBSERVED_COLOR := Color(0.55, 0.8, 1.0, 0.38)  # detections after the seed day
 const STATE_NAMES := ["no fuel", "unburnt", "burning", "burnt"]
 
@@ -300,6 +301,10 @@ func paint(i: int) -> void:
 			col.a = 0.8 if show_satellite else 1.0
 		_:
 			col = FUEL_COLORS[sim.fuel[i]] * shade[i]
+			if sim.fuel[i] == 0 and base_fuel.size() == sim.fuel.size() and base_fuel[i] != 0:
+				col = FIREBREAK_COLOR  # drawn firebreak: stays visible over the aerial photo too
+				image.set_pixel(i % sim.cols, i / sim.cols, col)
+				return
 			col.a = 0.0 if show_satellite else 1.0  # aerial view: the photo shows through
 			if sim.retardant[i] < 1.0:
 				col = col.lerp(RETARDANT_COLOR, 0.45)
@@ -480,6 +485,76 @@ func next_terrain() -> void:
 		new_terrain()
 
 
+# ---------- presentation demo ----------
+
+## Time and burnt area now, so the demo can compare a second run at the same sim time.
+func demo_status() -> Dictionary:
+	var cells: int = sim.burnt_count + sim.burning.size()
+	return {"elapsed_min": sim.elapsed_minutes, "area_ha": cells * sim.cell_size_m * sim.cell_size_m / 10000.0}
+
+
+## One step of the presentation demo (see demo/demo.gd). Keys, all optional, applied in this order:
+## reset, seed (default 7), aerial, speed, wind [turn deg, speed change m/s], compare {hours, firebreaks [[row0, col0, row1, col1], ...]}
+## (runs the fire to that sim time twice, without and with the firebreaks, and leaves the second run
+## on screen), play. Returns numbers for the caption.
+func demo_apply(args: Dictionary) -> Dictionary:
+	if loading:
+		return {}
+	if args.get("reset", false):
+		reset_fire()
+	if args.has("seed"):
+		sim.rng.seed = int(args.seed)
+	if args.has("aerial"):
+		aerial_toggle.button_pressed = args.aerial
+	if args.has("speed"):
+		set_speed(args.speed)
+	if args.has("wind"):
+		nudge_wind(args.wind[0], args.wind[1])  # [turn in degrees, speed change in m/s]
+	var out := {}
+	if args.has("compare"):
+		out = demo_compare(args.compare, int(args.get("seed", 7)))
+	if args.has("play"):
+		playing = args.play
+	var status := demo_status()
+	out["seeds"] = UI.thousands(seeds.size())
+	out["area"] = out.get("area", UI.thousands(int(status.area_ha)))
+	return out
+
+
+## The same fire to the same sim time without and with firebreaks. Same seed and weather, so the
+## difference is the firebreaks (fires after the first changed cell still draw different random
+## numbers, as in any run). Leaves the run with the firebreaks on screen.
+func demo_compare(c: Dictionary, seed_value: int) -> Dictionary:
+	var minutes: float = float(c.hours) * 60.0
+	reset_fire()
+	sim.rng.seed = seed_value
+	fast_forward(minutes)
+	var base: float = demo_status().area_ha
+	reset_fire()
+	sim.rng.seed = seed_value
+	for line in c.get("firebreaks", []):
+		sim.add_firebreak(line[0], line[1], line[2], line[3], FIREBREAK_WIDTH)
+	repaint_all()
+	fast_forward(minutes)
+	var area: float = demo_status().area_ha
+	return {
+		"hours": "%.0f" % float(c.hours),
+		"base_area": UI.thousands(int(base)),
+		"area": UI.thousands(int(area)),
+		"saved_pct": "%.0f" % (100.0 * (1.0 - area / maxf(base, 1.0))),
+	}
+
+
+## Runs the sim to a sim time, drawing only at the end.
+func fast_forward(to_minutes: float) -> void:
+	while sim.elapsed_minutes < to_minutes and not sim.is_done():
+		sim.step()
+		if region != null:
+			apply_weather()
+			update_observed()
+	repaint_all()
+
+
 # ---------- input ----------
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -635,6 +710,7 @@ func build_panel() -> void:
 	UI.swatch(legend, FIRE_COLOR, "Burning")
 	UI.swatch(legend, BURNT_COLOR.lightened(0.25), "Burnt")
 	UI.swatch(legend, RETARDANT_COLOR, "Retardant")
+	UI.swatch(legend, FIREBREAK_COLOR, "Firebreak")
 	UI.swatch(legend, Color(OBSERVED_COLOR, 1.0), "Observed later")
 
 	UI.heading(box, "Under the cursor")
@@ -646,6 +722,7 @@ func build_panel() -> void:
 
 func update_panel() -> void:
 	loading_label.visible = loading
+	loading_label.position = Vector2(28, 290 if Demo.active else 24)  # below the demo caption
 	if loading:
 		loading_label.text = "Loading the real area for %s, %s\n\nFuel (LANDFIRE), terrain, hourly weather (ERA5)\nand an aerial photo are fetched live.\n%s" % [
 			region.label, region.seed_date(), load_text]

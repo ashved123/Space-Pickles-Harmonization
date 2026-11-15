@@ -15,11 +15,11 @@ const GRID_LINE := Color("#383835")
 const ZERO := Color("#262624")       # recorded, no burning
 const NO_DATA := Color("#121211")    # no satellite record (hatched)
 const SELECT := Color("#f0efec")
-const UNUSUAL := Color("#f5c542")    # yellow so it shows on the red cells, always with the ▲ marker
+const UNUSUAL := Color("#3fd6c6")    # turquoise: stands out on every step of the heat scale, always with a marker
 const UNUSUAL_X_MEDIAN := 2.0       # unusual = top 10% for that month AND >= 2x its median
-# Burning: sequential red, dark mode: near zero recedes toward the surface, high is bright.
-const REDS: Array[Color] = [Color("#4d0f0f"), Color("#7a1818"), Color("#ab2525"), Color("#d93a3a"),
-	Color("#ec7070"), Color("#f4a3a3"), Color("#fbd3d3")]
+# Burning: heat scale. Dark red = little, through red and orange to bright yellow = most.
+const HEAT: Array[Color] = [Color("#3d0c0c"), Color("#7a1414"), Color("#b3201a"), Color("#e0401a"),
+	Color("#f47a1c"), Color("#fbb62e"), Color("#ffe97a")]
 # Second sequential context (outlook), one hue: blue, so it can't be mistaken for burning.
 const BLUES: Array[Color] = [Color("#0d366b"), Color("#184f95"), Color("#256abf"), Color("#3987e5"),
 	Color("#6da7ec"), Color("#9ec5f4"), Color("#cde2fb")]
@@ -120,7 +120,7 @@ func _build_controls() -> void:
 	all_button.position = Vector2(300, 38)
 	all_button.pressed.connect(func(): set_selection(data.all_cells()))
 	add_child(all_button)
-	map_button.text = "← Back to map"
+	map_button.text = "Back to map"
 	map_button.pressed.connect(back_to_map)
 	add_child(map_button)
 
@@ -290,7 +290,7 @@ func select_month(year: int, month: int) -> void:
 	shown_fires = data.fires_in(selection, year, month)
 	fire_list.clear()
 	for f in shown_fires:
-		fire_list.add_item("%s   %s → %s   %.0f km²   %d detections" % [f.id, f.start, f.end, f.km2, f.det])
+		fire_list.add_item("%s   %s to %s   %.0f km²   %d detections" % [f.id, f.start, f.end, f.km2, f.det])
 	fire_title.text = "Fires in this area, %s %d (observed detections grouped into events): %d" % [
 		MONTHS[month - 1], year, shown_fires.size()]
 	sim_button.disabled = true
@@ -314,6 +314,26 @@ func open_sim() -> void:
 	AppState.sim_request = {}  # the sim builds the region from the fire event
 	AppState.return_scene = "res://ui/calendar_view.tscn"
 	get_tree().change_scene_to_file("res://main.tscn")
+
+
+# ---------- presentation demo ----------
+
+## One step of the presentation demo (see demo/demo.gd). Keys, all optional: view (index into
+## VIEWS) and month [year, month]. Returns the number shown for the selected month, for the caption.
+func demo_apply(args: Dictionary) -> Dictionary:
+	if args.has("view"):
+		set_view(args.view)
+		while view != args.view and is_inside_tree():
+			await get_tree().process_frame  # the satellite counts take a moment the first time
+	if args.has("month"):
+		select_month(args.month[0], args.month[1])
+	var v := NAN
+	if sel_year > 0 and not grid.is_empty():
+		v = grid[sel_year - data.FIRST_YEAR][sel_month - 1]
+	return {
+		"count": "n/a" if is_nan(v) else UI.thousands(int(v)),
+		"month": ("%s %d" % [MONTHS[sel_month - 1], sel_year]) if sel_year > 0 else "",
+	}
 
 
 # ---------- input ----------
@@ -413,7 +433,7 @@ func heat_color(v: float, vmax: float, vmin: float = 1.0) -> Color:
 	if v <= 0.0:
 		return ZERO
 	vmin = minf(vmin, vmax * 0.5)
-	return ramp(REDS, (log(v) - log(vmin)) / maxf(log(vmax) - log(vmin), 0.001))
+	return ramp(HEAT, (log(v) - log(vmin)) / maxf(log(vmax) - log(vmin), 0.001))
 
 
 func is_unusual(v: float, m: int) -> bool:
@@ -486,9 +506,9 @@ func _draw_heatmap() -> void:
 	if view == 0:
 		var y2012 := _row_y(2012) + cell_h / 18.0  # Feb 2012 sits in the 2012 row (a fraction of the row)
 		draw_line(Vector2(heat_x - 50, _row_y(2012)), Vector2(heat_x + 12 * cell_w, _row_y(2012)), INK_3, 1.0)
-		draw_string(font, Vector2(heat_x + 12 * cell_w + 6, y2012 + 4), "↑ MODIS, harmonized",
+		draw_string(font, Vector2(heat_x + 12 * cell_w + 6, y2012 + 4), "above: MODIS, harmonized",
 			HORIZONTAL_ALIGNMENT_LEFT, -1, 11, INK_3)
-		draw_string(font, Vector2(heat_x + 12 * cell_w + 6, y2012 + 18), "↓ VIIRS S-NPP, observed",
+		draw_string(font, Vector2(heat_x + 12 * cell_w + 6, y2012 + 18), "below: VIIRS S-NPP, observed",
 			HORIZONTAL_ALIGNMENT_LEFT, -1, 11, INK_3)
 	else:
 		draw_string(font, Vector2(heat_x + 12 * cell_w + 6, _row_y(data.FIRST_YEAR) + _text_dy()), "raw counts: don't compare",
@@ -524,10 +544,10 @@ func _draw_heatmap() -> void:
 func _draw_legend() -> void:
 	var x := heat_x
 	var y := _row_y(data.OUTLOOK_YEAR) + cell_h + 18
-	draw_string(font, Vector2(x, y), "less", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, INK_3)
+	draw_string(font, Vector2(x, y), "few", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, INK_3)
 	for i in 24:
-		draw_rect(Rect2(x + 30 + i * 6, y - 9, 6, 10), ramp(REDS, i / 23.0))
-	draw_string(font, Vector2(x + 180, y), "more (log scale, %.0f–%.0f %s)" % [heat_min, heat_max, unit_text()],
+		draw_rect(Rect2(x + 30 + i * 6, y - 9, 6, 10), ramp(HEAT, i / 23.0))
+	draw_string(font, Vector2(x + 180, y), "most (log scale, %.0f–%.0f %s)" % [heat_min, heat_max, unit_text()],
 		HORIZONTAL_ALIGNMENT_LEFT, -1, 11, INK_3)
 	y += 18
 	draw_rect(Rect2(x, y - 9, 14, 10), NO_DATA)
@@ -597,7 +617,7 @@ func _describe(p: Vector2) -> String:
 	if med > 0.0:
 		lines.append("%.1f× the 2001–2025 median for %s (%.0f)" % [v / med, MONTHS[h.y - 1], med])
 	if is_unusual(v, h.y - 1):
-		lines.append("▲ Unusual: top 10%% of %s months and ≥ 2× the median" % MONTHS[h.y - 1])
+		lines.append("Unusual (turquoise outline): top 10%% of %s months and at least 2x the median" % MONTHS[h.y - 1])
 	if data.preliminary[mi]:
 		lines.append("Preliminary (near-real-time data, may be revised)")
 	if data.partial[mi]:

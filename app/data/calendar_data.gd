@@ -41,7 +41,8 @@ var _sensor_done := false
 var _cell_lookup := PackedInt32Array()       # 0.25 degree lat/lon box -> cell index, -1 if none
 
 
-func load_all(dir: String = "res://datasets") -> bool:
+## `with_sensor_counts`: also load the per-satellite counts file (false to count from the hotspot files).
+func load_all(dir: String = "res://datasets", with_sensor_counts: bool = true) -> bool:
 	var cal = _read_json(dir + "/calendar.json")
 	if cal == null:
 		return false
@@ -79,6 +80,8 @@ func load_all(dir: String = "res://datasets") -> bool:
 		outlook_label = o.label
 		outlook_p = o.p
 		outlook_info = o.get("validation_summary", {})
+	if with_sensor_counts:
+		load_sensor_counts(dir + "/sensor_counts.bin")
 	return true
 
 
@@ -235,6 +238,8 @@ static func _cell_key(lat: float, lon: float) -> String:
 ## Counts one year of detections per sensor, cell and month. Call once for every year from
 ## FIRST_YEAR to last_year, in order (the big years take a moment, so spread them over frames).
 func count_sensor_year(y: int, dir: String = "res://datasets/hotspots") -> void:
+	if _sensor_done:
+		return  # already loaded from the counts file
 	var slots := year_count() * 12
 	var cells := cell_count()
 	if _sensor_counts.is_empty():
@@ -275,6 +280,57 @@ func count_sensor_year(y: int, dir: String = "res://datasets/hotspots") -> void:
 				_sensor_last[s] = maxi(_sensor_last[s], slot)
 	if y >= last_year:
 		_sensor_done = true
+
+
+## Loads the per-satellite counts made ahead of time by build_sensor_counts.gd. Counting 2.4 million
+## detections in a browser takes over 20 s, so the app ships the result: a few hundred KB, instant.
+## False if the file is missing or doesn't match this calendar (other cells or years); the app then
+## counts from the hotspot files instead. File format: "SNC1", u32 cells, u32 slots, u32 sensors,
+## u32 raw size, then per sensor s32 first slot and s32 last slot, then the int32 counts
+## [sensor][cell][slot] compressed with deflate.
+func load_sensor_counts(path: String = "res://datasets/sensor_counts.bin") -> bool:
+	if not FileAccess.file_exists(path):
+		return false
+	var b := FileAccess.get_file_as_bytes(path)
+	var n := SENSOR_NAMES.size()
+	var header := 20 + n * 8
+	if b.size() < header or b.slice(0, 4).get_string_from_ascii() != "SNC1":
+		return false
+	var slots := year_count() * 12
+	var raw_size := b.decode_u32(16)
+	if b.decode_u32(4) != cell_count() or b.decode_u32(8) != slots or b.decode_u32(12) != n \
+			or raw_size != n * cell_count() * slots * 4:
+		return false
+	var body := b.slice(header).decompress(raw_size, FileAccess.COMPRESSION_DEFLATE)
+	if body.size() != raw_size:
+		return false
+	_sensor_counts = body.to_int32_array()
+	for i in n:
+		_sensor_first[i] = b.decode_s32(20 + i * 8)
+		_sensor_last[i] = b.decode_s32(24 + i * 8)
+	_sensor_done = true
+	return true
+
+
+## Writes the counts file (see load_sensor_counts). Counts must be complete (every year counted).
+func save_sensor_counts(path: String = "res://datasets/sensor_counts.bin") -> bool:
+	if not _sensor_done:
+		return false
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	if f == null:
+		return false
+	var body := _sensor_counts.to_byte_array()
+	f.store_buffer("SNC1".to_ascii_buffer())
+	f.store_32(cell_count())
+	f.store_32(year_count() * 12)
+	f.store_32(SENSOR_NAMES.size())
+	f.store_32(body.size())
+	for i in SENSOR_NAMES.size():
+		f.store_32(_sensor_first[i] & 0xFFFFFFFF)
+		f.store_32(_sensor_last[i] & 0xFFFFFFFF)
+	f.store_buffer(body.compress(FileAccess.COMPRESSION_DEFLATE))
+	f.close()
+	return true
 
 
 ## True once every year has been counted.
