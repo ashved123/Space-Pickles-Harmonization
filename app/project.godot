@@ -6,7 +6,7 @@ config_version=5
 [application]
 
 config/name="FireSim"
-run/main_scene="res://ui/calendar_view.tscn"
+run/main_scene="res://ui/map_view.tscn"
 config/features=PackedStringArray("4.5", "GL Compatibility")
 
 [autoload]

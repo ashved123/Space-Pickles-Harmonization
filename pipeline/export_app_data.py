@@ -10,12 +10,21 @@ Writes:
     calendar.json  months, per-month source/labels, 0.25 deg cells, sparse cell-month values
     fires.json     fire events (observed detections grouped by find_fires.py)
     outlook.json   risk outlook per cell (copied, cells matched to calendar.json order)
+    hotspots/<year>.bin   clean hotspots for the map (with --hotspots <raw firms dir>), see HOTSPOT_FORMAT
 """
 import json
 import os
 import sys
 
+import numpy as np
 import pandas as pd
+
+# Hotspot files: "HSP1", uint32 count, then per detection (little-endian, 10 bytes):
+#   uint16 lat_q, uint16 lon_q, uint16 day_of_year (1-366), uint16 frp_mw (clamped),
+#   uint8 sensor (0 MODIS, 1 VIIRS S-NPP, 2 VIIRS NOAA-20), uint8 hour_utc
+# lat = LAT0 + lat_q * LAT_SPAN / 65535, lon = LON0 + lon_q * LON_SPAN / 65535 (~20 m steps)
+HOTSPOT_FORMAT = {"lat0": 32.0, "lat_span": 10.5, "lon0": -125.0, "lon_span": 11.5}
+SENSOR_CODE = {"MODIS": 0, "SNPP": 1, "N20": 2}
 
 # Which months are observed on the reference scale and which are converted to it.
 KIND = {
@@ -24,6 +33,36 @@ KIND = {
     "MODIS Terra (converted)": "harmonized",
     "VIIRS NOAA-20 (scaled to S-NPP)": "harmonized",
 }
+
+
+def export_hotspots(raw_dir, out_dir):
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from find_fires import load_points  # same cleaning as the calendar and fire events
+    pts = load_points(raw_dir)
+    f = HOTSPOT_FORMAT
+    hs_dir = os.path.join(out_dir, "hotspots")
+    os.makedirs(hs_dir, exist_ok=True)
+    rec = np.dtype([("lat", "<u2"), ("lon", "<u2"), ("doy", "<u2"), ("frp", "<u2"),
+                    ("sensor", "u1"), ("hour", "u1")])
+    years = {}
+    for year, g in pts.groupby(pts["acq_date"].dt.year):
+        g = g.sort_values(["acq_date", "acq_time"])
+        a = np.zeros(len(g), dtype=rec)
+        a["lat"] = np.clip(np.round((g["latitude"] - f["lat0"]) / f["lat_span"] * 65535), 0, 65535)
+        a["lon"] = np.clip(np.round((g["longitude"] - f["lon0"]) / f["lon_span"] * 65535), 0, 65535)
+        a["doy"] = g["acq_date"].dt.dayofyear
+        a["frp"] = np.clip(np.round(g["frp"].fillna(0)), 0, 65535)
+        a["sensor"] = g["sensor"].map(SENSOR_CODE)
+        a["hour"] = g["acq_time"].astype(int) // 100
+        with open(os.path.join(hs_dir, f"{year}.bin"), "wb") as fh:
+            fh.write(b"HSP1")
+            fh.write(np.uint32(len(a)).tobytes())
+            fh.write(a.tobytes())
+        years[int(year)] = len(a)
+    with open(os.path.join(hs_dir, "index.json"), "w") as fh:
+        json.dump({"format": f, "sensors": ["MODIS", "VIIRS S-NPP", "VIIRS NOAA-20"],
+                   "label": "observed detections (cleaned like the calendar)", "years": years}, fh)
+    print(f"hotspots: {sum(years.values()):,} in {len(years)} year files")
 
 
 def main(data_dir, out_dir):
@@ -58,9 +97,12 @@ def main(data_dir, out_dir):
         json.dump(calendar, f, separators=(",", ":"))
 
     ev = pd.read_csv(os.path.join(data_dir, "fires", "fire_events.csv"))
+    hull_path = os.path.join(data_dir, "fires", "fire_hulls.json")
+    hulls = json.load(open(hull_path)) if os.path.exists(hull_path) else {}
     fires = [{"id": r.event_id, "start": r.start, "end": r.end, "peak": r.peak_day,
               "km2": r.footprint_km2, "det": int(r.detections), "lat": r.lat, "lon": r.lon,
-              "bbox": [r.min_lat, r.min_lon, r.max_lat, r.max_lon]} for r in ev.itertuples()]
+              "bbox": [r.min_lat, r.min_lon, r.max_lat, r.max_lon],
+              "hull": hulls.get(r.event_id, [])} for r in ev.itertuples()]
     with open(os.path.join(out_dir, "fires.json"), "w") as f:
         json.dump({"label": "observed detections grouped into events", "events": fires}, f,
                   separators=(",", ":"))
@@ -76,8 +118,12 @@ def main(data_dir, out_dir):
             json.dump(o, f, separators=(",", ":"))
 
     for name in sorted(os.listdir(out_dir)):
-        print(f"{name}: {os.path.getsize(os.path.join(out_dir, name)) // 1024} KB")
+        path = os.path.join(out_dir, name)
+        if os.path.isfile(path):
+            print(f"{name}: {os.path.getsize(path) // 1024} KB")
 
 
 if __name__ == "__main__":
     main(sys.argv[1], sys.argv[2])
+    if "--hotspots" in sys.argv:
+        export_hotspots(sys.argv[sys.argv.index("--hotspots") + 1], sys.argv[2])

@@ -60,6 +60,7 @@ var fire_list := ItemList.new()
 var fire_title := Label.new()
 var sim_button := Button.new()
 var all_button := Button.new()
+var map_button := Button.new()
 var shown_fires: Array = []
 
 
@@ -80,7 +81,7 @@ func _ready() -> void:
 
 
 func _build_controls() -> void:
-	for b in [all_button, sim_button]:
+	for b in [all_button, sim_button, map_button]:
 		b.add_theme_stylebox_override("normal", _button_style(Color("#2b2b29"), INK_3))
 		b.add_theme_stylebox_override("hover", _button_style(Color("#383835"), INK_2))
 		b.add_theme_stylebox_override("pressed", _button_style(Color("#383835"), INK))
@@ -98,6 +99,10 @@ func _build_controls() -> void:
 	all_button.position = Vector2(300, 38)
 	all_button.pressed.connect(func(): set_selection(data.all_cells()))
 	add_child(all_button)
+	map_button.text = "← Back to map"
+	map_button.position = Vector2(1040, 8)
+	map_button.pressed.connect(back_to_map)
+	add_child(map_button)
 
 	info.position = Vector2(16, 612)
 	info.size = Vector2(440, 180)
@@ -187,11 +192,21 @@ func select_month(year: int, month: int) -> void:
 	queue_redraw()
 
 
+## Back to the map, showing the month picked here (if any).
+func back_to_map() -> void:
+	if sel_year > 0 and not AppState.map_state.is_empty():
+		AppState.map_state.year = mini(sel_year, data.last_year)
+		AppState.map_state.month = sel_month
+		AppState.map_state.day = 0
+	get_tree().change_scene_to_file("res://ui/map_view.tscn")
+
+
 func open_sim() -> void:
 	var picked := fire_list.get_selected_items()
 	if picked.is_empty():
 		return
 	AppState.sim_event = shown_fires[picked[0]]
+	AppState.return_scene = "res://ui/calendar_view.tscn"
 	get_tree().change_scene_to_file("res://main.tscn")
 
 

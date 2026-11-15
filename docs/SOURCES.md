@@ -33,8 +33,13 @@ All DOIs below were checked to resolve on 2026-11-14.
   "Produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved."
 - USGS 3D Elevation Program (3DEP), alternative DEM. https://www.usgs.gov/3d-elevation-program (**planned**)
 - MODIS MOD13Q1 v6.1 vegetation indices (NDVI), 16-day 250 m. Didan, K. (2021). NASA LP DAAC. https://doi.org/10.5067/MODIS/MOD13Q1.061 (**planned**)
-- Open-Meteo Historical Weather API. Zippenfenig, P. (2023). Open-Meteo.com Weather API [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.7970649 · data CC BY 4.0, https://open-meteo.com/en/license (**planned**)
-- ERA5 reanalysis (behind Open-Meteo archive). Hersbach, H. et al. (2020). The ERA5 global reanalysis. *Q. J. R. Meteorol. Soc.* 146, 1999–2049. https://doi.org/10.1002/qj.3803 · dataset: https://doi.org/10.24381/cds.adbb2d47 (**planned**)
+- Open-Meteo Historical Weather API. Zippenfenig, P. (2023). Open-Meteo.com Weather API [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.7970649 · data CC BY 4.0, https://open-meteo.com/en/license (**used**: map wind layer, fetched live with `models=era5`; **planned** for sim day files)
+- ERA5 reanalysis (behind Open-Meteo archive). Hersbach, H. et al. (2020). The ERA5 global reanalysis. *Q. J. R. Meteorol. Soc.* 146, 1999–2049. https://doi.org/10.1002/qj.3803 · dataset: https://doi.org/10.24381/cds.adbb2d47 (**used**: map wind layer)
+- NASA Global Imagery Browse Services (GIBS), NASA ESDIS. Map tiles streamed by the app: MODIS Terra Corrected Reflectance (True Color), daily. https://www.earthdata.nasa.gov/engage/open-data-services-software/earthdata-developer-portal/gibs-api (**used**: "satellite view that day" layer)
+  We acknowledge the use of imagery provided by services from NASA's Global Imagery Browse Services (GIBS), part of NASA's Earth Science Data and Information System (ESDIS).
+- USGS The National Map base maps (USGSImageryOnly, USGSImageryTopo, USGSTopo tile services), U.S. Geological Survey, public domain. https://basemap.nationalmap.gov/arcgis/rest/services (**used**: map base layers)
+  Map services and data available from U.S. Geological Survey, National Geospatial Program.
+- US Census Bureau cartographic boundary file `cb_2018_us_state_5m` (public domain). https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html (**used**: California outline, `pipeline/build_boundary.py`)
 - NASA Worldview Snapshots (background imagery), NASA ESDIS / GIBS. https://wvs.earthdata.nasa.gov/ (**planned**)
 
 ## Validation

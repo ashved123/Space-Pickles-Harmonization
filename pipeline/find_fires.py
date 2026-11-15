@@ -14,6 +14,7 @@ Outputs (data/fires/):
     fire_events.csv          one row per event with >= MIN_CELL_DAYS cell-days, largest first
     fire_event_days.csv      per event and day: detections, fire cells, FRP, sensors (for picking
                              sim days and seeding the sim)
+    fire_hulls.json          per event: convex hull of its fire cell-days [[lat, lon], ...] (map outline)
 
 All values are observed detections, not burned area. A big event can be several nearby fires
 that touched in space and time.
@@ -56,6 +57,27 @@ def load_points(indir):
         parts += [a, n]
     pts = pd.concat(parts, ignore_index=True)
     return pts[["latitude", "longitude", "acq_date", "acq_time", "sensor", "frp", "cx", "cy"]]
+
+
+def convex_hull(points):
+    """Monotone chain convex hull of (lon, lat) points; returns the hull in order."""
+    pts = sorted(set(points))
+    if len(pts) <= 2:
+        return pts
+
+    def cross(o, a, b):
+        return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
+
+    lower, upper = [], []
+    for p in pts:
+        while len(lower) >= 2 and cross(lower[-2], lower[-1], p) <= 0:
+            lower.pop()
+        lower.append(p)
+    for p in reversed(pts):
+        while len(upper) >= 2 and cross(upper[-2], upper[-1], p) <= 0:
+            upper.pop()
+        upper.append(p)
+    return lower[:-1] + upper[:-1]
 
 
 def link_cell_days(cd):
@@ -133,6 +155,18 @@ def main(indir, outdir):
     daily = daily.round({"frp_mw": 1})
     daily[["event_id", "date", "detections", "fire_cells", "frp_mw", "sensors"]].sort_values(
         ["event_id", "date"]).to_csv(os.path.join(outdir, "fire_event_days.csv"), index=False)
+
+    # Outline per event: hull of its ~1 km fire cells (cell corners, so tiny fires still get an area).
+    hulls = {}
+    half = GRID / 2
+    for label, g in cd.groupby("label"):
+        corners = [(round(lo + dx, 4), round(la + dy, 4))
+                   for la, lo in zip((g["cy"] + 0.5) * GRID, (g["cx"] + 0.5) * GRID)
+                   for dx in (-half, half) for dy in (-half, half)]
+        hulls[ids[label]] = [[la, lo] for lo, la in convex_hull(corners)]
+    import json
+    with open(os.path.join(outdir, "fire_hulls.json"), "w") as f:
+        json.dump(hulls, f, separators=(",", ":"))
 
     print(f"{len(pts):,} clean detections -> {len(size):,} raw clusters -> {len(out):,} events "
           f"(>= {MIN_CELL_DAYS} cell-days)")
