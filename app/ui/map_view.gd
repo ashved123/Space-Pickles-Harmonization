@@ -43,9 +43,11 @@ const BASES := [
 ]
 # Backdrop outside California: a dark silhouette, not a map. Land is flat dark grey with
 # thin diagonal white stripes ("not covered here"), water is dark blue, and a light line
-# marks the shore. The land / water shapes come from low-zoom USGS topo tiles (the topo map
-# draws water in blue); nothing else from the tiles is shown.
-const BACKDROP_MAX_ZOOM := 7
+# marks the shore. The shapes come from NASA GIBS's OSM land/water mask (OpenStreetMap land
+# polygons: water 128 grey, land 75 grey), so coasts, bays and islands are clean and rivers
+# don't show. Nothing else from the tiles is used. Zoom 9 is the finest the service has.
+const BACKDROP_URL := "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/OSM_Land_Water_Map/default/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png"
+const BACKDROP_MAX_ZOOM := 8
 const BACKDROP_LAND := Color("#2b2b29")
 const BACKDROP_WATER := Color("#122436")
 const BACKDROP_STRIPE := Color(1, 1, 1, 0.13)
@@ -56,20 +58,15 @@ uniform vec4 land : source_color;
 uniform vec4 water : source_color;
 uniform vec4 stripe : source_color;
 uniform vec4 border : source_color;
-float water_at(sampler2D tex, vec2 uv) {
-	vec4 c = texture(tex, uv);
-	return smoothstep(0.03, 0.12, c.b - c.r);  // the topo map draws water in blue
-}
 void fragment() {
-	// Water only where the pixels 3 texels away on every side are water too: this drops
-	// rivers, blue labels and road shields, and keeps the ocean and real lakes.
-	vec2 d = TEXTURE_PIXEL_SIZE * 3.0;
-	float w = water_at(TEXTURE, UV);
-	w = min(w, min(water_at(TEXTURE, UV + vec2(d.x, 0.0)), water_at(TEXTURE, UV - vec2(d.x, 0.0))));
-	w = min(w, min(water_at(TEXTURE, UV + vec2(0.0, d.y)), water_at(TEXTURE, UV - vec2(0.0, d.y))));
+	// 0 on land (grey 75/255), 1 on water (grey 128/255), in between on anti-aliased edges.
+	float w = clamp((texture(TEXTURE, UV).r - 0.294) / 0.208, 0.0, 1.0);
 	float aa = fwidth(w) + 0.0001;
 	float is_water = smoothstep(0.5 - aa, 0.5 + aa, w);  // sharp edge at any zoom
-	float shore = 1.0 - smoothstep(aa * 0.75, aa * 1.5, abs(w - 0.5));
+	// The shore line is drawn on the land side only (1-2 px wide), so along California's own coast
+	// it sits under the state and doesn't peek out past it.
+	float px_inside = (0.5 - w) / aa;
+	float shore = (1.0 - is_water) * (1.0 - smoothstep(1.0, 2.0, px_inside));
 	// Stripes are fixed to the screen: 1.5 px wide, every 14 px, running bottom-left to top-right.
 	float on_stripe = step(fract((FRAGCOORD.x + FRAGCOORD.y) / 14.0), 0.11);
 	vec3 col = mix(mix(land.rgb, stripe.rgb, on_stripe * stripe.a), water.rgb, is_water);
@@ -161,10 +158,11 @@ func _ready() -> void:
 		_fit_state()  # first visit: show the whole state, sized for this window
 	base_tiles.setup(BASES[base_choice][1], BASES[base_choice][2])
 	sat_tiles.setup(GIBS_DAILY, 9)
+	sat_tiles.skip_black = true  # today's tiles are black until NASA has processed them
 	# Keep the whole state in memory at low zoom, so zooming always has something to show.
 	base_tiles.preload_region(region_bbox, 6, 9)
 	get_window().size_changed.connect(_apply_view)
-	backdrop_tiles.setup(USGS % "USGSTopo", BACKDROP_MAX_ZOOM)
+	backdrop_tiles.setup(BACKDROP_URL, BACKDROP_MAX_ZOOM)
 	var backdrop_shader := Shader.new()
 	backdrop_shader.code = BACKDROP_SHADER
 	var backdrop_mat := ShaderMaterial.new()
@@ -185,8 +183,8 @@ func _ready() -> void:
 	for n in [vector, modis_layer, viirs_layer]:
 		world.add_child(n)
 	add_child(world)
-	wind.to_world = screen_to_world
-	add_child(wind)
+	# Flat on the ground: in map coordinates and clipped to the state, below hotspots and outlines.
+	region_clip.add_child(wind)
 	_wind_timer.one_shot = true
 	_wind_timer.wait_time = 0.6
 	_wind_timer.timeout.connect(func(): wind.show_date(_wind_date))
@@ -641,6 +639,12 @@ func _date_text() -> String:
 	return "%d %s %d" % [day, MONTHS[month], year]
 
 
+## Newest day NASA GIBS can have MODIS imagery for: yesterday (UTC). Today's tiles are black
+## until the day has been processed, and later days don't exist.
+func _latest_imagery_date() -> String:
+	return Time.get_date_string_from_unix_time(int(Time.get_unix_time_from_system()) - 86400)
+
+
 func _imagery_date() -> String:
 	var d := ""
 	if month > 0 and day > 0:
@@ -766,19 +770,19 @@ func _apply_view() -> void:
 	if base_tiles.visible:
 		base_tiles.set_template(BASES[base_choice][1], BASES[base_choice][2])
 		base_tiles.update_view(rect, zoom)
-	sat_tiles.visible = show_sat
+	sat_tiles.visible = show_sat and img_date <= _latest_imagery_date()
 	if show_sat:
 		sat_tiles.set_date(img_date)
 		sat_tiles.update_view(rect, zoom)
 	wind.visible = show_wind
-	wind.map_size = ms
+	wind.screen_scale = s
 	wind.hour = wind_hour
+	wind.set_view(rect, zoom)
 	wind_row.visible = show_wind
 	hour_label.text = "%02d:00 Pacific (%02d:00 UTC)" % [(wind_hour + 16) % 24, wind_hour]
 	if show_wind:
 		_wind_date = img_date
 		_wind_timer.start()  # fetch once the date stops changing
-		wind.queue_redraw()
 	modis_layer.set_view_scale(s)
 	viirs_layer.set_view_scale(s)
 	if absf(zoom - _last_vector_zoom) > 0.01:
@@ -828,10 +832,13 @@ func _update_status() -> void:
 	var loading := sat_tiles.loading_count() + base_tiles.loading_count()
 	var base := "Base map: USGS National Map" if base_tiles.visible else "No base map"
 	if show_sat:
-		base += " · Satellite: NASA GIBS, MODIS Terra, %s" % _imagery_date()
+		if _imagery_date() > _latest_imagery_date():
+			base += " · Satellite: no NASA image for %s yet (latest %s)" % [_imagery_date(), _latest_imagery_date()]
+		else:
+			base += " · Satellite: NASA GIBS, MODIS Terra, %s" % _imagery_date()
 	if show_wind:
-		var ws := "loading…" if wind.status == "loading" else ("arrows point where it blows, longer = faster" if wind.status == "ready" else wind.status)
-		base += "\nWind %s %02d:00 UTC, ERA5 reanalysis via Open-Meteo (modelled): %s" % [_imagery_date(), wind_hour, ws]
+		var ws := "loading…" if wind.status == "loading" else ("lines follow the wind, bright end = downwind, longer = faster" if wind.status == "ready" else wind.status)
+		base += "\nWind %s %02d:00 UTC · ERA5 via Open-Meteo, modelled · %s" % [_imagery_date(), wind_hour, ws]
 	status.text = "%s%s\n%s hotspots (observed, NASA FIRMS) · %d fire events · zoom %.1f\n%s" % [
 		base, ("   loading %d tiles…" % loading) if loading > 0 else "",
 		_thousands(n_hot), shown_fires.size(), zoom,

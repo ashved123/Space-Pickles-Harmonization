@@ -25,6 +25,7 @@ var max_zoom := 9
 var date := ""           # "YYYY-MM-DD" for daily layers, "" for static ones
 var tint := Color.WHITE
 var pixel_bias := 0.0    # extra zoom levels for high-DPI screens (log2 of screen px per map px)
+var skip_black := false  # treat an all-black tile as missing (GIBS sends black for imagery not ready yet)
 
 var _view_rect := Rect2()
 var _view_zoom := 0.0
@@ -225,6 +226,14 @@ func _disk_path(url: String) -> String:
 	return "%s/%s.bin" % [CACHE_DIR, url.md5_text()]
 
 
+## True if every pixel is black (a tile with no image yet, not a real dark scene).
+static func _is_black(img: Image) -> bool:
+	var data := img.get_data()
+	var zeros := PackedByteArray()
+	zeros.resize(data.size())
+	return data == zeros
+
+
 ## Decode tile bytes into the memory cache. Returns false if they aren't a valid image.
 func _store(url: String, body: PackedByteArray) -> bool:
 	if body.size() < 4:
@@ -233,6 +242,8 @@ func _store(url: String, body: PackedByteArray) -> bool:
 	# PNG files start with byte 0x89; everything else we request is JPEG.
 	var err := img.load_png_from_buffer(body) if body[0] == 0x89 else img.load_jpg_from_buffer(body)
 	if err != OK:
+		return false
+	if skip_black and _is_black(img):
 		return false
 	_cache[url] = ImageTexture.create_from_image(img)
 	queue_redraw()

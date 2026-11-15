@@ -1,7 +1,6 @@
 # Sources
 
 Every external resource we use: data, papers, libraries, tools, assets.
-Space Apps requires this. Add an entry **when you start using something**, not at the end.
 
 Status tags: **used** = already relied on · **planned** = in the design, not pulled yet.
 All DOIs below were checked to resolve on 2026-11-14.
@@ -43,6 +42,8 @@ All DOIs below were checked to resolve on 2026-11-14.
 - USGS The National Map base maps (USGSImageryOnly, USGSImageryTopo, USGSTopo tile services), U.S. Geological Survey, public domain. https://basemap.nationalmap.gov/arcgis/rest/services (**used**: map base layers; USGSImageryOnly `export` for the sim's aerial view)
   Map services and data available from U.S. Geological Survey, National Geospatial Program.
 - US Census Bureau cartographic boundary file `cb_2018_us_state_5m` (public domain). https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html (**used**: California outline, `pipeline/build_boundary.py`)
+- NASA GIBS OSM Land/Water Map (`OSM_Land_Water_Map`, EPSG:3857 tiles), NASA ESDIS / GIBS, derived from OpenStreetMap land polygons. https://nasa-gibs.github.io/gibs-api-docs/available-visualizations/ (**used**: land / water mask for the dark map backdrop outside California)
+  Contains data from OpenStreetMap, © OpenStreetMap contributors, ODbL: https://www.openstreetmap.org/copyright
 - NASA Worldview Snapshots (background imagery), NASA ESDIS / GIBS. https://wvs.earthdata.nasa.gov/ (**planned**)
 
 ## Validation
