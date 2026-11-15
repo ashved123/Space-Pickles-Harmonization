@@ -31,8 +31,38 @@ func _init() -> void:
 	check(absf(s.expected - o[8]) < 0.01 and s.high > 0 and s.medium > s.high, "outlook summary: Sept %.1f cells expected, %d high, %d medium" % [s.expected, s.high, s.medium])
 	check(d.outlook_summary(0).high >= s.high, "peak-month summary has at least as many High cells")
 	test_date_queries()
+	test_sensor_counts(d, butte)
 	print("FAILED: %d" % failures if failures > 0 else "all tests passed")
 	quit(1 if failures > 0 else 0)
+
+
+## Raw detections per satellite, counted from the hotspot files.
+func test_sensor_counts(d, butte: PackedInt32Array) -> void:
+	check(not d.sensor_ready(), "satellite counts start empty")
+	var t := Time.get_ticks_msec()
+	for y in range(d.FIRST_YEAR, d.last_year + 1):
+		d.count_sensor_year(y)
+	check(d.sensor_ready(), "all years counted in %d ms" % (Time.get_ticks_msec() - t))
+	var all: PackedInt32Array = d.all_cells()
+	var modis: Array = d.sensor_area_grid(0, all)
+	var snpp: Array = d.sensor_area_grid(1, all)
+	var noaa20: Array = d.sensor_area_grid(2, all)
+	check(modis[5][7] > 0.0 and is_nan(snpp[5][7]) and is_nan(noaa20[5][7]), "Aug 2005: MODIS only (%d detections)" % modis[5][7])
+	check(snpp[13][7] > 0.0 and is_nan(noaa20[13][7]), "Aug 2013: S-NPP on record, NOAA-20 not yet")
+	check(noaa20[20][7] > 0.0 and snpp[20][7] > modis[20][7], "Aug 2020: all three, VIIRS sees more than MODIS (%d vs %d)" % [snpp[20][7], modis[20][7]])
+	var camp: Array = d.sensor_area_grid(1, butte)
+	check(camp[18][10] > 1000.0 and camp[18][10] > camp[18][5] * 10.0, "Camp Fire: Butte S-NPP detections spike in Nov 2018 (%d)" % camp[18][10])
+	var total := 0.0
+	for c in butte:
+		total += d.sensor_cell_value(1, c, 2018, 11)
+	check(is_equal_approx(total, camp[18][10]), "cell values add up to the area total")
+	var index = JSON.parse_string(FileAccess.get_file_as_string("res://datasets/hotspots/index.json"))
+	var year_total := 0.0
+	for g in [modis, snpp, noaa20]:
+		for v in g[18]:
+			if not is_nan(v):
+				year_total += v
+	check(absf(year_total - index.years["2018"]) <= index.years["2018"] * 0.01, "2018 counts match the hotspot file (%d of %d)" % [year_total, index.years["2018"]])
 
 
 func test_date_queries() -> void:

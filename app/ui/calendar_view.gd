@@ -4,6 +4,7 @@
 extends Control
 
 const CalendarData = preload("res://data/calendar_data.gd")
+const UI = preload("res://ui/ui_kit.gd")
 
 # Dark surface and ink (dataviz reference palette, dark mode).
 const SURFACE := Color("#1a1a19")
@@ -14,14 +15,16 @@ const GRID_LINE := Color("#383835")
 const ZERO := Color("#262624")       # recorded, no burning
 const NO_DATA := Color("#121211")    # no satellite record (hatched)
 const SELECT := Color("#f0efec")
-const UNUSUAL := Color("#ec835a")    # status "serious", always with the ▲ marker
+const UNUSUAL := Color("#f5c542")    # yellow so it shows on the red cells, always with the ▲ marker
 const UNUSUAL_X_MEDIAN := 2.0       # unusual = top 10% for that month AND >= 2x its median
-# Sequential blue, dark mode: near zero recedes toward the surface, high is bright.
+# Burning: sequential red, dark mode: near zero recedes toward the surface, high is bright.
+const REDS: Array[Color] = [Color("#4d0f0f"), Color("#7a1818"), Color("#ab2525"), Color("#d93a3a"),
+	Color("#ec7070"), Color("#f4a3a3"), Color("#fbd3d3")]
+# Second sequential context (outlook), one hue: blue, so it can't be mistaken for burning.
 const BLUES: Array[Color] = [Color("#0d366b"), Color("#184f95"), Color("#256abf"), Color("#3987e5"),
 	Color("#6da7ec"), Color("#9ec5f4"), Color("#cde2fb")]
-# Second sequential context (outlook), one hue: orange.
-const ORANGES: Array[Color] = [Color("#4a1f0d"), Color("#7a3415"), Color("#b14a1e"), Color("#eb6834"),
-	Color("#f29a73"), Color("#f8c7b0")]
+# What the heatmap shows: the harmonized series, or one satellite's raw detections.
+const VIEWS := ["Harmonized", "MODIS", "VIIRS S-NPP", "VIIRS NOAA-20"]
 const MONTHS := ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
 # Map geometry (equirectangular, x scaled by cos 37.5°).
@@ -46,6 +49,10 @@ var outlook := PackedFloat32Array()
 var heat_max := 1.0
 var heat_min := 1.0  # low end of the colour scale (5th percentile of non-zero months)
 var cell_mean := PackedFloat32Array()  # mean monthly value per cell, for the default map
+var view := 0            # index into VIEWS now shown; satellite views are sensor code + 1
+var wanted_view := 0     # view picked by the user; shown once its counts are ready
+var counting_year := 0   # next hotspot year to count for the satellite views, 0 = not started
+var view_buttons: Array = []
 var sel_year := 0
 var sel_month := 0
 var hover_text := ""
@@ -87,7 +94,7 @@ func _build_controls() -> void:
 		b.add_theme_stylebox_override("pressed", _button_style(Color("#383835"), INK))
 		b.add_theme_stylebox_override("disabled", _button_style(SURFACE, GRID_LINE))
 		b.add_theme_color_override("font_color", INK)
-	title.text = "California burning calendar   ·   MODIS + VIIRS harmonized, 2000–2026"
+	_update_title()
 	title.position = Vector2(16, 10)
 	title.add_theme_font_size_override("font_size", 20)
 	title.add_theme_color_override("font_color", INK)
@@ -103,6 +110,12 @@ func _build_controls() -> void:
 	map_button.position = Vector2(1040, 8)
 	map_button.pressed.connect(back_to_map)
 	add_child(map_button)
+
+	var view_row := VBoxContainer.new()
+	view_row.position = Vector2(HEAT_X, 38)
+	view_row.size = Vector2(12 * CELL_W, 30)
+	add_child(view_row)
+	view_buttons = UI.segmented(view_row, VIEWS, view, set_view)
 
 	info.position = Vector2(16, 612)
 	info.size = Vector2(440, 180)
@@ -139,6 +152,59 @@ func _button_style(bg: Color, border: Color) -> StyleBoxFlat:
 	return s
 
 
+## Switch between the harmonized series and one satellite's raw detections. The satellite
+## counts are made from the hotspot files the first time they are needed (a few seconds).
+func set_view(i: int) -> void:
+	wanted_view = i
+	view_buttons[i].button_pressed = true
+	if i > 0 and not data.sensor_ready():
+		if counting_year == 0:
+			counting_year = data.FIRST_YEAR
+		_update_title()
+		return
+	_show_view(i)
+
+
+func _show_view(i: int) -> void:
+	view = i
+	hover_text = ""  # the old text described the previous view
+	info.text = ""
+	_update_title()
+	_compute_cell_means()
+	set_selection(selection)
+
+
+func _process(_delta: float) -> void:
+	if counting_year == 0 or data.sensor_ready():
+		return
+	data.count_sensor_year(counting_year)
+	counting_year += 1
+	_update_title()
+	if data.sensor_ready() and wanted_view != view:
+		_show_view(wanted_view)
+
+
+func _update_title() -> void:
+	var t := "MODIS + VIIRS harmonized, 2000–2026"
+	if wanted_view > 0 and not data.sensor_ready():
+		t = "counting %s detections, %d…" % [VIEWS[wanted_view], counting_year]
+	elif view > 0:
+		t = "%s only: raw detections (observed), not harmonized" % VIEWS[view]
+	title.text = "California burning calendar   ·   " + t
+
+
+## Value of a cell in a month for the current view. NAN = no record.
+func value_of(c: int, year: int, month: int) -> float:
+	if view == 0:
+		return data.cell_value(c, year, month)
+	return data.sensor_cell_value(view - 1, c, year, month)
+
+
+## What the numbers count in the current view.
+func unit_text() -> String:
+	return "fire cell-days" if view == 0 else "%s detections" % VIEWS[view]
+
+
 func _compute_cell_means() -> void:
 	cell_mean.resize(data.cell_count())
 	for c in data.cell_count():
@@ -146,7 +212,7 @@ func _compute_cell_means() -> void:
 		var n := 0
 		for y in range(data.FIRST_YEAR, data.last_year + 1):
 			for m in range(1, 13):
-				var v: float = data.cell_value(c, y, m)
+				var v: float = value_of(c, y, m)
 				if not is_nan(v):
 					total += v
 					n += 1
@@ -158,7 +224,7 @@ func set_selection(cells: PackedInt32Array) -> void:
 		return
 	selection = cells
 	AppState.selection = cells
-	grid = data.area_grid(selection)
+	grid = data.area_grid(selection) if view == 0 else data.sensor_area_grid(view - 1, selection)
 	unusual = data.unusual_thresholds(grid)
 	medians = data.baseline_medians(grid)
 	outlook = data.outlook_area(selection)
@@ -308,11 +374,12 @@ func heat_color(v: float, vmax: float, vmin: float = 1.0) -> Color:
 	if v <= 0.0:
 		return ZERO
 	vmin = minf(vmin, vmax * 0.5)
-	return ramp(BLUES, (log(v) - log(vmin)) / maxf(log(vmax) - log(vmin), 0.001))
+	return ramp(REDS, (log(v) - log(vmin)) / maxf(log(vmax) - log(vmin), 0.001))
 
 
 func is_unusual(v: float, m: int) -> bool:
-	return v > 0.0 and v >= unusual[m] and v >= UNUSUAL_X_MEDIAN * medians[m]
+	# Only for the harmonized series: a single satellite's record is too short for a baseline.
+	return view == 0 and v > 0.0 and v >= unusual[m] and v >= UNUSUAL_X_MEDIAN * medians[m]
 
 
 # ---------- drawing ----------
@@ -332,14 +399,14 @@ func _draw_map() -> void:
 	var month_mode := sel_year > 0
 	var vmax := 1.0
 	for c in data.cell_count():
-		var v: float = data.cell_value(c, sel_year, sel_month) if month_mode else cell_mean[c]
+		var v: float = value_of(c, sel_year, sel_month) if month_mode else cell_mean[c]
 		if not is_nan(v):
 			vmax = maxf(vmax, v)
 	var sel := {}
 	for c in selection:
 		sel[c] = true
 	for c in data.cell_count():
-		var v: float = data.cell_value(c, sel_year, sel_month) if month_mode else cell_mean[c]
+		var v: float = value_of(c, sel_year, sel_month) if month_mode else cell_mean[c]
 		var p := _to_screen(data.cell_lat[c] + 0.125, data.cell_lon[c] - 0.125)
 		draw_rect(Rect2(p + Vector2(0.5, 0.5), size - Vector2(1, 1)), heat_color(v, vmax))
 	if selection.size() < data.cell_count():
@@ -348,8 +415,8 @@ func _draw_map() -> void:
 			draw_rect(Rect2(p, size), SELECT, false, 1.5)
 	if drag_from.x >= 0 and drag_from.distance_to(drag_to) > 6.0:
 		draw_rect(Rect2(drag_from, drag_to - drag_from).abs(), SELECT, false, 1.0)
-	var caption := "Map: %s" % ("%s %d, fire cell-days per 25 km cell" % [MONTHS[sel_month - 1], sel_year]
-		if month_mode else "average monthly burning per 25 km cell, 2000–2026")
+	var caption := "Map: %s" % ("%s %d, %s per 25 km cell" % [MONTHS[sel_month - 1], sel_year, unit_text()]
+		if month_mode else "average monthly %s per 25 km cell" % unit_text())
 	draw_string(font, Vector2(MAP_RECT.position.x, MAP_RECT.end.y + 4), caption,
 		HORIZONTAL_ALIGNMENT_LEFT, -1, 12, INK_3)
 	draw_string(font, Vector2(MAP_RECT.position.x, MAP_RECT.end.y + 20), "Click a cell · shift+click to add · drag a box",
@@ -362,7 +429,6 @@ func _draw_heatmap() -> void:
 			CELL_W, 12, INK_2)
 	for y in range(data.FIRST_YEAR, data.last_year + 1):
 		var top := _row_y(y)
-		var kind: String = "harmonized" if y < 2012 else "observed"
 		draw_string(font, Vector2(HEAT_X - 46, top + 13), str(y), HORIZONTAL_ALIGNMENT_RIGHT, 40, 12, INK_2)
 		for m in 12:
 			var v: float = grid[y - data.FIRST_YEAR][m]
@@ -372,34 +438,41 @@ func _draw_heatmap() -> void:
 				_hatch(r)
 				continue
 			var mi: int = data.month_index(y, m + 1)
-			if data.partial[mi] or data.preliminary[mi]:
+			if mi >= 0 and (data.partial[mi] or data.preliminary[mi]):
 				draw_circle(r.position + Vector2(r.size.x - 5, 5), 2.0, INK_2)
 			if is_unusual(v, m):
 				draw_rect(r.grow(-1), UNUSUAL, false, 2.0)
 				_triangle(r.position + Vector2(4, r.size.y - 4))
-	# Sensor change markers.
-	var y2012 := _row_y(2012) + CELL_H / 18.0  # Feb 2012 sits in the 2012 row
-	draw_line(Vector2(HEAT_X - 50, _row_y(2012)), Vector2(HEAT_X + 12 * CELL_W, _row_y(2012)), INK_3, 1.0)
-	draw_string(font, Vector2(HEAT_X + 12 * CELL_W + 6, y2012 + 4), "↑ MODIS, harmonized",
-		HORIZONTAL_ALIGNMENT_LEFT, -1, 11, INK_3)
-	draw_string(font, Vector2(HEAT_X + 12 * CELL_W + 6, y2012 + 18), "↓ VIIRS S-NPP, observed",
-		HORIZONTAL_ALIGNMENT_LEFT, -1, 11, INK_3)
-	var y26 := _row_y(data.last_year)
-	draw_string(font, Vector2(HEAT_X + 12 * CELL_W + 6, y26 + 13), "S-NPP ended 2 Nov",
-		HORIZONTAL_ALIGNMENT_LEFT, -1, 11, INK_3)
+	# Sensor change markers (the harmonized series switches source in 2012).
+	if view == 0:
+		var y2012 := _row_y(2012) + CELL_H / 18.0  # Feb 2012 sits in the 2012 row
+		draw_line(Vector2(HEAT_X - 50, _row_y(2012)), Vector2(HEAT_X + 12 * CELL_W, _row_y(2012)), INK_3, 1.0)
+		draw_string(font, Vector2(HEAT_X + 12 * CELL_W + 6, y2012 + 4), "↑ MODIS, harmonized",
+			HORIZONTAL_ALIGNMENT_LEFT, -1, 11, INK_3)
+		draw_string(font, Vector2(HEAT_X + 12 * CELL_W + 6, y2012 + 18), "↓ VIIRS S-NPP, observed",
+			HORIZONTAL_ALIGNMENT_LEFT, -1, 11, INK_3)
+	else:
+		draw_string(font, Vector2(HEAT_X + 12 * CELL_W + 6, _row_y(data.FIRST_YEAR) + 13), "raw counts: don't compare",
+			HORIZONTAL_ALIGNMENT_LEFT, -1, 11, INK_3)
+		draw_string(font, Vector2(HEAT_X + 12 * CELL_W + 6, _row_y(data.FIRST_YEAR) + 27), "between satellites",
+			HORIZONTAL_ALIGNMENT_LEFT, -1, 11, INK_3)
+	if view == 0 or view == 2:
+		var y26 := _row_y(data.last_year)
+		draw_string(font, Vector2(HEAT_X + 12 * CELL_W + 6, y26 + 13), "S-NPP ended 2 Nov",
+			HORIZONTAL_ALIGNMENT_LEFT, -1, 11, INK_3)
 	# Outlook row.
 	var oy := _row_y(data.OUTLOOK_YEAR)
-	draw_string(font, Vector2(HEAT_X - 70, oy + 13), "%d" % data.OUTLOOK_YEAR, HORIZONTAL_ALIGNMENT_RIGHT, 64, 12, ORANGES[4])
+	draw_string(font, Vector2(HEAT_X - 70, oy + 13), "%d" % data.OUTLOOK_YEAR, HORIZONTAL_ALIGNMENT_RIGHT, 64, 12, BLUES[4])
 	var omax := 0.001
 	for v in outlook:
 		omax = maxf(omax, v)
 	for m in 12:
 		var r := Rect2(HEAT_X + m * CELL_W + 1, oy + 1, CELL_W - 2, CELL_H - 2)
-		draw_rect(r, ramp(ORANGES, outlook[m] / omax))
+		draw_rect(r, ramp(BLUES, outlook[m] / omax))
 	draw_string(font, Vector2(HEAT_X + 12 * CELL_W + 6, oy + 13), "OUTLOOK: past patterns,",
-		HORIZONTAL_ALIGNMENT_LEFT, -1, 11, ORANGES[4])
+		HORIZONTAL_ALIGNMENT_LEFT, -1, 11, BLUES[4])
 	draw_string(font, Vector2(HEAT_X + 12 * CELL_W + 6, oy + 27), "not a fire forecast",
-		HORIZONTAL_ALIGNMENT_LEFT, -1, 11, ORANGES[4])
+		HORIZONTAL_ALIGNMENT_LEFT, -1, 11, BLUES[4])
 	# Selected month.
 	if sel_year > 0:
 		draw_rect(Rect2(HEAT_X + (sel_month - 1) * CELL_W, _row_y(sel_year), CELL_W, CELL_H), SELECT, false, 2.0)
@@ -414,8 +487,8 @@ func _draw_legend() -> void:
 	var y := _row_y(data.OUTLOOK_YEAR) + CELL_H + 18
 	draw_string(font, Vector2(x, y), "less", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, INK_3)
 	for i in 24:
-		draw_rect(Rect2(x + 30 + i * 6, y - 9, 6, 10), ramp(BLUES, i / 23.0))
-	draw_string(font, Vector2(x + 180, y), "more burning (log scale, %.0f–%.0f cell-days)" % [heat_min, heat_max],
+		draw_rect(Rect2(x + 30 + i * 6, y - 9, 6, 10), ramp(REDS, i / 23.0))
+	draw_string(font, Vector2(x + 180, y), "more (log scale, %.0f–%.0f %s)" % [heat_min, heat_max, unit_text()],
 		HORIZONTAL_ALIGNMENT_LEFT, -1, 11, INK_3)
 	y += 18
 	draw_rect(Rect2(x, y - 9, 14, 10), NO_DATA)
@@ -451,9 +524,11 @@ func _describe(p: Vector2) -> String:
 		var c: int = data.cell_at(ll.x, ll.y)
 		if c < 0:
 			return "No fire detections recorded in this 25 km cell."
-		var v: float = data.cell_value(c, sel_year, sel_month) if sel_year > 0 else cell_mean[c]
-		return "Cell %.3f, %.3f\n%s: %.1f fire cell-days" % [data.cell_lat[c], data.cell_lon[c],
-			("%s %d" % [MONTHS[sel_month - 1], sel_year]) if sel_year > 0 else "Average month", v]
+		var v: float = value_of(c, sel_year, sel_month) if sel_year > 0 else cell_mean[c]
+		if is_nan(v):
+			return "Cell %.3f, %.3f\nNo record for this month in this view." % [data.cell_lat[c], data.cell_lon[c]]
+		return "Cell %.3f, %.3f\n%s: %.1f %s" % [data.cell_lat[c], data.cell_lon[c],
+			("%s %d" % [MONTHS[sel_month - 1], sel_year]) if sel_year > 0 else "Average month", v, unit_text()]
 	var h := _heat_cell_at(p)
 	if h.x == 0:
 		return hover_text
@@ -465,7 +540,11 @@ func _describe(p: Vector2) -> String:
 			data.outlook_info.get("auc_climatology", 0.0)]
 	var v: float = grid[h.x - data.FIRST_YEAR][h.y - 1]
 	if is_nan(v):
-		return "%s %d — no satellite record. Missing data is not zero fire." % [MONTHS[h.y - 1], h.x]
+		return "%s %d — no %s record. Missing data is not zero fire." % [MONTHS[h.y - 1], h.x, "satellite" if view == 0 else VIEWS[view]]
+	if view > 0:
+		return "%s %d — OBSERVED, %s only\n%s raw detections in this area\n%s\nSource: NASA FIRMS active-fire detections.\nClick to list this area's fires for the month." % [
+			MONTHS[h.y - 1], h.x, VIEWS[view], UI.thousands(int(v)),
+			"MODIS pixels are 1 km, VIIRS pixels 375 m, so the satellites' counts are not comparable. Use Harmonized to compare years."]
 	var mi: int = data.month_index(h.x, h.y)
 	var lines := ["%s %d — %s" % [MONTHS[h.y - 1], h.x, data.kinds[mi].to_upper()],
 		"%.0f fire cell-days (S-NPP scale)" % v,

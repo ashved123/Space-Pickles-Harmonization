@@ -517,7 +517,7 @@ func _rebuild_calendar() -> void:
 		b.text = str(d)
 		b.custom_minimum_size = Vector2(DAY_W, 26)
 		b.tooltip_text = "%d %s %d: %s hotspots detected" % [d, MONTH_NAMES[cal_month - 1], year, _thousands(n)]
-		var shade := Color("#262624") if n == 0 else VectorLayer._ramp(VectorLayer.BLUES, log(1.0 + n) / log(1.0 + peak))
+		var shade := Color("#262624") if n == 0 else VectorLayer._ramp(VectorLayer.REDS, log(1.0 + n) / log(1.0 + peak))
 		var chosen := month == cal_month and (day == d or day == 0)
 		var exact := month == cal_month and day == d
 		# Selected day: a thick ring that contrasts with the cell's own shade.
@@ -958,13 +958,13 @@ func _outlook_text(y: int, m: int, d: int) -> String:
 	var s: Dictionary = cal.outlook_summary(m)
 	var t := ""
 	if m > 0:
-		t = "OUTLOOK for %s %d\nAbout %.0f of %d map cells (25 km each) are expected to have notable burning. %s ranks %d of 12 for the year; the peak is %s (%.0f cells).\nHigh risk: %d cells. Medium: %d cells. Shown in orange on the map." % [
+		t = "OUTLOOK for %s %d\nAbout %.0f of %d map cells (25 km each) are expected to have notable burning. %s ranks %d of 12 for the year; the peak is %s (%.0f cells).\nHigh risk: %d cells. Medium: %d cells. Shown in blue on the map." % [
 			MONTH_NAMES[m - 1], y, s.expected, cal.cell_count(), MONTH_NAMES[m - 1], order.find(m - 1) + 1,
 			MONTH_NAMES[order[0]], by_month[order[0]], s.high, s.medium]
 		if d > 0:
 			t += "\nThe outlook is monthly: %d %s gets the values for all of %s." % [d, MONTH_NAMES[m - 1], MONTH_NAMES[m - 1]]
 	else:
-		t = "OUTLOOK for %d\nBusiest months: %s (%.0f cells expected to have notable burning), %s (%.0f), %s (%.0f). Quietest: %s (%.0f).\n%d of %d cells reach High risk in at least one month, %d more reach Medium. The map shows each cell's peak month in orange." % [
+		t = "OUTLOOK for %d\nBusiest months: %s (%.0f cells expected to have notable burning), %s (%.0f), %s (%.0f). Quietest: %s (%.0f).\n%d of %d cells reach High risk in at least one month, %d more reach Medium. The map shows each cell's peak month in blue." % [
 			y, MONTH_NAMES[order[0]], by_month[order[0]], MONTH_NAMES[order[1]], by_month[order[1]],
 			MONTH_NAMES[order[2]], by_month[order[2]], MONTH_NAMES[order[11]], by_month[order[11]],
 			s.high, cal.cell_count(), s.medium]

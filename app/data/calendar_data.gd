@@ -32,6 +32,14 @@ var outlook_label := ""
 var outlook_p: Array = []                # per cell: 12 probabilities
 var outlook_info := {}
 
+const SENSOR_NAMES := ["MODIS", "VIIRS S-NPP", "VIIRS NOAA-20"]  # sensor codes 0-2 in the hotspot files
+const LOOKUP_N := 64                         # 64 x 64 cells of 0.25 degrees covers California
+var _sensor_counts := PackedInt32Array()     # [sensor][cell][slot], filled by count_sensor_year()
+var _sensor_first := [-1, -1, -1]            # first / last slot with any detection, per sensor
+var _sensor_last := [-1, -1, -1]
+var _sensor_done := false
+var _cell_lookup := PackedInt32Array()       # 0.25 degree lat/lon box -> cell index, -1 if none
+
 
 func load_all(dir: String = "res://datasets") -> bool:
 	var cal = _read_json(dir + "/calendar.json")
@@ -218,6 +226,99 @@ static func _snap(x: float) -> float:
 
 static func _cell_key(lat: float, lon: float) -> String:
 	return "%.3f,%.3f" % [lat, lon]
+
+
+# ---------- raw detections per satellite ----------
+# Counted from the per-year hotspot files (the map's data), not from the harmonized series:
+# these are raw detection counts, so MODIS (1 km pixels) and VIIRS (375 m) are NOT comparable.
+
+## Counts one year of detections per sensor, cell and month. Call once for every year from
+## FIRST_YEAR to last_year, in order (the big years take a moment, so spread them over frames).
+func count_sensor_year(y: int, dir: String = "res://datasets/hotspots") -> void:
+	var slots := year_count() * 12
+	var cells := cell_count()
+	if _sensor_counts.is_empty():
+		_sensor_counts.resize(SENSOR_NAMES.size() * cells * slots)
+		_sensor_counts.fill(0)
+		_cell_lookup.resize(LOOKUP_N * LOOKUP_N)
+		_cell_lookup.fill(-1)
+		for c in cells:
+			_cell_lookup[_lookup_index(cell_lat[c], cell_lon[c])] = c
+	var fmt = _read_json(dir + "/index.json")
+	var path := "%s/%d.bin" % [dir, y]
+	if fmt != null and FileAccess.file_exists(path):
+		var b := FileAccess.get_file_as_bytes(path)
+		if b.size() >= 8 and b.slice(0, 4).get_string_from_ascii() == "HSP1":
+			var lat0: float = fmt.format.lat0
+			var lon0: float = fmt.format.lon0
+			var ks: float = fmt.format.lat_span / 65535.0
+			var kl: float = fmt.format.lon_span / 65535.0
+			# Day of year -> month (1-12) for this year.
+			var month_of := PackedByteArray()
+			month_of.resize(367)
+			var d := 1
+			for m in range(1, 13):
+				for _i in days_in_month(y, m):
+					month_of[d] = m
+					d += 1
+			for i in b.decode_u32(4):
+				var o := 8 + i * 10
+				var c := _cell_lookup[_lookup_index(lat0 + b.decode_u16(o) * ks, lon0 + b.decode_u16(o + 2) * kl)]
+				var month: int = month_of[mini(b.decode_u16(o + 4), 366)]
+				var s: int = b[o + 8]
+				if c < 0 or month == 0 or s >= SENSOR_NAMES.size():
+					continue
+				var slot := (y - FIRST_YEAR) * 12 + month - 1
+				_sensor_counts[(s * cells + c) * slots + slot] += 1
+				if _sensor_first[s] < 0 or slot < _sensor_first[s]:
+					_sensor_first[s] = slot
+				_sensor_last[s] = maxi(_sensor_last[s], slot)
+	if y >= last_year:
+		_sensor_done = true
+
+
+## True once every year has been counted.
+func sensor_ready() -> bool:
+	return _sensor_done
+
+
+## Whether a sensor has any detections on record by that month (between its first and last).
+func sensor_has_record(sensor: int, year: int, month: int) -> bool:
+	var slot := (year - FIRST_YEAR) * 12 + month - 1
+	return _sensor_first[sensor] >= 0 and slot >= _sensor_first[sensor] and slot <= _sensor_last[sensor]
+
+
+## Raw detections of one sensor in a cell and month. NAN outside the sensor's record.
+func sensor_cell_value(sensor: int, cell: int, year: int, month: int) -> float:
+	if not sensor_has_record(sensor, year, month):
+		return NAN
+	return _sensor_counts[(sensor * cell_count() + cell) * year_count() * 12 + (year - FIRST_YEAR) * 12 + month - 1]
+
+
+## Year x month grid of one sensor's raw detections over an area, shaped like area_grid().
+func sensor_area_grid(sensor: int, cells: PackedInt32Array) -> Array:
+	var slots := year_count() * 12
+	var grid := []
+	for y in range(FIRST_YEAR, last_year + 1):
+		var row := PackedFloat32Array()
+		for m in range(1, 13):
+			if not sensor_has_record(sensor, y, m):
+				row.append(NAN)
+				continue
+			var slot := (y - FIRST_YEAR) * 12 + m - 1
+			var total := 0
+			for c in cells:
+				total += _sensor_counts[(sensor * cell_count() + c) * slots + slot]
+			row.append(total)
+		grid.append(row)
+	return grid
+
+
+## Slot in _cell_lookup for a coordinate: the 0.25 degree cell it falls in.
+static func _lookup_index(lat: float, lon: float) -> int:
+	var li := clampi(int(floor(lat / 0.25)) - 120, 0, LOOKUP_N - 1)   # from 30 N
+	var lo := clampi(int(floor(lon / 0.25)) + 512, 0, LOOKUP_N - 1)   # from 128 W
+	return li * LOOKUP_N + lo
 
 
 static func days_in_month(y: int, m: int) -> int:
