@@ -20,6 +20,7 @@ var doy := PackedInt32Array()
 var frp := PackedInt32Array()
 var sensor := PackedByteArray()
 var hour := PackedByteArray()
+var day_counts := PackedInt32Array()  # detections per day of year (index 1-366), all sensors
 
 
 func load_index() -> bool:
@@ -42,6 +43,8 @@ func load_year(y: int) -> bool:
 	var path := "%s/%d.bin" % [dir, y]
 	if not FileAccess.file_exists(path):
 		year = y
+		day_counts.resize(367)
+		day_counts.fill(0)
 		pos.clear()
 		doy.clear()
 		frp.clear()
@@ -57,12 +60,15 @@ func load_year(y: int) -> bool:
 	frp.resize(n)
 	sensor.resize(n)
 	hour.resize(n)
+	day_counts.resize(367)
+	day_counts.fill(0)
 	var ks := lat_span / 65535.0
 	var kl := lon_span / 65535.0
 	for i in n:
 		var o := 8 + i * 10
 		pos[i] = Mercator.to_world(lat0 + b.decode_u16(o) * ks, lon0 + b.decode_u16(o + 2) * kl)
 		doy[i] = b.decode_u16(o + 4)
+		day_counts[mini(doy[i], 366)] += 1
 		frp[i] = b.decode_u16(o + 6)
 		sensor[i] = b[o + 8]
 		hour[i] = b[o + 9]

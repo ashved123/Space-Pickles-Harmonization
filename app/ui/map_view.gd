@@ -1,5 +1,6 @@
-## Start screen: a pannable, zoomable map (NASA GIBS imagery) with hotspots, fire outlines and the
-## harmonized burning grid, filtered by date, sensor, heat and fire size.
+## Start screen: a pannable, zoomable map of California with hotspots, fire outlines and the
+## harmonized burning grid. The side panel has a month calendar (days shaded by hotspot count),
+## layer toggles and preset filters.
 ## Drag to pan, scroll / pinch to zoom, click a fire or hotspot for details.
 extends Control
 
@@ -19,7 +20,12 @@ const INK_2 := Color("#c3c2b7")
 const INK_3 := Color("#8a897f")
 const MODIS_COLOR := Color("#3987e5")  # categorical slot 1 (dark mode)
 const VIIRS_COLOR := Color("#d95926")  # categorical slot 2 (dark mode)
-const PANEL_W := 330.0
+const PANEL_W := 340.0
+const INNER_W := PANEL_W - 30.0
+const DAY_W := 42.0
+const FRP_STEPS := [0, 10, 50, 100]      # MW
+const SIZE_STEPS := [0, 10, 50, 200]     # km2
+const MONTH_NAMES := ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 const MIN_ZOOM := 5.0
 const MAX_ZOOM := 15.0
 const GIBS_DAILY := "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/{date}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg"
@@ -49,6 +55,8 @@ var _last_loading := -1
 var year := 2018
 var month := 11
 var day := 0
+var cal_month := 11        # month shown in the calendar (month is 0 for "whole year")
+var _last_day := 8         # day to return to when switching back to "single day"
 var sensor_choice := 0     # 0 all, 1 MODIS, 2 VIIRS
 var min_frp := 0
 var min_km2 := 0.0
@@ -78,20 +86,17 @@ var wind: WindLayer = WindLayer.new()
 var _wind_timer := Timer.new()
 var region_bbox := Rect2()   # world rect of California, limits panning
 var hour_label := Label.new()
-var hour_slider := HSlider.new()
+var wind_row := HBoxContainer.new()
+var month_label := Label.new()
+var day_grid := GridContainer.new()
+var cal_note := Label.new()
+var scope_buttons: Array = []
 var vector: VectorLayer = VectorLayer.new()
 var modis_layer: HotspotLayer = HotspotLayer.new()
 var viirs_layer: HotspotLayer = HotspotLayer.new()
 var status := RichTextLabel.new()
 var info := Label.new()
 var date_label := Label.new()
-var year_slider := HSlider.new()
-var month_slider := HSlider.new()
-var day_slider := HSlider.new()
-var frp_slider := HSlider.new()
-var frp_label := Label.new()
-var size_slider := HSlider.new()
-var size_label := Label.new()
 var sim_button := Button.new()
 var font: Font
 
@@ -165,67 +170,102 @@ func _build_panel() -> void:
 	var scroll := ScrollContainer.new()
 	scroll.set_anchors_preset(Control.PRESET_FULL_RECT)
 	scroll.offset_left = 14
-	scroll.offset_right = -10
+	scroll.offset_right = -6
 	scroll.offset_top = 12
 	scroll.offset_bottom = -12
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	bg.add_child(scroll)
 	var box := VBoxContainer.new()
-	box.custom_minimum_size.x = PANEL_W - 40
+	box.custom_minimum_size.x = INNER_W
 	box.add_theme_constant_override("separation", 6)
 	scroll.add_child(box)
 
 	_heading(box, "California fire map", 20)
-	_text(box, "MODIS + VIIRS hotspots, fire events and harmonized burning. Drag to pan, scroll to zoom, click for details.", INK_3)
 
-	_heading(box, "Date", 15)
+	# ----- date: month calendar -----
+	date_label.add_theme_font_size_override("font_size", 16)
 	date_label.add_theme_color_override("font_color", INK)
 	box.add_child(date_label)
-	_text(box, "Year", INK_3)
-	_slider(box, year_slider, 2000, 2026, year, func(v): year = int(v); _clamp_day(); _refresh_data())
-	_text(box, "Month (far left = whole year)", INK_3)
-	_slider(box, month_slider, 0, 12, month, func(v): month = int(v); _clamp_day(); _refresh_data())
-	_text(box, "Day (far left = whole month)", INK_3)
-	_slider(box, day_slider, 0, 31, day, func(v): day = int(v); _clamp_day(); _refresh_data())
+	var nav := HBoxContainer.new()
+	box.add_child(nav)
+	_nav_button(nav, "«", "Previous year", func(): _step_month(-12))
+	_nav_button(nav, "‹", "Previous month", func(): _step_month(-1))
+	month_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	month_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	month_label.add_theme_color_override("font_color", INK)
+	nav.add_child(month_label)
+	_nav_button(nav, "›", "Next month", func(): _step_month(1))
+	_nav_button(nav, "»", "Next year", func(): _step_month(12))
+	var week := GridContainer.new()
+	week.columns = 7
+	week.add_theme_constant_override("h_separation", 2)
+	box.add_child(week)
+	for d in ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]:
+		var l := Label.new()
+		l.text = d
+		l.custom_minimum_size = Vector2(DAY_W, 0)
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		l.add_theme_font_size_override("font_size", 11)
+		l.add_theme_color_override("font_color", INK_3)
+		week.add_child(l)
+	day_grid.columns = 7
+	day_grid.add_theme_constant_override("h_separation", 2)
+	day_grid.add_theme_constant_override("v_separation", 2)
+	box.add_child(day_grid)
+	cal_note.add_theme_font_size_override("font_size", 11)
+	cal_note.add_theme_color_override("font_color", INK_3)
+	cal_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	cal_note.custom_minimum_size.x = INNER_W
+	box.add_child(cal_note)
+	var step := HBoxContainer.new()
+	box.add_child(step)
+	_action_button(step, "‹ Previous day", func(): _step_day(-1))
+	_action_button(step, "Next day ›", func(): _step_day(1))
+	_text(box, "Show", INK_3)
+	scope_buttons = _segmented(box, ["Single day", "Whole month", "Whole year"], _scope(), _set_scope)
 
+	# ----- layers -----
 	_heading(box, "Layers", 15)
-	_check(box, "Hotspots (observed)", show_hotspots, func(on): show_hotspots = on; _refresh_data())
-	_check(box, "Fire event outlines", show_fires, func(on): show_fires = on; _refresh_data())
-	_check(box, "Harmonized burning (25 km)", show_grid, func(on): show_grid = on; _refresh_data())
-	_check(box, "2027 outlook (not a forecast)", show_outlook, func(on): show_outlook = on; _refresh_data())
-
-	_heading(box, "Filters", 15)
-	var sensors := OptionButton.new()
-	for s in ["All sensors", "MODIS only (1 km)", "VIIRS only (375 m)"]:
-		sensors.add_item(s)
-	sensors.select(sensor_choice)
-	sensors.item_selected.connect(func(i): sensor_choice = i; _refresh_data())
-	box.add_child(sensors)
-	frp_label.add_theme_color_override("font_color", INK_2)
-	box.add_child(frp_label)
-	_slider(box, frp_slider, 0, 300, min_frp, func(v): min_frp = int(v); _refresh_data())
-	size_label.add_theme_color_override("font_color", INK_2)
-	box.add_child(size_label)
-	_slider(box, size_slider, 0, 500, min_km2, func(v): min_km2 = v; _refresh_data())
-
-	_heading(box, "Base map", 15)
-	var base := OptionButton.new()
-	for b in BASES:
-		base.add_item(b[0])
-	base.select(base_choice)
-	base.item_selected.connect(func(i): base_choice = i; _apply_view())
-	box.add_child(base)
-	_check(box, "Satellite view that day (clouds, smoke)", show_sat, func(on): show_sat = on; _apply_view())
-
-	_heading(box, "Wind", 15)
-	_check(box, "Wind that day (ERA5, modelled)", show_wind, func(on): show_wind = on; _apply_view())
+	var layers := GridContainer.new()
+	layers.columns = 2
+	layers.add_theme_constant_override("h_separation", 4)
+	layers.add_theme_constant_override("v_separation", 4)
+	box.add_child(layers)
+	_toggle(layers, "Hotspots", "Individual satellite fire detections (observed)", show_hotspots, func(on): show_hotspots = on; _refresh_data())
+	_toggle(layers, "Fire outlines", "Hotspots grouped into fire events", show_fires, func(on): show_fires = on; _refresh_data())
+	_toggle(layers, "Burning grid", "Harmonized MODIS + VIIRS burning per 25 km cell", show_grid, func(on): show_grid = on; _refresh_data())
+	_toggle(layers, "2027 outlook", "Outlook from past patterns, not a forecast of actual fires", show_outlook, func(on): show_outlook = on; _refresh_data())
+	_toggle(layers, "Clouds + smoke", "NASA satellite image for that day, over the base map", show_sat, func(on): show_sat = on; _apply_view())
+	_toggle(layers, "Wind", "Wind that day (ERA5 reanalysis, modelled)", show_wind, func(on): show_wind = on; _apply_view())
+	wind_row.visible = show_wind
+	box.add_child(wind_row)
+	_nav_button(wind_row, "‹", "One hour earlier", func(): wind_hour = (wind_hour + 23) % 24; _apply_view())
+	hour_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hour_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hour_label.add_theme_font_size_override("font_size", 13)
 	hour_label.add_theme_color_override("font_color", INK_2)
-	box.add_child(hour_label)
-	_slider(box, hour_slider, 0, 23, wind_hour, func(v): wind_hour = int(v); _apply_view())
+	wind_row.add_child(hour_label)
+	_nav_button(wind_row, "›", "One hour later", func(): wind_hour = (wind_hour + 1) % 24; _apply_view())
 
+	# ----- filters -----
+	_heading(box, "Filters", 15)
+	_text(box, "Sensor", INK_3)
+	_segmented(box, ["All", "MODIS 1 km", "VIIRS 375 m"], sensor_choice, func(i): sensor_choice = i; _refresh_data())
+	_text(box, "Hotspot heat output (fire radiative power)", INK_3)
+	_segmented(box, ["Any", "10+ MW", "50+ MW", "100+ MW"], FRP_STEPS.find(min_frp), func(i): min_frp = FRP_STEPS[i]; _refresh_data())
+	_text(box, "Fire size (hotspot footprint)", INK_3)
+	_segmented(box, ["Any", "10+ km²", "50+ km²", "200+ km²"], SIZE_STEPS.find(int(min_km2)), func(i): min_km2 = SIZE_STEPS[i]; _refresh_data())
+
+	# ----- base map -----
+	_heading(box, "Base map", 15)
+	_segmented(box, ["Labels", "Aerial", "Topo", "None"], base_choice, func(i): base_choice = i; _apply_view())
+
+	# ----- selection -----
 	_heading(box, "Selected", 15)
 	info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	info.custom_minimum_size.x = PANEL_W - 44
+	info.custom_minimum_size.x = INNER_W
+	info.text = "Click a hotspot or inside a fire outline."
+	info.add_theme_font_size_override("font_size", 13)
 	info.add_theme_color_override("font_color", INK_2)
 	box.add_child(info)
 	sim_button.text = "Open in fire sim"
@@ -252,27 +292,200 @@ func _text(box: Container, t: String, c: Color) -> void:
 	var l := Label.new()
 	l.text = t
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	l.custom_minimum_size.x = PANEL_W - 40
+	l.custom_minimum_size.x = INNER_W
 	l.add_theme_font_size_override("font_size", 12)
 	l.add_theme_color_override("font_color", c)
 	box.add_child(l)
 
 
-func _slider(box: Container, s: HSlider, lo: float, hi: float, v: float, cb: Callable) -> void:
-	s.min_value = lo
-	s.max_value = hi
-	s.step = 1
-	s.value = v
-	s.value_changed.connect(cb)
-	box.add_child(s)
+func _flat(bg: Color, border: Color, width: int = 1) -> StyleBoxFlat:
+	var s := StyleBoxFlat.new()
+	s.bg_color = bg
+	s.border_color = border
+	s.set_border_width_all(width)
+	s.set_corner_radius_all(4)
+	s.content_margin_left = 6
+	s.content_margin_right = 6
+	s.content_margin_top = 5
+	s.content_margin_bottom = 5
+	return s
 
 
-func _check(box: Container, t: String, on: bool, cb: Callable) -> void:
-	var c := CheckBox.new()
-	c.text = t
-	c.button_pressed = on
-	c.toggled.connect(cb)
-	box.add_child(c)
+## Dark when off, light when on (or pressed).
+func _style_toggle(b: Button) -> void:
+	b.add_theme_stylebox_override("normal", _flat(Color("#2b2b29"), Color("#4a4a46")))
+	b.add_theme_stylebox_override("hover", _flat(Color("#383835"), INK_3))
+	b.add_theme_stylebox_override("pressed", _flat(Color("#e8e7e2"), Color("#e8e7e2")))
+	b.add_theme_stylebox_override("hover_pressed", _flat(INK, INK))
+	b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+	b.add_theme_color_override("font_color", INK_2)
+	b.add_theme_color_override("font_hover_color", INK)
+	b.add_theme_color_override("font_pressed_color", SURFACE)
+	b.add_theme_color_override("font_hover_pressed_color", SURFACE)
+	b.add_theme_color_override("font_focus_color", INK_2)
+	b.add_theme_font_size_override("font_size", 13)
+
+
+func _toggle(box: Container, t: String, tip: String, on: bool, cb: Callable) -> void:
+	var b := Button.new()
+	b.text = t
+	b.tooltip_text = tip
+	b.toggle_mode = true
+	b.button_pressed = on
+	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_style_toggle(b)
+	b.toggled.connect(cb)
+	box.add_child(b)
+
+
+## A row of buttons where exactly one is on. Returns the buttons.
+func _segmented(box: Container, labels: Array, selected: int, cb: Callable) -> Array:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 3)
+	box.add_child(row)
+	var group := ButtonGroup.new()
+	var out := []
+	for i in labels.size():
+		var b := Button.new()
+		b.text = labels[i]
+		b.toggle_mode = true
+		b.button_group = group
+		b.button_pressed = i == maxi(selected, 0)
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		_style_toggle(b)
+		b.add_theme_font_size_override("font_size", 12)
+		b.pressed.connect(cb.bind(i))
+		row.add_child(b)
+		out.append(b)
+	return out
+
+
+func _nav_button(box: Container, t: String, tip: String, cb: Callable) -> void:
+	var b := Button.new()
+	b.text = t
+	b.tooltip_text = tip
+	b.custom_minimum_size = Vector2(34, 30)
+	_style_toggle(b)
+	b.add_theme_font_size_override("font_size", 16)
+	b.pressed.connect(cb)
+	box.add_child(b)
+
+
+func _action_button(box: Container, t: String, cb: Callable) -> void:
+	var b := Button.new()
+	b.text = t
+	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_style_toggle(b)
+	b.pressed.connect(cb)
+	box.add_child(b)
+
+
+# ---------- calendar ----------
+
+func _scope() -> int:
+	return 2 if month == 0 else (1 if day == 0 else 0)
+
+
+func _set_scope(i: int) -> void:
+	if i == 2:
+		month = 0
+		day = 0
+	elif i == 1:
+		month = cal_month
+		day = 0
+	else:
+		month = cal_month
+		day = clampi(maxi(day, _last_day), 1, _days_in_month(year, month))
+	_date_changed()
+
+
+func _step_month(n: int) -> void:
+	var k := year * 12 + cal_month - 1 + n
+	k = clampi(k, 2000 * 12 + 10, 2026 * 12 + 11)  # Nov 2000 .. Dec 2026
+	year = k / 12
+	cal_month = k % 12 + 1
+	if month != 0:
+		month = cal_month
+		if day > 0:
+			day = mini(day, _days_in_month(year, month))
+	_date_changed()
+
+
+func _step_day(n: int) -> void:
+	if month == 0 or day == 0:
+		month = cal_month
+		day = clampi(_last_day, 1, _days_in_month(year, month))
+	else:
+		var t := Time.get_unix_time_from_datetime_dict({"year": year, "month": month, "day": day}) + n * 86400
+		var d := Time.get_datetime_dict_from_unix_time(t)
+		if d.year < 2000 or d.year > 2026:
+			return
+		year = d.year
+		month = d.month
+		day = d.day
+		cal_month = month
+	_date_changed()
+
+
+func _pick_day(d: int) -> void:
+	month = cal_month
+	day = d
+	_date_changed()
+
+
+func _date_changed() -> void:
+	if day > 0:
+		_last_day = day
+	for i in scope_buttons.size():
+		scope_buttons[i].set_pressed_no_signal(i == _scope())
+	_refresh_data()
+
+
+## Month grid. Each day is shaded by how many hotspots were detected that day (observed).
+func _rebuild_calendar() -> void:
+	for c in day_grid.get_children():
+		c.queue_free()
+	month_label.text = "%s %d" % [MONTH_NAMES[cal_month - 1], year]
+	hs.load_year(year)
+	var peak := 1
+	for n in hs.day_counts:
+		peak = maxi(peak, n)
+	# Monday-first offset of the 1st of the month.
+	var first := Time.get_datetime_dict_from_datetime_string("%04d-%02d-01" % [year, cal_month], true)
+	var offset: int = (int(first.weekday) + 6) % 7
+	for i in offset:
+		var pad := Control.new()
+		pad.custom_minimum_size = Vector2(DAY_W, 26)
+		day_grid.add_child(pad)
+	var has_record: bool = cal.has_data(year, cal_month)
+	var month_total := 0
+	for d in range(1, _days_in_month(year, cal_month) + 1):
+		var n: int = hs.day_counts[_doy(year, cal_month, d)] if hs.day_counts.size() > 366 else 0
+		month_total += n
+		var b := Button.new()
+		b.text = str(d)
+		b.custom_minimum_size = Vector2(DAY_W, 26)
+		b.tooltip_text = "%d %s %d: %s hotspots detected" % [d, MONTH_NAMES[cal_month - 1], year, _thousands(n)]
+		var shade := Color("#262624") if n == 0 else VectorLayer._ramp(VectorLayer.BLUES, log(1.0 + n) / log(1.0 + peak))
+		var chosen := month == cal_month and (day == d or day == 0)
+		var exact := month == cal_month and day == d
+		# Selected day: a thick ring that contrasts with the cell's own shade.
+		var ring := SURFACE if shade.get_luminance() > 0.45 else INK
+		var border := ring if exact else (INK_3 if chosen else shade)
+		b.add_theme_stylebox_override("normal", _flat(shade, border, 3 if exact else 1))
+		b.add_theme_stylebox_override("hover", _flat(shade.lightened(0.15), INK, 1))
+		b.add_theme_stylebox_override("pressed", _flat(shade, INK, 2))
+		b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+		var ink := SURFACE if shade.get_luminance() > 0.45 else (INK_3 if n == 0 else INK)
+		for c in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
+			b.add_theme_color_override(c, ink)
+		b.add_theme_font_size_override("font_size", 12)
+		b.pressed.connect(_pick_day.bind(d))
+		day_grid.add_child(b)
+	if not has_record:
+		cal_note.text = "No satellite record for this month (the record starts in Nov 2000). Missing data is not zero fire."
+	else:
+		cal_note.text = "Brighter day = more hotspots detected (observed). %s this month. Click a day." % _thousands(month_total)
 
 
 func _style_button(b: Button) -> void:
@@ -301,6 +514,13 @@ func _build_overlay() -> void:
 	back.offset_bottom = -10
 	back.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(back)
+	var zoom_box := VBoxContainer.new()
+	zoom_box.position = Vector2(10, 10)
+	zoom_box.add_theme_constant_override("separation", 3)
+	add_child(zoom_box)
+	_nav_button(zoom_box, "+", "Zoom in", func(): _zoom_at(_map_size() / 2.0, zoom + 1.0))
+	_nav_button(zoom_box, "−", "Zoom out", func(): _zoom_at(_map_size() / 2.0, zoom - 1.0))
+	_nav_button(zoom_box, "CA", "Show the whole state", _show_state)
 	status.bbcode_enabled = true
 	status.fit_content = true
 	status.autowrap_mode = TextServer.AUTOWRAP_OFF
@@ -322,14 +542,6 @@ func _doy(y: int, m: int, d: int) -> int:
 	var t0 := Time.get_unix_time_from_datetime_dict({"year": y, "month": 1, "day": 1})
 	var t := Time.get_unix_time_from_datetime_dict({"year": y, "month": m, "day": d})
 	return int((t - t0) / 86400) + 1
-
-
-func _clamp_day() -> void:
-	if month == 0:
-		day = 0
-	elif day > _days_in_month(year, month):
-		day = _days_in_month(year, month)
-	day_slider.set_value_no_signal(day)
 
 
 func _date_range() -> Vector2i:
@@ -366,14 +578,14 @@ func _imagery_date() -> String:
 
 func _refresh_data() -> void:
 	date_label.text = _date_text()
-	frp_label.text = "Min fire radiative power: %d MW" % min_frp
-	size_label.text = "Min fire event size: %.0f km²" % min_km2
+	_rebuild_calendar()
 	var r := _date_range()
 	var mask := 7 if sensor_choice == 0 else (1 if sensor_choice == 1 else 6)
 
 	shown_idx_modis = PackedInt32Array()
 	shown_idx_viirs = PackedInt32Array()
-	if show_hotspots and hs.load_year(year):
+	hs.load_year(year)
+	if show_hotspots:
 		var idx := hs.filter(r.x, r.y, mask, min_frp)
 		for i in idx:
 			if hs.sensor[i] == 0:
@@ -475,7 +687,8 @@ func _apply_view() -> void:
 	wind.visible = show_wind
 	wind.map_size = ms
 	wind.hour = wind_hour
-	hour_label.text = "Hour: %02d:00 UTC (%02d:00 Pacific standard time)" % [wind_hour, (wind_hour + 16) % 24]
+	wind_row.visible = show_wind
+	hour_label.text = "%02d:00 Pacific (%02d:00 UTC)" % [(wind_hour + 16) % 24, wind_hour]
 	if show_wind:
 		_wind_date = img_date
 		_wind_timer.start()  # fetch once the date stops changing
@@ -489,6 +702,12 @@ func _apply_view() -> void:
 	_save_state()
 	_update_status()
 	queue_redraw()
+
+
+func _show_state() -> void:
+	zoom = 6.0
+	center = Mercator.to_world(37.3, -119.4)
+	_apply_view()
 
 
 func _zoom_at(screen_pos: Vector2, new_zoom: float) -> void:
@@ -663,7 +882,7 @@ func _save_state() -> void:
 	AppState.map_state = {"zoom": zoom, "center": center, "year": year, "month": month, "day": day,
 		"sensor": sensor_choice, "min_frp": min_frp, "min_km2": min_km2, "base": base_choice,
 		"hotspots": show_hotspots, "fires": show_fires, "grid": show_grid, "outlook": show_outlook,
-		"sat": show_sat, "wind": show_wind, "hour": wind_hour}
+		"cal_month": cal_month, "sat": show_sat, "wind": show_wind, "hour": wind_hour}
 
 
 func _restore_state() -> void:
@@ -675,6 +894,7 @@ func _restore_state() -> void:
 	year = s.year
 	month = s.month
 	day = s.day
+	cal_month = month if month > 0 else s.get("cal_month", 8)
 	sensor_choice = s.sensor
 	min_frp = s.min_frp
 	min_km2 = s.min_km2
